@@ -1,99 +1,121 @@
-# Astro Theme Pure
+# Personal Website
 
-English | [简体中文](./README-zh-CN.md)
+Built on [Astro Theme Pure](https://github.com/cworld1/astro-theme-pure)
 
-A simple, fast and powerful blog & document theme built by Astro.
+A fast, elegant blog and documentation site with comprehensive Obsidian vault integration and enhanced markdown support.
 
-[![GitHub deployments](https://img.shields.io/github/deployments/cworld1/astro-theme-pure/production?style=flat&logo=vercel&label=vercel)](https://astro-pure.js.org/)
-[![NPM Version](https://img.shields.io/npm/v/astro-pure?logo=npm&style=flat)](https://www.npmjs.com/package/astro-pure)
-[![GitHub Release](https://img.shields.io/github/v/release/cworld1/astro-theme-pure?include_prereleases&style=flat&label=template)](https://github.com/cworld1/astro-theme-pure/releases)
-[![GitHub License](https://img.shields.io/github/license/cworld1/astro-theme-pure?style=flat)](https://github.com/cworld1/astro-theme-pure/blob/main/LICENSE)
+[![Built with Astro](https://img.shields.io/badge/built%20with-Astro-0C1222?style=flat&logo=astro)](https://astro.build)
 
-![image](./.github/assets/header.webp)
-![image](./.github/assets/body.webp)
+## Overview
 
-> [!NOTE]
-> Known issues: 1. Header & customize options is still under development (template exposed still). 2. Theme template v4.0.5^ UnoCSS preset changed to PresetMini. If there's any problem, please report as issue.
+This is a personal website instance built on top of the [Astro Theme Pure](https://github.com/cworld1/astro-theme-pure) template with customizations for:
 
-## Introduction
+- **Enhanced Markdown**: Single newlines create line breaks (Obsidian-style behavior) with remark-breaks plugin
+- **Developer Friendly**: Modern setup with TypeScript, UnoCSS, and extensive markdown plugins
+- **Production Ready**: Deployed on Vercel with SSR support
+- **Content-First**: Markdown and MDX with KaTeX math support, callouts, and custom plugins
 
-Checkout [Demo Site →](https://astro-pure.js.org/)
+Upcoming:
+~~- **Obsidian Vault Integration**: Full support for Obsidian markdown vaults with folder notes, wikilinks, proper line break handling, callouts, and navigation~~
+## Features
 
-### :fire: Features
+- ⚡ **Performance**: Lightning-fast site generation and delivery
+- 🎨 **Clean Design**: Minimal, distraction-free interface
+- 📱 **Responsive**: Mobile-first responsive design
+- 🔍 **Full-Site Search**: Built-in search with [Pagefind](https://pagefind.app/)
+- 📚 **Documentation Support**: Dedicated vault system for organizing knowledge
+- 🪲 **Obsidian Compatibility**: Render Obsidian vaults with folder notes and wikilinks
+- 📝 **Markdown + MDX**: Write with Markdown or interactive MDX components
+- 🧮 **Math Support**: KaTeX support for mathematical expressions
+- 🔗 **SEO Optimized**: Sitemap, RSS feed, Open Graph generation
+- 📖 **Table of Contents**: Auto-generated TOC with scroll-spy
+- 🖼️ **Image Optimization**: Fast image loading with zoom lightbox
+- 🌙 **Dark Mode**: Built-in theme switching
 
-- [x] :rocket: Fast & high performance
-- [x] :star: Simple & clean design
-- [x] :iphone: Responsive design
-- [x] :mag: Full-site search built with [pagefind](https://pagefind.app/)
-- [x] :world_map: Sitemap & RSS feed
-- [x] :spider_web: SEO-friendly
-- [x] :book: TOC (table of contents)
-- [x] :framed_picture: Dynamic open graph generation for posts
-- [x] :framed_picture: Mediumzoom lightbox for images
+## Built-in Components
 
-### :package: Components
+Basic components: `Aside`, `Tabs`, `Timeline`, `Steps`, `Spoiler`, `Callout`
 
-Theme includes a lot of components, which can not only be used in the theme, but also in other astro projects.
-
-> For other astro projects, UnoCSS is required. See [Package README](https://github.com/cworld1/astro-theme-pure/blob/main/packages/pure/README.md#use-with-common-astro-project) for more details.
-
-- Basic components: `Aside`, `Tabs`, `Timeline`, `Steps`, `Spoiler`...
-- Advanced components: `GithubCard`, `LinkPreview`, `Quote`, `QRCode`...
-
-### :white_check_mark: Lighthouse score
-
-[![lighthouse-score](./.github/assets/lighthouse-score.png)](https://pagespeed.web.dev/analysis/https-cworld-top/o229zrt5o4?form_factor=mobile&hl=en)
+Advanced components: `GithubCard`, `LinkPreview`, `Quote`, `QRCode`, `Vault Navigation`
 
 ## Documentation
 
-[Docs](https://astro-pure.js.org/docs) | [Showcase](https://github.com/cworld1/astro-theme-pure/issues/10)
+[Full Docs](https://astro-pure.js.org/docs)
 
-## Package
+## Key Customizations
 
-See [astro-theme-pure](https://www.npmjs.com/package/astro-pure) on npm.
+Enhancements built on top of Astro Theme Pure base:
 
-## Local development
+- **Folder Notes System**: Two-pass algorithm for proper Obsidian folder note handling in vault navigation
+- **Smart Link Visibility**: Content links inside headings are visible by default (with underline), while anchor hash links remain hidden until hover
+- **Line Break Handling**: Single newlines create `<br>` tags via `remark-breaks` plugin for Obsidian compatibility
+- **Obsidian Callouts**: Full support for Obsidian-style callouts via `rehype-callouts` plugin
+- **Improved Vault Tree**: Folders with only index docs render as simple links without expand buttons
+- **Safe Navigation**: Error handling and path normalization for consistent folder/document matching
 
-Environment requirements:
+## Project Structure
 
-- [Nodejs](https://nodejs.org/): 18.0.0+
-
-Clone the repository:
-
-```shell
-git clone https://github.com/cworld1/astro-theme-pure.git
-cd astro-theme-pure
+```
+├── src/
+│   ├── content/          # Blog posts and vault documents
+│   │   ├── blog/         # Blog collection
+│   │   └── vault/        # Obsidian vault (organized by folders)
+│   ├── components/       # Reusable Astro components
+│   ├── layouts/          # Page layouts
+│   ├── pages/            # Route pages
+│   ├── plugins/          # Markdown/Rehype plugins
+│   └── utils/            # Utilities (vault navigation, etc)
+├── packages/pure/        # Reusable component package
+└── public/               # Static assets
 ```
 
-Useful commands:
+## Configuration
+
+Main configuration files:
+
+- `astro.config.ts` - Astro configuration with markdown and integrations setup
+- `src/site.config.ts` - Site metadata and theme options
+- `uno.config.ts` - UnoCSS typography and theme colors
+- `tsconfig.json` - TypeScript configuration
+
+## Tech Stack
+
+Built on [Astro Theme Pure](https://github.com/cworld1/astro-theme-pure) with:
+
+- **Framework**: [Astro](https://astro.build)
+- **Styling**: [UnoCSS](https://unocss.dev) with @unocss/preset-typography
+- **Markdown Processing**: 
+  - remark-math, remark-breaks
+  - rehype-katex, rehype-callouts
+  - Custom rehype plugins for heading links and code blocks
+- **Search**: [Pagefind](https://pagefind.app/)
+- **Deployment**: [Cloudflare](https://cloudflare.com)
+
+## Development
 
 ```shell
-# Install dependencies
-bun install
-# Start the dev server
+# Start dev server with hot reload
 bun dev
-# Build the project
-bun run build
-# Preview (after the build)
+
+# Build for production
+bun build
+
+# Preview production build
 bun preview
-# Create a new post
+
+# Create new blog post
 bun pure new
+
+# Check for errors
+bun check
+
+# Format code
+bun format
+
+# Lint and fix code
+bun lint
 ```
 
-## Contributions
+## Base Theme
 
-To spend more time coding and less time fiddling with whitespace, this project uses code conventions and styles to encourage consistency. Code with a consistent style is easier (and less error-prone!) to review, maintain, and understand.
-
-## Thanks
-
-- [Astro Cactus](https://github.com/chrismwilliams/astro-theme-cactus)
-- [Astro Resume](https://github.com/srleom/astro-theme-resume)
-- [Starlight](https://github.com/withastro/starlight)
-
-Other third party references are on [Docs#Contributions](https://astro-pure.js.org/docs/advanced/thanks). Appreciate for all open source libraries.
-
-## License
-
-This project is licensed under the Apache 2.0 License.
-
-[![Star History Chart](https://api.star-history.com/svg?repos=cworld1/astro-theme-pure&type=Date)](https://star-history.com/#cworld1/astro-theme-pure&Date)
+This site is built on [Astro Theme Pure](https://github.com/cworld1/astro-theme-pure) - an excellent minimal blog and documentation theme. The base theme itself was inspired by:

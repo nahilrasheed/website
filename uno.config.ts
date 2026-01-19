@@ -44,6 +44,13 @@ const typographyConfig: TypographyOptions = {
       opacity: '0',
       'user-select': 'none'
     },
+    // Make content links inside headings always visible
+    'h1>a:not(.anchor),h2>a:not(.anchor),h3>a:not(.anchor),h4>a:not(.anchor),h5>a:not(.anchor),h6>a:not(.anchor)': {
+      opacity: '1',
+      color: 'hsl(var(--primary))',
+      'text-decoration': 'underline',
+      'user-select': 'auto'
+    },
     'h1>a:focus,h2>a:focus,h3>a:focus,h4>a:focus,h5>a:focus,h6>a:focus': {
       opacity: 1
     },
