@@ -1,0 +1,70 @@
+---
+import type { HTMLTag, Polymorphic } from 'astro/types'
+import { Image } from 'astro:assets'
+
+import { cn } from 'astro-pure/utils'
+
+type Props<Tag extends HTMLTag> = Polymorphic<{ as: Tag }> & {
+  heading?: string
+  subheading?: string
+  date?: string
+  location?: string
+  imagePath?: string
+  altText?: string
+  isLCP?: boolean
+  class?: string
+}
+
+const {
+  as: Tag = 'div',
+  class: className,
+  href,
+  heading,
+  subheading,
+  date,
+  location,
+  imagePath,
+  altText,
+  isLCP = false
+} = Astro.props
+
+let image: any = null
+if (imagePath) {
+  const images = import.meta.glob<{ default: any }>(
+    '/src/assets/**/*.{jpeg,jpg,png,gif,avif,webp}'
+  )
+  const imageModule = await images[imagePath]?.()
+  image = imageModule?.default
+}
+---
+
+<Tag
+  class={cn(
+    'not-prose block relative rounded-2xl border border-border px-5 py-3',
+    href && 'transition-all hover:shadow-sm hover:bg-muted',
+    className
+  )}
+  href={href}
+  target={href ? '_blank' : undefined}
+  rel={href ? 'noopener noreferrer' : undefined}
+>
+  {image && (
+    <Image
+      src={image}
+      widths={[189, 280, 360]}
+      sizes='(max-width: 768px) 189px, (max-width: 1200px) 240px, 240px'
+      alt={altText ?? heading}
+      class='absolute end-2 top-2 z-0 h-[78%] w-auto max-w-[240px] object-contain object-center opacity-40'
+      priority={isLCP}
+    />
+  )}
+  <div class='flex flex-col gap-y-1.5'>
+    <div class='flex flex-col gap-y-0.5'>
+      <h2 class='text-lg font-medium'>{heading}</h2>
+      {subheading && <p class='text-muted-foreground'>{subheading}</p>}
+      {date && <p class='text-muted-foreground'>{date}</p>}
+      {location && <p class='text-muted-foreground'>{location}</p>}
+    </div>
+    <slot />
+  </div>
+</Tag>
