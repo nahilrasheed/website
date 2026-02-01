@@ -24,22 +24,25 @@
   "dependencies": {
     "@astrojs/check": "^0.9.6",
     "@astrojs/rss": "4.0.15",
-    "astro": "5.16.11",
+    "@flowershow/remark-wiki-link": "^3.3.1",
+    "astro": "5.17.1",
     "astro-pure": "1.4.0",
-    "katex": "^0.16.27",
+    "katex": "^0.16.28",
     "rehype-callouts": "^2.1.2",
     "rehype-katex": "^7.0.1",
     "remark-breaks": "^4.0.0",
     "remark-math": "^6.0.0",
     "sharp": "^0.34.5",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "unist-util-visit": "^5.1.0"
   },
   "devDependencies": {
     "@ianvs/prettier-plugin-sort-imports": "^4.7.0",
-    "@typescript-eslint/parser": "^8.53.0",
+    "@typescript-eslint/parser": "^8.54.0",
     "eslint": "^9.39.2",
     "eslint-plugin-astro": "^1.5.0",
-    "prettier": "^3.8.0",
+    "glob": "^13.0.0",
+    "prettier": "^3.8.1",
     "prettier-plugin-astro": "^0.14.1"
   }
 }

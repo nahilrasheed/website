@@ -1,0 +1,210 @@
+---
+import { getVaultTree } from '@/utils/vault'
+import { cn } from 'astro-pure/utils'
+import type { VaultNode } from '@/utils/vault'
+
+interface Props {
+  currentSlug?: string
+  node?: VaultNode
+  level?: number
+  title?: string
+  class?: string
+}
+
+const { currentSlug, node, level = 0, title, class: className } = Astro.props
+
+// If no node is passed, we are at the root level so we fetch the tree
+const tree = !node ? await getVaultTree() : null
+
+const isChildActive = (n: VaultNode): boolean => {
+  if (n.slug === currentSlug) return true
+  return n.children.some(isChildActive)
+}
+
+const isActive = node?.slug === currentSlug
+const hasChildren = (node?.children.length ?? 0) > 0
+const isOpen = hasChildren && (isActive || (node && isChildActive(node)))
+---
+
+{
+  !node ? (
+    <vault-tree class={cn('block text-sm font-sans select-none', className)}>
+      <div class={cn('flex items-center mb-2 px-2', title ? 'justify-between' : 'justify-end')}>
+        {title && (
+          <div class='font-semibold text-foreground flex items-center gap-2'>
+            <svg
+              xmlns='http://www.w3.org/2000/svg'
+              width='16'
+              height='16'
+              viewBox='0 0 24 24'
+              fill='none'
+              stroke='currentColor'
+              stroke-width='2'
+              stroke-linecap='round'
+              stroke-linejoin='round'
+              class='lucide lucide-library'
+            >
+              <path d='m16 6 4 14' />
+              <path d='M12 6v14' />
+              <path d='M8 8v12' />
+              <path d='M4 4v16' />
+            </svg>
+            {title}
+          </div>
+        )}
+        <button
+          type='button'
+          class='toggle-all text-muted-foreground hover:text-foreground transition-colors p-1 rounded-md hover:bg-muted'
+          aria-label='Expand all'
+          title='Expand all'
+        >
+          <svg
+            class='icon-expand'
+            xmlns='http://www.w3.org/2000/svg'
+            width='16'
+            height='16'
+            viewBox='0 0 24 24'
+            fill='none'
+            stroke='currentColor'
+            stroke-width='2'
+            stroke-linecap='round'
+            stroke-linejoin='round'
+          >
+            <path d='m7 15 5 5 5-5' />
+            <path d='m7 9 5 5 5-5' />
+          </svg>
+          <svg
+            class='icon-collapse hidden'
+            xmlns='http://www.w3.org/2000/svg'
+            width='16'
+            height='16'
+            viewBox='0 0 24 24'
+            fill='none'
+            stroke='currentColor'
+            stroke-width='2'
+            stroke-linecap='round'
+            stroke-linejoin='round'
+          >
+            <path d='m7 15 5-5 5 5' />
+            <path d='m7 9 5-5 5 5' />
+          </svg>
+        </button>
+      </div>
+      <ul class='space-y-0.5'>
+        {tree?.map((rootNode) => (
+          <Astro.self node={rootNode} {currentSlug} level={level + 1} />
+        ))}
+      </ul>
+
+      <script>
+        class VaultTree extends HTMLElement {
+          constructor() {
+            super()
+            const btn = this.querySelector('.toggle-all')
+            const expandIcon = this.querySelector('.icon-expand')
+            const collapseIcon = this.querySelector('.icon-collapse')
+
+            const updateState = () => {
+              const details = Array.from(this.querySelectorAll('details'))
+              const anyOpen = details.some((el) => el.open)
+
+              if (anyOpen) {
+                // State: Some are open -> Show Collapse Button
+                btn?.setAttribute('aria-label', 'Collapse all')
+                btn?.setAttribute('title', 'Collapse all')
+                expandIcon?.classList.add('hidden')
+                collapseIcon?.classList.remove('hidden')
+              } else {
+                // State: All closed -> Show Expand Button
+                btn?.setAttribute('aria-label', 'Expand all')
+                btn?.setAttribute('title', 'Expand all')
+                expandIcon?.classList.remove('hidden')
+                collapseIcon?.classList.add('hidden')
+              }
+            }
+
+            // Initial state check
+            updateState()
+
+            // Listen for user interactions with the button
+            btn?.addEventListener('click', () => {
+              const details = this.querySelectorAll('details')
+              const anyOpen = Array.from(details).some((el) => el.open)
+
+              if (anyOpen) {
+                // Collapse all
+                details.forEach((el) => (el.open = false))
+              } else {
+                // Expand all
+                details.forEach((el) => (el.open = true))
+              }
+              updateState()
+            })
+
+            // Listen for changes in any details element to update button state
+            this.addEventListener('toggle', updateState, { capture: true })
+          }
+        }
+
+        if (!customElements.get('vault-tree')) {
+          customElements.define('vault-tree', VaultTree)
+        }
+      </script>
+    </vault-tree>
+  ) : (
+    <li class='my-0.5'>
+      {hasChildren ? (
+        <details open={isOpen} class='group/details'>
+          <summary class='flex items-center gap-1 cursor-pointer list-none py-1 text-sm text-muted-foreground hover:text-foreground transition-colors'>
+            {/* Arrow Icon */}
+            <svg
+              xmlns='http://www.w3.org/2000/svg'
+              width='14'
+              height='14'
+              viewBox='0 0 24 24'
+              fill='none'
+              stroke='currentColor'
+              stroke-width='2'
+              stroke-linecap='round'
+              stroke-linejoin='round'
+              class='shrink-0 transition-transform duration-200 group-open/details:rotate-90 text-muted-foreground/50'
+            >
+              <path d='m9 18 6-6-6-6' />
+            </svg>
+
+            {node.slug ? (
+              <a
+                href={`/vault/${node.slug}`}
+                class={cn(
+                  'flex-1 truncate underline decoration-dotted underline-offset-4 hover:decoration-solid',
+                  isActive && 'text-primary font-medium text-foreground decoration-solid'
+                )}
+              >
+                {node.title}
+              </a>
+            ) : (
+              <span class='flex-1 truncate font-medium'>{node.title}</span>
+            )}
+          </summary>
+          <ul class='ml-[0.6rem] pl-2 border-l border-border/40 space-y-0.5'>
+            {node.children.map((child) => (
+              <Astro.self node={child} {currentSlug} level={level + 1} />
+            ))}
+          </ul>
+        </details>
+      ) : (
+        <div class='flex items-center py-1 gap-2'>
+          <a
+            href={node.slug ? `/vault/${node.slug}` : '#'}
+            class={cn(
+              'flex-1 truncate ml-4 text-sm text-muted-foreground hover:text-foreground transition-colors',
+              isActive && 'text-primary font-medium text-foreground'
+            )}
+          >
+            {node.title}
+          </a>
+        </div>
+      )}
+    </li>
+  )
+}

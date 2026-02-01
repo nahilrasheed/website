@@ -5,10 +5,32 @@ import rehypeKatex from 'rehype-katex'
 import rehypeCallouts from 'rehype-callouts'
 import remarkMath from 'remark-math'
 import remarkBreaks from 'remark-breaks'
-
+import remarkWikiLink from '@flowershow/remark-wiki-link'
+import { globSync } from 'glob'
 
 // Local integrations
 import rehypeAutolinkHeadings from './src/plugins/rehype-auto-link-headings.ts'
+import { remarkNormalizeLinks } from './src/plugins/remark-normalize-links.ts'
+
+const vaultFiles = globSync('./src/content/vault/**/*.{md,mdx,jpg,jpeg,png,webp,gif,svg}')
+const contentFiles = vaultFiles.map((f) => f.replace(/\\/g, '/'))
+
+const permalinks = Object.fromEntries(
+  contentFiles.map((file) => {
+    // Use /vault/ prefix for markdown paths
+    const relativePath = file.replace(/^src\/content\/vault\//, '')
+    if (file.match(/\.(md|mdx)$/)) {
+      const slug = relativePath
+        .replace(/\.(md|mdx)$/, '')
+        .split('/')
+        .map((part) => part.toLowerCase().replace(/\s+/g, '-').replace(/--+/g, '-'))
+        .join('/')
+      return [file, `/vault/${slug}`]
+    }
+    // For images/assets, use the dynamic vault attachment route
+    return [file, `/vault/${relativePath}`] 
+  })
+)
 // Shiki
 import {
   addCollapse,
@@ -56,7 +78,19 @@ export default defineConfig({
 
   // [Markdown]
   markdown: {
-    remarkPlugins: [remarkMath, remarkBreaks],
+    remarkPlugins: [
+      remarkMath,
+      remarkBreaks,
+      remarkNormalizeLinks,
+      [
+        remarkWikiLink,
+        {
+          format: 'shortestPossible',
+          files: contentFiles,
+          permalinks,
+        }
+      ]
+    ],
     rehypePlugins: [
       [rehypeKatex, {}],
       rehypeHeadingIds,
