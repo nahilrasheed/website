@@ -1,6 +1,7 @@
 ---
 import { Footer, Header, ThemeProvider } from 'astro-pure/components/basic'
 import type { SiteMeta } from 'astro-pure/types'
+import { cn } from 'astro-pure/utils'
 import BaseHead from '@/components/BaseHead.astro'
 import config from '@/site-config'
 
@@ -12,11 +13,13 @@ import '@/assets/styles/app.css'
 interface Props {
   meta: SiteMeta
   highlightColor?: string
+  wide?: boolean
 }
 
 const {
   meta: { articleDate, description = config.description, ogImage, title },
   highlightColor,
+  wide = false,
   ...props
 } = Astro.props
 ---
@@ -39,10 +42,10 @@ const {
     }
     <div
       id='main-container'
-      class='w-full max-w-[70rem] min-h-[100dvh] flex flex-col justify-between'
+      class='w-full max-w-[90rem] min-h-[100dvh] flex flex-col justify-between'
     >
       <Header />
-      <div class='flex-1 w-full'>
+      <div class={cn('flex-1 w-full mx-auto', wide ? '' : 'max-w-[70rem]')}>
         <slot />
       </div>
       <Footer />

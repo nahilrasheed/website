@@ -40,4 +40,21 @@ const blog = defineCollection({
     })
 })
 
-export const collections = { blog }
+const vault = defineCollection({
+  loader: glob({ base: './src/content/vault', pattern: '**/*.{md,mdx}' }),
+  schema: ({ image }) =>
+    z.object({
+      title: z.string().optional(),
+      description: z.string().optional(),
+      publishDate: z.coerce.date().optional(),
+      updatedDate: z.coerce.date().optional(),
+      publish: z.boolean().default(true).optional(),
+      tags: z.array(z.string()).default([]),
+      permalink: z.string().optional(),
+      image: image().optional(),
+      cover: image().optional(),
+      order: z.number().default(999)
+    })
+})
+
+export const collections = { blog, vault }
