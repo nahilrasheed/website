@@ -1,3 +1,6 @@
+/* Obsidian callouts */
+@import 'rehype-callouts/theme/obsidian';
+
 /* Theme */
 :root {
   /* Primary */

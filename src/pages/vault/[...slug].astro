@@ -1,0 +1,69 @@
+---
+import { render } from 'astro:content'
+import type { CollectionEntry } from 'astro:content'
+
+import { MediumZoom } from 'astro-pure/advanced'
+import VaultLayout from '@/layouts/VaultLayout.astro'
+import { normalizeVaultSlug, getEnrichedVaultCollection, getVaultFlatList } from '@/utils/vault'
+
+export const prerender = true
+
+export async function getStaticPaths() {
+  const vault = await getEnrichedVaultCollection()
+  return vault.map((entry) => {
+    const slug = normalizeVaultSlug(entry.id)
+    return {
+      params: { slug },
+      props: { entry, slug }
+    }
+  })
+}
+
+interface Props {
+  entry: CollectionEntry<'vault'>
+  slug: string
+}
+
+const { entry, slug } = Astro.props
+const { Content, headings, remarkPluginFrontmatter } = await render(entry)
+const { title, description, publishDate } = entry.data
+
+const displayTitle = title!
+const editPath = `https://github.com/nahilrasheed/website/edit/main/src/content/vault/${entry.id}`
+
+// Pagination
+const flatList = await getVaultFlatList()
+const currentIndex = flatList.findIndex((item) => item.slug === slug)
+const prev = flatList[currentIndex - 1]
+const next = flatList[currentIndex + 1]
+
+const paginationProps = {
+  ...(prev && {
+    prev: {
+      data: { title: prev.title },
+      link: `/vault/${prev.slug}`
+    }
+  }),
+  ...(next && {
+    next: {
+      data: { title: next.title },
+      link: `/vault/${next.slug}`
+    }
+  })
+}
+---
+
+<VaultLayout 
+  meta={{ title: displayTitle, description: description ?? displayTitle, articleDate: publishDate?.toISOString() }} 
+  {headings} 
+  currentSlug={slug}
+  entry={entry}
+  remarkPluginFrontmatter={remarkPluginFrontmatter}
+  paginationProps={paginationProps}
+  editPath={editPath}
+>
+
+  <Content />
+
+</VaultLayout>
+<MediumZoom />
