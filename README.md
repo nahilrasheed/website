@@ -2,64 +2,157 @@
 
 Built on [Astro Theme Pure](https://github.com/cworld1/astro-theme-pure)
 
-A fast, elegant blog and documentation site with comprehensive Obsidian vault integration and enhanced markdown support.
+<div align="center">
+  <img src="https://img.shields.io/badge/built%20with-Astro-0C1222?style=flat&logo=astro" alt="Built with Astro">
+</div>
 
-[![Built with Astro](https://img.shields.io/badge/built%20with-Astro-0C1222?style=flat&logo=astro)](https://astro.build)
+## 🎨 About
 
-## Overview
+A fast, elegant personal website combining **blog** and **knowledge vault** - built to work seamlessly with Obsidian notes while maintaining clean URLs and beautiful typography.
 
-This is a personal website instance built on top of the [Astro Theme Pure](https://github.com/cworld1/astro-theme-pure) template with customizations for:
+### ✨ Core Features
 
-- **Enhanced Markdown**: Single newlines create line breaks (Obsidian-style behavior) with remark-breaks plugin
-- **Developer Friendly**: Modern setup with TypeScript, UnoCSS, and extensive markdown plugins
-- **Production Ready**: Deployed on Vercel with SSR support
-- **Content-First**: Markdown and MDX with KaTeX math support, callouts, and custom plugins
+#### 📚 Obsidian Vault Integration
+- **Wikilinks Support**: Full support via `@flowershow/remark-wiki-link` with proper permalink resolution
+- **Title Preservation**: File system mapping preserves original casing/symbols
+- **Folder Notes**: Support for index.md/README.md patterns
+- **Auto-Generated Titles**: Automatic title generation from filenames with symbol handling
 
-Upcoming:
-~~- **Obsidian Vault Integration**: Full support for Obsidian markdown vaults with folder notes, wikilinks, proper line break handling, callouts, and navigation~~
-## Features
+#### 🌿 Interactive Vault Dashboard
+- **Responsive Grid Layout**: Card-based interface with smooth animations
+- **Smart Navigation**: Auto-closes other folders when opening one for cleaner UX
+- **Unified Tree Component**: Recursive `VaultTree.astro` component for both sidebar and dashboard
+- **Active State Tracking**: Highlights current page in navigation
 
-- ⚡ **Performance**: Lightning-fast site generation and delivery
-- 🎨 **Clean Design**: Minimal, distraction-free interface
-- 📱 **Responsive**: Mobile-first responsive design
-- 🔍 **Full-Site Search**: Built-in search with [Pagefind](https://pagefind.app/)
-- 📚 **Documentation Support**: Dedicated vault system for organizing knowledge
-- 🪲 **Obsidian Compatibility**: Render Obsidian vaults with folder notes and wikilinks
-- 📝 **Markdown + MDX**: Write with Markdown or interactive MDX components
-- 🧮 **Math Support**: KaTeX support for mathematical expressions
-- 🔗 **SEO Optimized**: Sitemap, RSS feed, Open Graph generation
-- 📖 **Table of Contents**: Auto-generated TOC with scroll-spy
-- 🖼️ **Image Optimization**: Fast image loading with zoom lightbox
-- 🌙 **Dark Mode**: Built-in theme switching
+#### 🔍 Full-Site Search
+- **Pagefind Integration**: Fast, efficient search across all content
+- **Zero-JS Until Needed**: Search assets only loaded when activated
 
-## Built-in Components
+#### 📝 Enhanced Markdown
+- **Obsidian Compatibility**: Single newlines create line breaks via `remark-breaks`
+- **Math Support**: KaTeX rendering for mathematical expressions
+- **Callouts**: Full support for Obsidian-style callouts via `rehype-callouts`
+- **Code Blocks**: Custom transformers with syntax highlighting, copy button, and collapse
 
-Basic components: `Aside`, `Tabs`, `Timeline`, `Steps`, `Spoiler`, `Callout`
+#### 🎨 UI Optimization
+- **Clean Design**: Minimal, distraction-free interface with custom typography
+- **Dark Mode**: Built-in theme switching
+- **Responsive**: Mobile-first design adapted for all devices
+- **Image Optimization**: Fast loading with optional zoom lightbox
 
-Advanced components: `GithubCard`, `LinkPreview`, `Quote`, `QRCode`, `Vault Navigation`
+---
 
-## Documentation
+## 🚀 Quick Start
 
-[Full Docs](https://astro-pure.js.org/docs)
+### Requirements
 
-## Key Customizations
+- [Node.js](https://nodejs.org/): 18.0.0+
+- [Bun](https://bun.sh/) (recommended) or npm/pnpm
 
-Enhancements built on top of Astro Theme Pure base:
+### Installation
 
-- **Folder Notes System**: Two-pass algorithm for proper Obsidian folder note handling in vault navigation
-- **Smart Link Visibility**: Content links inside headings are visible by default (with underline), while anchor hash links remain hidden until hover
-- **Line Break Handling**: Single newlines create `<br>` tags via `remark-breaks` plugin for Obsidian compatibility
-- **Obsidian Callouts**: Full support for Obsidian-style callouts via `rehype-callouts` plugin
-- **Improved Vault Tree**: Folders with only index docs render as simple links without expand buttons
-- **Safe Navigation**: Error handling and path normalization for consistent folder/document matching
+```shell
+# Clone repository
+git clone https://github.com/nahilrasheed/website
+cd website
 
-## Project Structure
+# Install dependencies
+bun install
+```
+
+```shell
+# Start dev server (localhost:4321)
+bun dev
+
+# Build for production
+bun build
+
+# Preview production build
+bun preview
+```
+
+### Maintenance
+
+```shell
+# Create new blog post with wizard
+bun pure new
+
+# Run type checks
+bun check
+
+# Format code with Prettier
+bun format
+
+# Lint and fix code
+bun lint
+```
+
+---
+
+## 📝 Usage Guide
+
+### Creating Content
+
+#### Blog Posts
+Add `.md` or `.mdx` files to `src/content/blog/` with required frontmatter:
+```yaml
+---
+title: "Your Post Title"
+description: "Brief description"
+publishDate: 2024-01-01
+tags: ["tag1", "tag2"]
+---
+```
+
+#### Vault Documents
+Add files to `src/content/vault/` - organized by folders:
+- **Optional frontmatter** - titles auto-generated from filenames
+- **Wikilinks** - Use `[[Note Name]]` to link between notes
+- **Folder notes** - Create `index.md` or `README.md` for folder descriptions
+
+### Using Wikilinks
+
+```markdown
+<!-- Basic wikilink -->
+[[Other Note]]
+
+<!-- Wikilink with custom text -->
+[[Other Note|Custom Display Text]]
+
+<!-- Nested paths work automatically -->
+[[Folder/Subfolder/Note]]
+```
+
+---
+
+## ⚙️ Configuration
+
+### Main Configuration Files
+
+- **`astro.config.ts`** - Framework config, markdown plugins, integrations
+- **`src/site.config.ts`** - Site metadata, theme options, header/footer
+- **`uno.config.ts`** - Typography and theme colors
+- **`tsconfig.json`** - TypeScript configuration
+
+### Key Settings
+
+Edit `src/site.config.ts` to customize:
+- Site title, description, author
+- Social links
+- Header navigation menu
+- Footer links and credits
+- Blog page size
+- Search settings
+
+---
+
+## 📚 Project Structure
 
 ```
 ├── src/
-│   ├── content/          # Blog posts and vault documents
-│   │   ├── blog/         # Blog collection
-│   │   └── vault/        # Obsidian vault (organized by folders)
+│   ├── content/          # Content collections
+│   │   ├── blog/         # Blog posts
+│   │   └── vault/        # Obsidian vault
 │   ├── components/       # Reusable Astro components
 │   ├── layouts/          # Page layouts
 │   ├── pages/            # Route pages
@@ -69,53 +162,44 @@ Enhancements built on top of Astro Theme Pure base:
 └── public/               # Static assets
 ```
 
-## Configuration
+---
 
-Main configuration files:
-
-- `astro.config.ts` - Astro configuration with markdown and integrations setup
-- `src/site.config.ts` - Site metadata and theme options
-- `uno.config.ts` - UnoCSS typography and theme colors
-- `tsconfig.json` - TypeScript configuration
-
-## Tech Stack
+## 🛠️ Tech Stack
 
 Built on [Astro Theme Pure](https://github.com/cworld1/astro-theme-pure) with:
 
 - **Framework**: [Astro](https://astro.build)
 - **Styling**: [UnoCSS](https://unocss.dev) with @unocss/preset-typography
 - **Markdown Processing**: 
-  - remark-math, remark-breaks
-  - rehype-katex, rehype-callouts
-  - Custom rehype plugins for heading links and code blocks
+  - remark-math, remark-breaks, remark-wiki-link
+  - rehype-katex, rehype-callouts, rehype-autolink-headings
+  - Custom plugins for code blocks and link normalization
 - **Search**: [Pagefind](https://pagefind.app/)
 - **Deployment**: [Cloudflare](https://cloudflare.com)
 
-## Development
+---
 
-```shell
-# Start dev server with hot reload
-bun dev
+## 🙏 Acknowledgments
 
-# Build for production
-bun build
+This project is based on the following excellent open-source projects:
 
-# Preview production build
-bun preview
+- **[Astro Theme Pure](https://github.com/cworld1/astro-theme-pure)** - Base theme framework
+- **[Flowershow](https://github.com/datopian/flowershow)** - Wikilink processing inspiration
+- **[Pagefind](https://pagefind.app/)** - Fast static search
+- **[Obsidian](https://obsidian.md/)** - Note-taking concept reference
 
-# Create new blog post
-bun pure new
+---
 
-# Check for errors
-bun check
+## 📄 License
 
-# Format code
-bun format
+This project is open source under the [MIT License](LICENSE).
 
-# Lint and fix code
-bun lint
-```
+---
 
-## Base Theme
+## 🔧 Built-in Components
 
-This site is built on [Astro Theme Pure](https://github.com/cworld1/astro-theme-pure) - an excellent minimal blog and documentation theme. The base theme itself was inspired by:
+**Basic**: `Aside`, `Tabs`, `Timeline`, `Steps`, `Spoiler`, `Callout`
+
+**Advanced**: `GithubCard`, `LinkPreview`, `Quote`, `QRCode`, `Vault Navigation`
+
+For full documentation, visit: [Astro Pure Docs](https://astro-pure.js.org/docs)
