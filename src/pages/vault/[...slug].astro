@@ -4,21 +4,17 @@ import type { CollectionEntry } from 'astro:content'
 
 import { MediumZoom } from 'astro-pure/advanced'
 import VaultLayout from '@/layouts/VaultLayout.astro'
-import { normalizeVaultSlug, getEnrichedVaultCollection, getVaultFlatList } from '@/utils/vault'
+import { getEnrichedVaultCollection, getVaultFlatList } from '@/utils/vault'
 
 export const prerender = true
 
 export async function getStaticPaths() {
   const vault = await getEnrichedVaultCollection()
-  return vault.map((entry) => {
-    const slug = normalizeVaultSlug(entry.id)
-    return {
-      params: { slug },
-      props: { entry, slug }
-    }
-  })
+  return vault.map((entry) => ({
+    params: { slug: entry.slug },
+    props: { entry, slug: entry.slug }
+  }))
 }
-
 interface Props {
   entry: CollectionEntry<'vault'>
   slug: string
