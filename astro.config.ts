@@ -15,6 +15,20 @@ import { remarkNormalizeLinks } from './src/plugins/remark-normalize-links.ts'
 const vaultFiles = globSync('./src/content/vault/**/*.{md,mdx,jpg,jpeg,png,webp,gif,svg}')
 const contentFiles = vaultFiles.map((f) => f.replace(/\\/g, '/'))
 
+/**
+ * Sanitize a path segment for use in URLs - must match vault.ts sanitization
+ */
+function sanitizeSlugPart(part: string): string {
+  return part
+    .toLowerCase()
+    // Remove special characters
+    .replace(/[&()[\]{}]/g, '')        // Remove &, brackets, parens
+    .replace(/[,;:!?@#$%^*+=|\\/<>"'`~]/g, '') // Remove punctuation
+    .replace(/\s+/g, '-')             // Spaces → dashes
+    .replace(/--+/g, '-')             // Multiple dashes → single
+    .replace(/^-+|-+$/g, '')          // Trim dashes from ends
+}
+
 const permalinks = Object.fromEntries(
   contentFiles.map((file) => {
     // Use /vault/ prefix for markdown paths
@@ -23,7 +37,7 @@ const permalinks = Object.fromEntries(
       const slug = relativePath
         .replace(/\.(md|mdx)$/, '')
         .split('/')
-        .map((part) => part.toLowerCase().replace(/\s+/g, '-').replace(/--+/g, '-'))
+        .map(sanitizeSlugPart)
         .join('/')
       return [file, `/vault/${slug}`]
     }
@@ -86,7 +100,7 @@ export default defineConfig({
         remarkWikiLink,
         {
           format: 'shortestPossible',
-          files: contentFiles,
+          files: vaultFiles,
           permalinks,
         }
       ]
