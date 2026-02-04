@@ -181,6 +181,7 @@ const isOpen = hasChildren && (isActive || (node && isChildActive(node)))
                 )}
               >
                 {node.title}
+                {node.entry?.data.publish === false && <span class='text-red-500 text-xs ml-1'>(Unpublished)</span>}
               </a>
             ) : (
               <span class='flex-1 truncate font-medium'>{node.title}</span>
@@ -202,6 +203,7 @@ const isOpen = hasChildren && (isActive || (node && isChildActive(node)))
             )}
           >
             {node.title}
+            {node.entry?.data.publish === false && <span class='text-red-500 text-xs ml-1'>(Unpublished)</span>}
           </a>
         </div>
       )}
