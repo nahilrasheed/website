@@ -5,6 +5,8 @@ import { join } from 'node:path'
 
 export type VaultEntry = CollectionEntry<'vault'>
 
+export const prod = import.meta.env.PROD
+
 export interface VaultNode {
   title: string
   slug?: string
@@ -75,11 +77,14 @@ export function normalizeVaultSlug(id: string): string {
  * - Adds `slug` property (for URLs)
  * - Auto-generates `title` from filename if missing in frontmatter
  * - Preserves original casing/symbols in titles via originalNameMap
+ * - Filters out unpublished notes in production (publish: false)
  */
 export async function getEnrichedVaultCollection() {
-  const vault = await getCollection('vault')
+  const vault = await getCollection('vault', ({ data }) => {
+    // In production, filter out unpublished notes
+    return prod ? data.publish !== false : true
+  })
   return vault
-    .filter(entry => entry.data.publish !== false)
     .map(entry => {
         const slug = normalizeVaultSlug(entry.id)
         

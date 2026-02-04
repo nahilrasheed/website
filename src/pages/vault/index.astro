@@ -32,6 +32,7 @@ const tree = await getVaultTree()
                {node.slug ? (
                    <a href={`/vault/${node.slug}`} class='font-semibold text-lg decoration-dotted underline underline-offset-4 hover:decoration-solid hover:text-primary flex-1 break-words'>
                       {node.title}
+                      {node.entry?.data.publish === false && <span class='text-red-500 text-sm ml-1'>(Unpublished)</span>}
                    </a>
                ) : (
                    <span class='font-semibold text-lg flex-1 break-words'>{node.title}</span>
@@ -51,6 +52,7 @@ const tree = await getVaultTree()
            <a href={node.slug ? `/vault/${node.slug}` : '#'} class='block p-4 relative border rounded-xl bg-card/60 text-card-foreground shadow-sm transition-all duration-300 hover:bg-card/80 hover:z-30'>
               <span class='font-semibold text-lg pl-6 block break-words'>
                   {node.title}
+                  {node.entry?.data.publish === false && <span class='text-red-500 text-sm ml-1'>(Unpublished)</span>}
               </span>
            </a>
         )
