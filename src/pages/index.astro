@@ -40,37 +40,39 @@ if (!images[imagePath])
           <Label title='India'>
             <Icon name='location' class='size-5' slot='icon' />
           </Label>
-          <Label
-            title='Github'
-            as='a'
-            href='https://github.com/nahilrasheed'
-            target='_blank'
-          >
+          <Label title='Github' as='a' href='https://github.com/nahilrasheed' target='_blank'>
             <Icon name='github' class='size-5' slot='icon' />
           </Label>
-          <Label
-            title='Linkedin'
-            as='a'
-            href='https://linkedin.com/in/nahilrasheed'
-            target='_blank'
-          >
+          <Label title='Linkedin' as='a' href='https://linkedin.com/in/nahilrasheed' target='_blank'>
             <Icon name='linkedin' class='size-5' slot='icon' />
           </Label>
         </div>
       </div>
-
     </section>
 
     <div id='content' class='animate flex flex-col gap-y-10 md:w-4/5 lg:w-5/6'>
       <Section title='About'>
         <p class='text-muted-foreground'>
           Hi, I'm Nahil Rasheed.
+          <span class='font-mono tracking-tight'> aka <span class='text-primary'>0xnhl</span></span>
         </p>
         <p>
           I'm deeply interested in cybersecurity, technology, and computer science, and I spend a lot of my time learning, experimenting, and documenting my journey.
           I enjoy working on projects that involve security testing, programming, and problem-solving, and I use this space to share my notes, ideas, and experiments.
         </p>
-        <Button title='More about me' class='w-fit self-end' href='/about' variant='ahead' />
+        <div class='flex flex-wrap items-center gap-3'>
+          <a href='/vault' class='group flex flex-col items-start gap-x-3 gap-y-2 rounded-2xl border bg-background px-4 py-2 text-sm shadow-sm transition-shadow hover:shadow-md'>
+            <div class='flex flex-row items-center gap-x-3'>
+              <p class='font-medium text-muted-foreground'>🗃️ Explore the Vault</p>
+              <svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' class='stroke-muted-foreground group-hover:stroke-primary ml-auto'>
+                <line x1='5' y1='12' x2='19' y2='12' class='translate-x-4 scale-x-0 transition-all duration-300 ease-in-out group-hover:translate-x-1 group-hover:scale-x-100' />
+                <polyline points='12 5 19 12 12 19' class='translate-x-0 transition-all duration-300 ease-in-out group-hover:translate-x-1' />
+              </svg>
+            </div>
+            <span class='text-xs text-muted-foreground'>A collection of my notes and writeups</span>
+          </a>
+          <Button title='More about me' class='ml-auto w-fit' href='/about' variant='ahead' />
+        </div>
       </Section>
       
       {
