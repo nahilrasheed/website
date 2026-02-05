@@ -3,12 +3,24 @@ import { getBlogCollection, getUniqueTagsWithCount } from 'astro-pure/server'
 import { Button } from 'astro-pure/user'
 import { cn } from 'astro-pure/utils'
 import PageLayout from '@/layouts/BaseLayout.astro'
+import { getUniqueVaultTagsWithCount } from '@/utils/vault'
 
 const allPosts = await getBlogCollection()
-const allTags = getUniqueTagsWithCount(allPosts)
+const blogTags = getUniqueTagsWithCount(allPosts)
+const vaultTags = await getUniqueVaultTagsWithCount()
+
+// Merge blog and vault tags, keeping the count
+const allTagsMap = new Map<string, number>()
+for (const [tag, count] of blogTags) {
+  allTagsMap.set(tag, (allTagsMap.get(tag) || 0) + count)
+}
+for (const [tag, count] of vaultTags) {
+  allTagsMap.set(tag, (allTagsMap.get(tag) || 0) + count)
+}
+const allTags = [...allTagsMap.entries()].sort((a, b) => b[1] - a[1])
 
 const meta = {
-  description: "A list of all the topics I've written about in my posts",
+  description: "A list of all the topics I've written about in my posts and vault notes",
   title: 'All Tags'
 }
 ---
