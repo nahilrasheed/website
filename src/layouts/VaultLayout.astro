@@ -5,6 +5,9 @@ import type { SiteMeta } from 'astro-pure/types'
 import VaultTree from '@/components/vault/VaultTree.astro'
 import { ArticleBottom, BackToTop, Copyright, TOC } from 'astro-pure/components/pages'
 
+// Plugin styles
+import 'katex/dist/katex.min.css'
+
 interface Props {
   meta: SiteMeta
   back?: string
@@ -255,6 +258,9 @@ const dateTimeOptions: Intl.DateTimeFormatOptions = {
       height: 100vh !important;
       min-width: 40vw !important;
       max-width: 75vw !important;
+      background-color: hsl(var(--card)) !important;
+      border-left: 1px solid hsl(var(--border) / 0.6) !important;
+      box-shadow: -12px 0 32px hsl(var(--foreground) / 0.08) !important;
       border-top-right-radius: 0 !important;
       border-bottom-right-radius: 0 !important;
       padding-top: 1.5rem !important;
