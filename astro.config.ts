@@ -63,14 +63,14 @@ import config from './src/site.config.ts'
 // https://astro.build/config
 export default defineConfig({
   // [Basic]
-  site: process.env.SITE_URL || 'http://localhost:4321',
+  site: import.meta.env.SITE_URL || 'http://localhost:4321/',
   // Deploy to a sub path
   // https://astro-pure.js.org/docs/setup/deployment#platform-with-base-path
   // base: '/astro-pure/',
-  trailingSlash: 'never',
+  trailingSlash: 'ignore',
   // root: './my-project-directory',
   server: { host: true },
-
+  
   // [Adapter]
   // https://docs.astro.build/en/guides/deploy/
   // Cloudflare Workers
