@@ -1,7 +1,8 @@
 ---
 import PageLayout from '@/layouts/BaseLayout.astro'
-import { getVaultTree } from '@/utils/vault'
+import { getVaultTree, getUniqueVaultTagsWithCount } from '@/utils/vault'
 import VaultTree from '@/components/vault/VaultTree.astro'
+import { Button, Icon } from 'astro-pure/user'
 
 const meta = {
   title: 'Vault',
@@ -9,12 +10,29 @@ const meta = {
 }
 
 const tree = await getVaultTree()
+const allTags = await getUniqueVaultTagsWithCount()
+const topTags = allTags.slice(0, 4)
 ---
 
 <PageLayout {meta} wide>
   <div class='mt-4 max-w-[90rem] mx-auto px-4 lg:px-0'>
     <h1 class='text-3xl font-bold mb-4 tracking-tight text-foreground'>Vault</h1>
-    <p class='text-muted-foreground mb-8 text-lg'>Welcome to my digital garden. Explore the notes below.</p>
+    
+    <div class='flex flex-col sm:flex-row flex-wrap items-start sm:items-center sm:justify-between gap-4 mb-8'>
+      <p class='text-muted-foreground text-lg'>Welcome to my digital garden. Explore the notes below.</p>
+      
+      {!!topTags.length && (
+        <div class='flex items-center gap-2 text-base sm:text-sm flex-wrap sm:ml-auto'>
+          <Icon name='tag-2' class='size-5 text-muted-foreground' />
+          {topTags.map(([tag]) => (
+            <Button title={tag} href={`/tags/${tag}`} variant='pill' class='text-sm sm:text-xs' />
+          ))}
+        </div>
+        <a aria-label='View all vault tags' href='/tags' data-astro-prefetch class='text-base sm:text-xs whitespace-nowrap'>
+          View all →
+        </a>
+      )}
+    </div>
 
     <div class='vault-grid grid gap-4 sm:grid-cols-2 lg:grid-cols-3 items-start'>
       {tree.map((node) => (

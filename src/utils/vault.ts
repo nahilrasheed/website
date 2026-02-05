@@ -185,3 +185,33 @@ export async function getVaultFlatList(): Promise<{ title: string; slug: string 
   traverse(tree)
   return list
 }
+
+/**
+ * Get all unique tags from vault entries
+ */
+export async function getUniqueVaultTags(): Promise<string[]> {
+  const vault = await getEnrichedVaultCollection()
+  const allTags = vault
+    .flatMap(entry => entry.data.tags ?? [])
+    .map(tag => tag.toLowerCase())
+  return [...new Set(allTags)]
+}
+
+/**
+ * Get unique tags with their count from vault entries
+ */
+export async function getUniqueVaultTagsWithCount(): Promise<[string, number][]> {
+  const vault = await getEnrichedVaultCollection()
+  const tagMap = new Map<string, number>()
+  
+  for (const entry of vault) {
+    if (entry.data.tags) {
+      for (const tag of entry.data.tags) {
+        const normalizedTag = tag.toLowerCase()
+        tagMap.set(normalizedTag, (tagMap.get(normalizedTag) || 0) + 1)
+      }
+    }
+  }
+  
+  return [...tagMap.entries()].sort((a, b) => b[1] - a[1])
+}
