@@ -1,5 +1,7 @@
 import { rehypeHeadingIds } from '@astrojs/markdown-remark'
-import AstroPureIntegration from 'astro-pure'
+import mdx from '@astrojs/mdx'
+import sitemap from '@astrojs/sitemap'
+import UnoCSS from 'unocss/astro'
 import { defineConfig, fontProviders } from 'astro/config'
 import rehypeKatex from 'rehype-katex'
 import rehypeCallouts from 'rehype-callouts'
@@ -11,6 +13,24 @@ import { globSync } from 'glob'
 // Local integrations
 import rehypeAutolinkHeadings from './src/plugins/rehype-auto-link-headings.ts'
 import { remarkNormalizeLinks } from './src/plugins/remark-normalize-links.ts'
+import rehypeExternalLinks from './src/plugins/rehype-external-links.ts'
+import rehypeTable from './src/plugins/rehype-table.ts'
+import { remarkAddZoomable, remarkReadingTime } from './src/plugins/remark-plugins.ts'
+import config from './src/site.config.ts'
+
+// Shiki
+import {
+  addCollapse,
+  addCopyButton,
+  addLanguage,
+  addTitle,
+  updateStyle
+} from './src/plugins/shiki-custom-transformers.ts'
+import {
+  transformerNotationDiff,
+  transformerNotationHighlight,
+  transformerRemoveNotationEscape
+} from './src/plugins/shiki-official/transformers.ts'
 
 const vaultFiles = globSync('./src/content/vault/**/*.{md,mdx,jpg,jpeg,png,webp,gif,svg}')
 const contentFiles = vaultFiles.map((f) => f.replace(/\\/g, '/'))
@@ -45,25 +65,11 @@ const permalinks = Object.fromEntries(
     return [file, `/vault/${relativePath}`] 
   })
 )
-// Shiki
-import {
-  addCollapse,
-  addCopyButton,
-  addLanguage,
-  addTitle,
-  updateStyle
-} from './src/plugins/shiki-custom-transformers.ts'
-import {
-  transformerNotationDiff,
-  transformerNotationHighlight,
-  transformerRemoveNotationEscape
-} from './src/plugins/shiki-official/transformers.ts'
-import config from './src/site.config.ts'
 
 // https://astro.build/config
 export default defineConfig({
   // [Basic]
-  site: import.meta.env.SITE_URL || 'http://localhost:4321/',
+  site: 'https://nahil.pages.dev/',
   // Deploy to a sub path
   // https://astro-pure.js.org/docs/setup/deployment#platform-with-base-path
   // base: '/astro-pure/',
@@ -103,7 +109,9 @@ export default defineConfig({
           files: vaultFiles,
           permalinks,
         }
-      ]
+      ],
+      [remarkAddZoomable, config.integ.mediumZoom.options],
+      remarkReadingTime
     ],
     rehypePlugins: [
       [rehypeKatex, {}],
@@ -116,7 +124,15 @@ export default defineConfig({
           content: { type: 'text', value: '#' }
         }
       ],
-      rehypeCallouts
+      rehypeCallouts,
+      [
+        rehypeExternalLinks,
+        {
+          content: { type: 'text', value: config.content.externalLinks.content },
+          contentProperties: config.content.externalLinks.properties
+        }
+      ],
+      rehypeTable
     ],
     // https://docs.astro.build/en/guides/syntax-highlighting/
     shikiConfig: {
@@ -151,11 +167,11 @@ export default defineConfig({
 
   // [Integrations]
   integrations: [
-    // astro-pure will automatically add sitemap, mdx & unocss
-    // sitemap(),
-    // mdx(),
-    AstroPureIntegration(config)
+    mdx({ optimize: true }),
+    sitemap(),
+    UnoCSS({ injectReset: true })
   ],
+
 
   // [Experimental]
   experimental: {

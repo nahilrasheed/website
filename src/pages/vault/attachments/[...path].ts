@@ -46,8 +46,9 @@ export const GET: APIRoute = async ({ params }) => {
 
   const fileBuffer = fs.readFileSync(filePath);
   const mimeType = getMimeType(filePath);
+  const body = new Uint8Array(fileBuffer);
 
-  return new Response(fileBuffer, {
+  return new Response(body, {
     headers: {
       'Content-Type': mimeType,
     },

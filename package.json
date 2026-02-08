@@ -1,39 +1,41 @@
 {
   "name": "astro-theme-pure",
-  "workspaces": [
-    "packages/*"
-  ],
   "type": "module",
   "version": "4.1.2",
   "scripts": {
     "dev": "astro dev",
     "dev:check": "astro check --watch & astro dev",
-    "build": "astro-pure check && astro check && astro build",
+    "build": "astro check && astro build",
     "preview": "astro preview",
     "deploy": "wrangler pages deploy dist",
     "sync": "astro sync",
     "check": "astro check",
     "astro": "astro",
-    "pure": "astro-pure",
     "format": "prettier --write  '**/*.{js,jsx,ts,tsx,md,mdx,astro}'",
     "lint": "eslint --fix 'src/**/*.{js,ts,jsx,tsx,astro}'",
     "yijiansilian": "bun lint && bun sync && bun check && bun format",
-    "clean": "rm -rf .astro .vercel dist",
-    "cache:avatars": "tsx preset/scripts/cacheAvatars.ts"
+    "clean": "rm -rf .astro .vercel dist"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.6",
+    "@astrojs/mdx": "^4.0.0",
     "@astrojs/rss": "4.0.15",
+    "@astrojs/sitemap": "^3.0.0",
     "@flowershow/remark-wiki-link": "^3.3.1",
     "astro": "5.17.1",
-    "astro-pure": "1.4.0",
+    "hast-util-select": "^6.0.1",
     "katex": "^0.16.28",
+    "@pagefind/default-ui": "^1.1.0",
+    "node-html-parser": "^6.1.13",
+    "mdast-util-to-string": "^4.0.0",
+    "reading-time": "^1.5.0",
     "rehype-callouts": "^2.1.2",
     "rehype-katex": "^7.0.1",
     "remark-breaks": "^4.0.0",
     "remark-math": "^6.0.0",
     "sharp": "^0.34.5",
     "typescript": "^5.9.3",
+    "unocss": "^0.61.5",
     "unist-util-visit": "^5.1.0"
   },
   "devDependencies": {

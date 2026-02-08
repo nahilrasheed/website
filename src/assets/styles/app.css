@@ -7,6 +7,7 @@
   --primary: 200 29% 45%;
   /* Foreground */
   --foreground: 240 10% 3.9%;
+  --card-foreground: 240 10% 3.9%;
   --muted-foreground: 240 3.8% 28.1%;
   /* Background */
   --background: 210 33% 99%;
@@ -24,6 +25,7 @@
   --primary: 195 95% 85%;
   /* Foreground */
   --foreground: 0 0% 98%;
+  --card-foreground: 0 0% 98%;
   --muted-foreground: 240 5% 74.9%;
   /* Background */
   --background: 240 20.54% 5.2%;

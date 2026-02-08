@@ -11,7 +11,7 @@ const bgMuted = 'hsl(var(--muted) / var(--un-bg-opacity, 1))'
 const border = 'var(--un-default-border-color)'
 const radius = 'var(--radius)'
 
-const typographyConfig: TypographyOptions = {
+const typographyConfig = {
   colorScheme: {
     body: fgMuted,
     headings: fg,
@@ -129,7 +129,7 @@ const typographyConfig: TypographyOptions = {
     },
     'sup>a': { 'scroll-margin-top': '4rem' }
   }
-}
+} as TypographyOptions
 
 const themeColors = {
   // Primary
@@ -141,7 +141,10 @@ const themeColors = {
     DEFAULT: 'hsl(var(--muted) / <alpha-value>)',
     foreground: 'hsl(var(--muted-foreground) / <alpha-value>)'
   },
-  card: 'hsl(var(--card) / <alpha-value>)',
+  card: {
+    DEFAULT: 'hsl(var(--card) / <alpha-value>)',
+    foreground: 'hsl(var(--card-foreground) / <alpha-value>)'
+  },
 
   // Basic
   border: 'hsl(var(--border) / <alpha-value>)',
