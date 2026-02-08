@@ -1,12 +1,11 @@
 ---
 import { Image } from 'astro:assets'
 
-import { PostPreview } from 'astro-pure/components/pages'
-import { getBlogCollection, sortMDByDate } from 'astro-pure/server'
-import { Button, Icon, Label } from 'astro-pure/user'
+import { PostPreview } from '@/components/pages'
+import { getBlogCollection, sortMDByDate } from '@/utils/blog'
+import { Button, Icon, Label, Section } from '@/components/user'
 import PageLayout from '@/layouts/BaseLayout.astro'
-import ProjectCard from '@/components/home/ProjectCard.astro'
-import Section from '@/components/home/Section.astro'
+import { ProjectCard } from '@/components/about'
 import config from '@/site-config'
 
 const MAX_POSTS = 10

@@ -1,7 +1,7 @@
 ---
-import { Spoiler, Timeline, Icon } from 'astro-pure/user'
+import { Spoiler, Timeline, Icon } from '@/components/user'
 import PageLayout from '@/layouts/CommonPage.astro'
-import Card from '@/components/home/Card.astro'
+import { ImageCard } from '@/components/about'
 // import SkillLayout from '@/components/home/SkillLayout.astro'
 
 
@@ -31,7 +31,7 @@ const headings = [
   </p>
 
   <h2 id='education'>Education</h2>
-  <Card
+  <ImageCard
     as='a'
     heading='IIIT Kottayam'
     location='Kottayam, India'
@@ -42,7 +42,7 @@ const headings = [
   />
 
   <h2 id='certifications'>Certifications</h2>
-  <Card
+  <ImageCard
     as='a'
     heading='Google Cybersecurity Professional Certificate'
     subheading='Google'
@@ -51,7 +51,7 @@ const headings = [
     imagePath='/src/assets/about/gcpc.png'
   />
   <br/>
-  <Card
+  <ImageCard
     as='a'
     heading='Cisco Ethical Hacker'
     subheading='Cisco'
@@ -113,7 +113,7 @@ const headings = [
     technical support provided by the following excellent projects/service providers:
   </p>
   <ul>
-    <li>Domain: <a href='#' target='_blank'></a></li>
+    <li>Domain: <a href='https://cloudflare.com/' target='_blank'>Cloudflare</a></li>
     <li>
       Framework & Theme: <a href='https://astro.build/' target='_blank'>Astro</a> + <a
         href='https://github.com/cworld1/astro-theme-pure'
@@ -122,11 +122,6 @@ const headings = [
     </li>
     <li>
       Site hosting: <a href='https://cloudflare.com/' target='_blank'>Cloudflare</a>
-    </li>
-    <li>
-      Other statistics: <a href='https://github.com/spencerwooo/substats' target='_blank'
-        >Substats</a
-      >
     </li>
   </ul>
 </PageLayout>
