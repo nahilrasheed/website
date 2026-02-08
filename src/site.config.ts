@@ -1,4 +1,4 @@
-import type { Config, IntegrationUserConfig, ThemeUserConfig } from 'astro-pure/types'
+import { UserConfigSchema, type ConfigOutput, type IntegrationUserConfig, type ThemeUserConfig } from './types/config'
 
 export const theme: ThemeUserConfig = {
   // [Basic]
@@ -128,5 +128,5 @@ export const integ: IntegrationUserConfig = {
   }
 }
 
-const config = { ...theme, integ } as Config
+const config = UserConfigSchema.parse({ ...theme, integ }) as ConfigOutput
 export default config

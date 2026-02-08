@@ -1,9 +1,9 @@
 ---
 import { Font } from 'astro:assets'
 
-import { prod } from 'astro-pure/server'
-import type { SiteMeta } from 'astro-pure/types'
-import config from 'virtual:config'
+import { prod } from '@/utils/blog'
+import type { SiteMeta } from '@/types/config'
+import config from '@/site.config'
 
 type Props = SiteMeta
 
