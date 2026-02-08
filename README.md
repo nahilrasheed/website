@@ -1,14 +1,15 @@
 # Personal Website
 
-Built on [Astro Theme Pure](https://github.com/cworld1/astro-theme-pure)
+Built with [Astro](https://astro.build), inspired by [Astro Theme Pure](https://github.com/cworld1/astro-theme-pure)
 
 <div align="center">
   <img src="https://img.shields.io/badge/built%20with-Astro-0C1222?style=flat&logo=astro" alt="Built with Astro">
+  <img src="https://img.shields.io/badge/styled-UnoCSS-4FC08D?style=flat" alt="Styled with UnoCSS">
 </div>
 
 ## 🎨 About
 
-A fast, elegant personal website combining **blog** and **knowledge vault** - built to work seamlessly with Obsidian notes while maintaining clean URLs and beautiful typography.
+A fast, elegant personal website combining **blog** and **knowledge vault** - built with Astro and designed to work seamlessly with Obsidian notes. Features clean URLs, beautiful typography, and a standalone architecture for maximum flexibility.
 
 ### ✨ Core Features
 
@@ -74,9 +75,6 @@ bun preview
 ### Maintenance
 
 ```shell
-# Create new blog post with wizard
-bun pure new
-
 # Run type checks
 bun check
 
@@ -129,20 +127,39 @@ Add files to `src/content/vault/` - organized by folders:
 
 ### Main Configuration Files
 
-- **`astro.config.ts`** - Framework config, markdown plugins, integrations
-- **`src/site.config.ts`** - Site metadata, theme options, header/footer
-- **`uno.config.ts`** - Typography and theme colors
-- **`tsconfig.json`** - TypeScript configuration
+- **`astro.config.ts`** - Astro framework config with explicit MDX, sitemap, UnoCSS integrations and remark/rehype plugins
+- **`src/site.config.ts`** - Site metadata, theme options, header/footer (validated with Zod schemas)
+- **`src/content.config.ts`** - Content collection schemas for blog and vault
+- **`uno.config.ts`** - UnoCSS configuration with typography presets and theme colors
+- **`tsconfig.json`** - TypeScript paths and compiler options
 
 ### Key Settings
 
 Edit `src/site.config.ts` to customize:
-- Site title, description, author
-- Social links
-- Header navigation menu
-- Footer links and credits
-- Blog page size
-- Search settings
+- Site title, description, author info
+- Social links and profile URLs
+- Header navigation menu items
+- Footer links and copyright
+- Blog pagination (posts per page)
+- Feature toggles (search, theme toggle, etc)
+
+### Path Aliases
+
+The project uses TypeScript path aliases for clean imports:
+
+```typescript
+// Before (relative paths)
+import { cn } from '../../utils'
+import Card from '../components/Card.astro'
+
+// After (path aliases)
+import { cn } from '@/utils'
+import Card from '@/components/user/Card.astro'
+```
+
+Configured in `tsconfig.json`:
+- `@/*` → `src/*` - Main source directory
+- Enables tree-shaking and better IDE support
 
 ---
 
@@ -154,39 +171,48 @@ Edit `src/site.config.ts` to customize:
 │   │   ├── blog/         # Blog posts
 │   │   └── vault/        # Obsidian vault
 │   ├── components/       # Reusable Astro components
+│   │   ├── advanced/     # Advanced components (GithubCard, LinkPreview, etc)
+│   │   ├── basic/        # Layout components (Header, Footer, ThemeProvider)
+│   │   ├── pages/        # Page-specific components (Hero, PostPreview, TOC)
+│   │   ├── user/         # UI components (Button, Card, Tabs, Timeline)
+│   │   ├── projects/     # Project-specific components
+│   │   └── vault/        # Vault navigation components
 │   ├── layouts/          # Page layouts
 │   ├── pages/            # Route pages
-│   ├── plugins/          # Markdown/Rehype plugins
-│   └── utils/            # Utilities (vault navigation, etc)
-├── packages/pure/        # Reusable component package
-└── public/               # Static assets
+│   ├── plugins/          # Remark/Rehype plugins
+│   ├── types/            # TypeScript type definitions
+│   ├── utils/            # Utility functions
+│   ├── libs/             # Shared libraries
+│   └── assets/           # Images, styles, fonts
+└── public/               # Static assets (favicon, robots.txt)
 ```
 
 ---
 
 ## 🛠️ Tech Stack
 
-Built on [Astro Theme Pure](https://github.com/cworld1/astro-theme-pure) with:
+Inspired by [Astro Theme Pure](https://github.com/cworld1/astro-theme-pure), built as a standalone project:
 
-- **Framework**: [Astro](https://astro.build)
-- **Styling**: [UnoCSS](https://unocss.dev) with @unocss/preset-typography
+- **Framework**: [Astro](https://astro.build) 5.17.1
+- **Runtime**: [Bun](https://bun.sh) (Node.js compatible)
+- **Styling**: [UnoCSS](https://unocss.dev) 0.61.9 with @unocss/preset-typography
 - **Markdown Processing**: 
-  - remark-math, remark-breaks, remark-wiki-link
-  - rehype-katex, rehype-callouts, rehype-autolink-headings
-  - Custom plugins for code blocks and link normalization
+  - **Remark**: remark-math, remark-breaks, @flowershow/remark-wiki-link, reading-time
+  - **Rehype**: rehype-katex, rehype-callouts, rehype-autolink-headings
+  - **Custom plugins**: Shiki transformers, code collapse, external links, steps/tabs
 - **Search**: [Pagefind](https://pagefind.app/)
+- **Type System**: TypeScript with Zod for config validation
 - **Deployment**: [Cloudflare](https://cloudflare.com)
 
 ---
 
 ## 🙏 Acknowledgments
 
-This project is based on the following excellent open-source projects:
+This project is inspired by and built upon the following excellent open-source projects:
 
-- **[Astro Theme Pure](https://github.com/cworld1/astro-theme-pure)** - Base theme framework
-- **[Flowershow](https://github.com/datopian/flowershow)** - Wikilink processing inspiration
-- **[Pagefind](https://pagefind.app/)** - Fast static search
-- **[Obsidian](https://obsidian.md/)** - Note-taking concept reference
+- **[Astro Theme Pure](https://github.com/cworld1/astro-theme-pure)** - Original theme framework and component inspiration
+- **[Pagefind](https://pagefind.app/)** - Fast static search engine
+- **[Obsidian](https://obsidian.md/)** - Note-taking workflow inspiration
 
 ---
 
@@ -198,8 +224,23 @@ This project is open source under the [MIT License](LICENSE).
 
 ## 🔧 Built-in Components
 
-**Basic**: `Aside`, `Tabs`, `Timeline`, `Steps`, `Spoiler`, `Callout`
+All components are organized in `src/components/` with barrel exports:
 
-**Advanced**: `GithubCard`, `LinkPreview`, `Quote`, `QRCode`, `Vault Navigation`
+**User Components** (`@/components/user`): 
+- Containers: `Card`, `Collapse`, `Aside`, `Tabs`, `TabItem`
+- Lists: `CardList`, `Timeline`, `Steps`
+- UI Elements: `Button`, `Label`, `Spoiler`, `Icon`, `FormattedDate`
+- Layout: `Section`
 
-For full documentation, visit: [Astro Pure Docs](https://astro-pure.js.org/docs)
+**Advanced Components** (`@/components/advanced`):
+`GithubCard`, `LinkPreview`, `Quote`, `QRCode`, `MediumZoom`
+
+**Page Components** (`@/components/pages`):
+`Hero`, `PostPreview`, `TOC`, `Paginator`, `BackToTop`, `ArticleBottom`
+
+**Import Examples**:
+```typescript
+import { Button, Card, Timeline } from '@/components/user'
+import { GithubCard } from '@/components/advanced'
+import { PostPreview } from '@/components/pages'
+```
