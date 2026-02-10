@@ -1,11 +1,11 @@
 {
-  "name": "astro-theme-pure",
+  "name": "nahil-website",
   "type": "module",
-  "version": "4.1.2",
+  "version": "1.0.0",
   "scripts": {
     "dev": "astro dev",
     "dev:check": "astro check --watch & astro dev",
-    "build": "astro check && astro build",
+    "build": "astro check && astro build && pagefind --site dist",
     "preview": "astro preview",
     "deploy": "wrangler pages deploy dist",
     "sync": "astro sync",
@@ -13,21 +13,21 @@
     "astro": "astro",
     "format": "prettier --write  '**/*.{js,jsx,ts,tsx,md,mdx,astro}'",
     "lint": "eslint --fix 'src/**/*.{js,ts,jsx,tsx,astro}'",
-    "yijiansilian": "bun lint && bun sync && bun check && bun format",
+    "check-all": "bun lint && bun sync && bun check && bun format",
     "clean": "rm -rf .astro .vercel dist"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.6",
-    "@astrojs/mdx": "^4.0.0",
+    "@astrojs/mdx": "^4.3.13",
     "@astrojs/rss": "4.0.15",
-    "@astrojs/sitemap": "^3.0.0",
+    "@astrojs/sitemap": "^3.7.0",
     "@flowershow/remark-wiki-link": "^3.3.1",
+    "@pagefind/default-ui": "^1.4.0",
     "astro": "5.17.1",
-    "hast-util-select": "^6.0.1",
+    "hast-util-select": "^6.0.4",
     "katex": "^0.16.28",
-    "@pagefind/default-ui": "^1.1.0",
-    "node-html-parser": "^6.1.13",
     "mdast-util-to-string": "^4.0.0",
+    "node-html-parser": "^7.0.2",
     "reading-time": "^1.5.0",
     "rehype-callouts": "^2.1.2",
     "rehype-katex": "^7.0.1",
@@ -35,16 +35,18 @@
     "remark-math": "^6.0.0",
     "sharp": "^0.34.5",
     "typescript": "^5.9.3",
-    "unocss": "^0.61.5",
-    "unist-util-visit": "^5.1.0"
+    "unist-util-visit": "^5.1.0",
+    "unocss": "^66.6.0"
   },
   "devDependencies": {
-    "@ianvs/prettier-plugin-sort-imports": "^4.7.0",
-    "@typescript-eslint/parser": "^8.54.0",
-    "eslint": "^9.39.2",
+    "@ianvs/prettier-plugin-sort-imports": "^4.7.1",
+    "@typescript-eslint/parser": "^8.55.0",
+    "eslint": "^9.0.0",
     "eslint-plugin-astro": "^1.5.0",
-    "glob": "^13.0.0",
+    "glob": "^13.0.1",
+    "pagefind": "^1.4.0",
     "prettier": "^3.8.1",
-    "prettier-plugin-astro": "^0.14.1"
+    "prettier-plugin-astro": "^0.14.1",
+    "wrangler": "^4.64.0"
   }
 }

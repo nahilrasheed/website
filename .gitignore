@@ -2,9 +2,6 @@
 dist/
 .astro/
 
-### Vercel ###
-.vercel/
-
 ### Vim ###
 [._]*.un~
 
@@ -39,3 +36,6 @@ ignore.*
 bunfig.toml
 /src/content/blog/test.*
 /test/
+
+.wrangler
+.vercel/
