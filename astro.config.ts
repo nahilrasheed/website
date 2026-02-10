@@ -71,8 +71,7 @@ export default defineConfig({
   // [Basic]
   site: 'https://nahil.pages.dev/',
   // Deploy to a sub path
-  // https://astro-pure.js.org/docs/setup/deployment#platform-with-base-path
-  // base: '/astro-pure/',
+  // base: '/website/',
   trailingSlash: 'ignore',
   // root: './my-project-directory',
   server: { host: true },
