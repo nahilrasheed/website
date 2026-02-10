@@ -3,8 +3,9 @@
 Built with [Astro](https://astro.build), inspired by [Astro Theme Pure](https://github.com/cworld1/astro-theme-pure)
 
 <div align="center">
-  <img src="https://img.shields.io/badge/built%20with-Astro-0C1222?style=flat&logo=astro" alt="Built with Astro">
-  <img src="https://img.shields.io/badge/styled-UnoCSS-4FC08D?style=flat" alt="Styled with UnoCSS">
+  <img src="https://img.shields.io/badge/built%20with-Astro-0C1222?style=flat-square&logo=astro" alt="Built with Astro">
+  <img src="https://img.shields.io/badge/styled-UnoCSS-4FC08D?style=flat-square&logo=unocss" alt="Styled with UnoCSS">
+  <img src="https://img.shields.io/badge/deployed%20on-Cloudflare-F38020?style=flat-square&logo=cloudflare" alt="Deployed on Cloudflare">
 </div>
 
 ## 🎨 About
@@ -218,7 +219,7 @@ This project is inspired by and built upon the following excellent open-source p
 
 ## 📄 License
 
-This project is open source under the [MIT License](LICENSE).
+This project is open source under the [Apache 2.0](LICENSE).
 
 ---
 

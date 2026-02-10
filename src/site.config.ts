@@ -7,7 +7,7 @@ export const theme: ThemeUserConfig = {
   /** Will be used in index page & copyright declaration */
   author: 'Nahil Rasheed',
   /** Description metadata for your website. Can be used in page metadata. */
-  description: 'Website',
+  description: "My Personal Website where i publish by blogs, writeups and notes.",
   /** The default favicon for your site which should be a path to an image in the `public/` directory. */
   favicon: '/favicon/favicon.ico',
   /** The default social card image for your site which should be a path to an image in the `public/` directory. */
@@ -88,7 +88,6 @@ export const integ: IntegrationUserConfig = {
   // [Search]
   pagefind: true,
   // Add a random quote to the footer (default on homepage footer)
-  // See: https://astro-pure.js.org/docs/integrations/advanced#web-content-render
   // [Quote]
   quote: {
     // - Hitokoto
@@ -114,7 +113,6 @@ export const integ: IntegrationUserConfig = {
   },
   // [Lightbox]
   // A lightbox library that can add zoom effect
-  // https://astro-pure.js.org/docs/integrations/others#medium-zoom
   mediumZoom: {
     enable: true, // disable it will not load the whole library
     selector: '.prose .zoomable',
