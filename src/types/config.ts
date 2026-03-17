@@ -1,4 +1,5 @@
 import { z } from 'astro/zod'
+
 import { Icons } from '../libs/icons'
 
 // ============================================
@@ -54,7 +55,7 @@ function isFaviconExt(ext: string): ext is keyof typeof faviconTypeMap {
 export const FaviconSchema = () =>
   z
     .string()
-    .default('/favicon/favicon.svg')
+    .prefault('/favicon/favicon.svg')
     .transform((favicon, ctx) => {
       // favicon can be absolute or relative url
       const { pathname } = new URL(favicon, 'https://example.com')
@@ -62,7 +63,7 @@ export const FaviconSchema = () =>
 
       if (!isFaviconExt(ext)) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: 'custom',
           message: 'favicon must be a .ico, .gif, .jpg, .png, or .svg file'
         })
 
@@ -85,7 +86,7 @@ export const HeadConfigSchema = () =>
         /** Name of the HTML tag to add to `<head>`, e.g. `'meta'`, `'link'`, or `'script'`. */
         tag: z.enum(['title', 'base', 'link', 'style', 'meta', 'script', 'noscript', 'template']),
         /** Attributes to set on the tag, e.g. `{ rel: 'stylesheet', href: '/custom.css' }`. */
-        attrs: z.record(z.union([z.string(), z.boolean(), z.undefined()])).default({}),
+        attrs: z.record(z.string(), z.union([z.string(), z.boolean(), z.undefined()])).default({}),
         /** Content to place inside the tag (optional). */
         content: z.string().default('')
       })
@@ -150,10 +151,10 @@ export const ShareSchema = () =>
 
 export const SocialLinksSchema = () =>
   z
-    .record(
+    .partialRecord(
       z.enum(socialLinks),
       // Link to the respective social profile for this site
-      z.string().url()
+      z.url()
     )
     .transform((links) => {
       const labelledLinks: Partial<Record<keyof typeof links, { label: string; url: string }>> = {}
@@ -385,7 +386,7 @@ export const ThemeConfigSchema = () =>
         content: z.string().optional().default(' ↗').describe('Content to show for external links'),
         /** Properties for the external links element */
         properties: z
-          .record(z.string())
+          .record(z.string(), z.string())
           .optional()
           .describe('Properties for the external links element')
       }),
@@ -473,11 +474,9 @@ export type IntegrationUserConfig = z.input<ReturnType<typeof IntegrationConfigS
 
 export const UserConfigSchema = ThemeConfigSchema()
   .strict()
-  .merge(
-    z.object({
-      integ: IntegrationConfigSchema()
-    })
-  )
+  .extend({
+    integ: IntegrationConfigSchema()
+  })
   .transform((config) => ({
     ...config,
     // Pagefind only defaults to true if prerender is also true.
