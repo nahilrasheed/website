@@ -5,7 +5,7 @@ import { PostPreview } from '@/components/pages'
 import { getBlogCollection, sortMDByDate } from '@/utils/blog'
 import { Button, Icon, Label, Section } from '@/components/user'
 import PageLayout from '@/layouts/BaseLayout.astro'
-import { ProjectCard } from '@/components/about'
+import { ProjectCard, ImageCard } from '@/components/about'
 import config from '@/site-config'
 
 const MAX_POSTS = 10
@@ -56,8 +56,7 @@ if (!images[imagePath])
           <span class='font-mono tracking-tight'> aka <span class='text-primary'>0xnhl</span></span>
         </p>
         <p>
-          I'm deeply interested in cybersecurity, technology, and computer science, and I spend a lot of my time learning, experimenting, and documenting my journey.
-          I enjoy working on projects that involve security testing, programming, and problem-solving, and I use this space to share my notes, ideas, and experiments.
+          Cybersecurity enthusiast, developer, and lifelong learner. I break things to understand how they work, and build them back securely. Welcome to my digital vault of security research, code experiments, and tech adventures!
         </p>
         <div class='flex flex-wrap items-center gap-3'>
           <a href='/vault' class='group flex flex-col items-start gap-x-3 gap-y-2 rounded-2xl border bg-background px-4 py-2 text-sm shadow-sm transition-shadow hover:shadow-md'>
@@ -104,6 +103,26 @@ if (!images[imagePath])
             imagePath='/src/assets/projects/image.png'
           />
         </div>
+      </Section>
+
+      <Section title='Certifications'>
+        <ImageCard
+          as='a'
+          heading='Google Cybersecurity Professional Certificate'
+          subheading='Google'
+          date='Dec 2025'
+          href='https://www.coursera.org/account/accomplishments/specialization/48W6CHQVROD8'
+          imagePath='/src/assets/about/gcpc.png'
+        />
+        <br />
+        <ImageCard
+          as='a'
+          heading='Cisco Ethical Hacker'
+          subheading='Cisco'
+          date='July 2025'
+          href='https://www.credly.com/badges/f806a313-6c62-4810-b196-eecc93dcb6a8/'
+          imagePath='/src/assets/about/cisco-eh.png'
+        />
       </Section>
     </div>
   </main>
