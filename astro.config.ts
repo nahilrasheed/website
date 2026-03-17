@@ -69,7 +69,7 @@ const permalinks = Object.fromEntries(
 // https://astro.build/config
 export default defineConfig({
   // [Basic]
-  site: 'https://nahil.pages.dev/',
+  site: 'https://nahil.xyz/',
   // Deploy to a sub path
   // base: '/website/',
   trailingSlash: 'ignore',
