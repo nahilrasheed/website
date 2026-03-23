@@ -73,6 +73,38 @@ export function normalizeVaultSlug(id: string): string {
 }
 
 /**
+ * Get a human-readable folder path from a vault entry id.
+ * Uses the original name map when available to preserve casing/symbols.
+ */
+export function getVaultFolderDisplayPathFromEntryId(entryId: string): string {
+  const parts = entryId.split('/')
+  const folderParts = parts.slice(0, -1)
+
+  if (folderParts.length === 0) return 'Root'
+
+  const displayParts: string[] = []
+  const normalizedPathParts: string[] = []
+
+  for (const part of folderParts) {
+    const normalizedPart = sanitizeSlugPart(part)
+    normalizedPathParts.push(normalizedPart)
+    const lookupKey = normalizedPathParts.join('/')
+    const original = originalNameMap[lookupKey]
+
+    displayParts.push(
+      original ??
+        part
+          .replace(/[-_]+/g, ' ')
+          .replace(/\s+/g, ' ')
+          .trim()
+          .replace(/\b\w/g, (char) => char.toUpperCase())
+    )
+  }
+
+  return displayParts.join(' / ')
+}
+
+/**
  * Get vault entries with normalized slugs and auto-generated titles
  * - Adds `slug` property (for URLs)
  * - Auto-generates `title` from filename if missing in frontmatter

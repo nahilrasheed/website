@@ -10,6 +10,7 @@ import { unified } from 'unified'
 import { visit } from 'unist-util-visit'
 
 import { getBlogCollection, sortMDByDate } from '@/utils/blog'
+import { getEnrichedVaultCollection, getVaultFolderDisplayPathFromEntryId } from '@/utils/vault'
 import config from '@/site.config'
 
 // Get dynamic import of images as a map collection
@@ -17,7 +18,7 @@ const imagesGlob = import.meta.glob<{ default: ImageMetadata }>(
   '/src/content/blog/**/*.{jpeg,jpg,png,gif,avif,webp}' // add more image formats if needed
 )
 
-const renderContent = async (post: CollectionEntry<'blog'>, site: URL) => {
+const renderBlogContent = async (post: CollectionEntry<'blog'>, site: URL) => {
   // Replace image links with the correct path
   function remarkReplaceImageLink() {
     /**
@@ -53,9 +54,69 @@ const renderContent = async (post: CollectionEntry<'blog'>, site: URL) => {
   return String(file)
 }
 
+const renderVaultContent = async (entry: CollectionEntry<'vault'>) => {
+  const file = await unified()
+    .use(remarkParse)
+    .use(remarkRehype)
+    .use(rehypeStringify)
+    .process(entry.body)
+
+  return String(file)
+}
+
+interface FeedItem {
+  title: string
+  description?: string
+  link: string
+  pubDate?: Date
+  content: string
+  customData?: string
+}
+
+function sortFeedItemsByDate(items: FeedItem[]): FeedItem[] {
+  return items.sort((a, b) => (b.pubDate?.valueOf() ?? 0) - (a.pubDate?.valueOf() ?? 0))
+}
+
 const GET = async (context: AstroGlobal) => {
   const allPostsByDate = sortMDByDate(await getBlogCollection()) as CollectionEntry<'blog'>[]
+  const allVaultEntries = await getEnrichedVaultCollection()
   const siteUrl = context.site ?? new URL(import.meta.env.SITE)
+
+  const blogItems: FeedItem[] = await Promise.all(
+    allPostsByDate.map(async (post) => {
+      const heroSrc =
+        typeof post.data.heroImage?.src === 'string'
+          ? post.data.heroImage.src
+          : post.data.heroImage?.src.src
+
+      return {
+        title: `[Blog] ${post.data.title}`,
+        description: post.data.description,
+        pubDate: post.data.publishDate,
+        link: `/blog/${post.id}`,
+        customData: heroSrc
+          ? `<h:img src="${heroSrc}" /><enclosure url="${heroSrc}" />`
+          : undefined,
+        content: await renderBlogContent(post, siteUrl)
+      }
+    })
+  )
+
+  const vaultItems: FeedItem[] = await Promise.all(
+    allVaultEntries.map(async (entry) => {
+      const title = entry.data.title ?? entry.id.split('/').pop()?.replace(/\.(md|mdx)$/, '') ?? entry.id
+      const folderPath = getVaultFolderDisplayPathFromEntryId(entry.id)
+      return {
+        title: `[Vault: ${folderPath}] ${title}`,
+        description: entry.data.description ?? title,
+        pubDate: entry.data.updatedDate ?? entry.data.publishDate,
+        link: `/vault/${entry.slug}`,
+        content: await renderVaultContent(entry)
+      }
+    })
+  )
+
+  const items = sortFeedItemsByDate([...blogItems, ...vaultItems])
 
   return rss({
     // Basic configs
@@ -67,16 +128,7 @@ const GET = async (context: AstroGlobal) => {
     title: config.title,
     description: config.description,
     site: import.meta.env.SITE,
-    items: await Promise.all(
-      allPostsByDate.map(async (post) => ({
-        pubDate: post.data.publishDate,
-        link: `/blog/${post.id}`,
-        customData: `<h:img src="${typeof post.data.heroImage?.src === 'string' ? post.data.heroImage?.src : post.data.heroImage?.src.src}" />
-          <enclosure url="${typeof post.data.heroImage?.src === 'string' ? post.data.heroImage?.src : post.data.heroImage?.src.src}" />`,
-        content: await renderContent(post, siteUrl),
-        ...post.data
-      }))
-    )
+    items
   })
 }
 
