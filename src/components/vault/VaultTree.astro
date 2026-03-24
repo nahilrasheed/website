@@ -9,9 +9,10 @@ interface Props {
   level?: number
   title?: string
   class?: string
+  collapsed?: boolean
 }
 
-const { currentSlug, node, level = 0, title, class: className } = Astro.props
+const { currentSlug, node, level = 0, title, class: className, collapsed = false } = Astro.props
 
 // If no node is passed, we are at the root level so we fetch the tree
 const tree = !node ? await getVaultTree() : null
@@ -23,7 +24,7 @@ const isChildActive = (n: VaultNode): boolean => {
 
 const isActive = node?.slug === currentSlug
 const hasChildren = (node?.children.length ?? 0) > 0
-const isOpen = hasChildren && (isActive || (node && isChildActive(node)))
+const isOpen = !collapsed && hasChildren && (isActive || (node && isChildActive(node)))
 const canLink = !!node?.slug && node.showLink !== false
 ---
 
@@ -93,7 +94,7 @@ const canLink = !!node?.slug && node.showLink !== false
       </div>
       <ul class='space-y-0.5'>
         {tree?.map((rootNode) => (
-          <Astro.self node={rootNode} {currentSlug} level={level + 1} />
+          <Astro.self node={rootNode} {currentSlug} {collapsed} level={level + 1} />
         ))}
       </ul>
 
@@ -190,7 +191,7 @@ const canLink = !!node?.slug && node.showLink !== false
           </summary>
           <ul class='ml-[0.6rem] pl-2 border-l border-border/40 space-y-0.5'>
             {node.children.map((child) => (
-              <Astro.self node={child} {currentSlug} level={level + 1} />
+              <Astro.self node={child} {currentSlug} {collapsed} level={level + 1} />
             ))}
           </ul>
         </details>
