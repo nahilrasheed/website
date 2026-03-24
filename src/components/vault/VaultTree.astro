@@ -24,6 +24,7 @@ const isChildActive = (n: VaultNode): boolean => {
 const isActive = node?.slug === currentSlug
 const hasChildren = (node?.children.length ?? 0) > 0
 const isOpen = hasChildren && (isActive || (node && isChildActive(node)))
+const canLink = !!node?.slug && node.showLink !== false
 ---
 
 {
@@ -172,7 +173,7 @@ const isOpen = hasChildren && (isActive || (node && isChildActive(node)))
               <path d='m9 18 6-6-6-6' />
             </svg>
 
-            {node.slug ? (
+            {canLink ? (
               <a
                 href={`/vault/${node.slug}`}
                 class={cn(
@@ -195,16 +196,23 @@ const isOpen = hasChildren && (isActive || (node && isChildActive(node)))
         </details>
       ) : (
         <div class='flex items-center py-1 gap-2'>
-          <a
-            href={node.slug ? `/vault/${node.slug}` : '#'}
-            class={cn(
-              'flex-1 truncate ml-4 text-sm text-muted-foreground hover:text-foreground transition-colors',
-              isActive && 'text-primary font-medium text-foreground'
-            )}
-          >
-            {node.title}
-            {node.entry?.data.publish === false && <span class='text-red-500 text-xs ml-1'>(Unpublished)</span>}
-          </a>
+          {canLink ? (
+            <a
+              href={`/vault/${node.slug}`}
+              class={cn(
+                'flex-1 truncate ml-4 text-sm text-muted-foreground hover:text-foreground transition-colors',
+                isActive && 'text-primary font-medium text-foreground'
+              )}
+            >
+              {node.title}
+              {node.entry?.data.publish === false && <span class='text-red-500 text-xs ml-1'>(Unpublished)</span>}
+            </a>
+          ) : (
+            <span class='flex-1 truncate ml-4 text-sm text-muted-foreground'>
+              {node.title}
+              {node.entry?.data.publish === false && <span class='text-red-500 text-xs ml-1'>(Unpublished)</span>}
+            </span>
+          )}
         </div>
       )}
     </li>

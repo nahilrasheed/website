@@ -17,8 +17,8 @@ const blog = defineCollection({
   schema: ({ image }) =>
     z.object({
       // Required
-      title: z.string().max(60),
-      description: z.string().max(160),
+      title: z.string().max(60).nullish().transform((val) => val ? val : ""),
+      description: z.string().max(160).nullish().transform((val) => val ? val : ""),
       publishDate: z.coerce.date(),
       // Optional
       updatedDate: z.coerce.date().optional(),
@@ -33,7 +33,7 @@ const blog = defineCollection({
           color: z.string().optional()
         })
         .optional(),
-      tags: z.array(z.string()).default([]).transform(removeDupsAndLowerCase),
+      tags: z.array(z.string()).nullable().default([]).transform((val) => val ? removeDupsAndLowerCase(val) : []),
       language: z.string().optional(),
       draft: z.boolean().default(false),
       // Special fields
@@ -45,12 +45,12 @@ const vault = defineCollection({
   loader: glob({ base: './src/content/vault', pattern: '**/*.{md,mdx}' }),
   schema: ({ image }) =>
     z.object({
-      title: z.string().optional(),
-      description: z.string().optional(),
+      title: z.string().nullish().transform((val) => val ? val : undefined),
+      description: z.string().nullish().transform((val) => val ? val : undefined),
       publishDate: z.coerce.date().optional(),
       updatedDate: z.coerce.date().optional(),
       publish: z.boolean().default(true).optional(),
-      tags: z.array(z.string()).default([]),
+      tags: z.array(z.string()).nullable().default([]).transform((val) => val ? val : []),
       permalink: z.string().optional(),
       image: image().optional(),
       cover: image().optional(),
