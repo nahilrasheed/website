@@ -1,46 +1,132 @@
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
+import { join } from 'node:path'
 import { getCollection } from 'astro:content'
 import type { CollectionEntry } from 'astro:content'
-import { readdirSync, statSync } from 'node:fs'
-import { join } from 'node:path'
 
 export type VaultEntry = CollectionEntry<'vault'>
+const VAULT_CONTENT_PATH = './src/content/vault'
+const DEFAULT_VAULT_ORDER = Number.POSITIVE_INFINITY
+
+interface GetEnrichedVaultCollectionOptions {
+  includeUnlinkable?: boolean
+}
+
+export interface EnrichedVaultEntry extends VaultEntry {
+  slug: string
+  isFolderNote: boolean
+  isMetadataOnlyFolderNote: boolean
+  isLinkable: boolean
+}
 
 export const prod = import.meta.env.PROD
+
+function buildMetadataOnlyFolderNoteSlugSet(basePath: string, prefix = ''): Set<string> {
+  const slugs = new Set<string>()
+
+  try {
+    const items = readdirSync(basePath)
+    const folderNote = items.find((item) => /^(index|readme)\.(md|mdx)$/i.test(item))
+
+    if (folderNote) {
+      const source = readFileSync(join(basePath, folderNote), 'utf8')
+      if (getMarkdownContentWithoutFrontmatter(source).length === 0 && prefix) {
+        slugs.add(prefix)
+      }
+    }
+
+    for (const item of items) {
+      if (item.startsWith('.')) continue
+
+      const fullPath = join(basePath, item)
+      const stat = statSync(fullPath)
+
+      if (!stat.isDirectory()) continue
+
+      const nextPrefix = prefix ? `${prefix}/${sanitizeSlugPart(item)}` : sanitizeSlugPart(item)
+      const nestedSlugs = buildMetadataOnlyFolderNoteSlugSet(fullPath, nextPrefix)
+
+      for (const slug of nestedSlugs) slugs.add(slug)
+    }
+  } catch (error) {
+    console.error('Error reading folder note metadata:', error)
+  }
+
+  return slugs
+}
+
+function getMarkdownContentWithoutFrontmatter(source: string | undefined): string {
+  if (!source) return ''
+
+  return source.replace(/^---\s*\n[\s\S]*?\n---\s*(\n|$)/, '').trim()
+}
 
 export interface VaultNode {
   title: string
   slug?: string
   children: VaultNode[]
   order: number
-  entry?: VaultEntry
+  entry?: EnrichedVaultEntry
+  showLink?: boolean
   active?: boolean
   isOpen?: boolean
+}
+
+interface VaultTreeBranch {
+  title: string
+  children: Record<string, VaultTreeBranch>
+  order: number
+  entry?: EnrichedVaultEntry
+  showLink?: boolean
+}
+
+function getVaultNodeSortOrder(order: number | undefined): number {
+  return typeof order === 'number' && Number.isFinite(order) ? order : DEFAULT_VAULT_ORDER
+}
+
+function isFolderNode(node: Pick<VaultNode, 'children'>): boolean {
+  return node.children.length > 0
+}
+
+function compareVaultNodes(a: VaultNode, b: VaultNode): number {
+  const orderDiff = getVaultNodeSortOrder(a.order) - getVaultNodeSortOrder(b.order)
+  if (orderDiff !== 0) return orderDiff
+
+  const aIsFolder = isFolderNode(a)
+  const bIsFolder = isFolderNode(b)
+
+  if (aIsFolder !== bIsFolder) return aIsFolder ? -1 : 1
+
+  return a.title.localeCompare(b.title)
+}
+
+function getFallbackTitle(value: string): string {
+  return value.replace(/[-_]/g, ' ')
 }
 
 //  Sanitize a path segment for URLs
 function sanitizeSlugPart(part: string): string {
   return part
     .toLowerCase()
-    .replace(/[&()[\]{}]/g, '')                       // Remove &, brackets, parens
-    .replace(/[,;:!?@#$%^*+=|\\/<>"'`~]/g, '')        // Remove punctuation
-    .replace(/\s+/g, '-')                             // Spaces → dashes
-    .replace(/--+/g, '-')                             // Multiple dashes → single
-    .replace(/^-+|-+$/g, '')                          // Trim edge dashes
+    .replace(/[&()[\]{}]/g, '') // Remove &, brackets, parens
+    .replace(/[,;:!?@#$%^*+=|\\/<>"'`~]/g, '') // Remove punctuation
+    .replace(/\s+/g, '-') // Spaces → dashes
+    .replace(/--+/g, '-') // Multiple dashes → single
+    .replace(/^-+|-+$/g, '') // Trim edge dashes
 }
 
- // Build map of normalized paths to original names with casing/symbols preserved
+// Build map of normalized paths to original names with casing/symbols preserved
 function buildOriginalNameMap(basePath: string, prefix = ''): Record<string, string> {
   const map: Record<string, string> = {}
-  
+
   try {
     const items = readdirSync(basePath)
-    
+
     for (const item of items) {
       if (item.startsWith('.')) continue
-      
+
       const fullPath = join(basePath, item)
       const stat = statSync(fullPath)
-      
+
       if (stat.isDirectory()) {
         const normalized = sanitizeSlugPart(item)
         const key = prefix ? `${prefix}/${normalized}` : normalized
@@ -56,12 +142,55 @@ function buildOriginalNameMap(basePath: string, prefix = ''): Record<string, str
   } catch (error) {
     console.error('Error reading vault directory:', error)
   }
-  
+
   return map
 }
 
 // Build the map once at module load for performance
-const originalNameMap = buildOriginalNameMap('./src/content/vault')
+const originalNameMap = buildOriginalNameMap(VAULT_CONTENT_PATH)
+const metadataOnlyFolderNoteSlugs = buildMetadataOnlyFolderNoteSlugSet(VAULT_CONTENT_PATH)
+
+function getOriginalVaultPath(entryId: string): string {
+  const parts = entryId.split('/')
+  const originalParts: string[] = []
+  const normalizedParts: string[] = []
+
+  for (const part of parts) {
+    normalizedParts.push(sanitizeSlugPart(part))
+    const lookupKey = normalizedParts.join('/')
+    originalParts.push(originalNameMap[lookupKey] ?? part)
+  }
+
+  return originalParts.join('/')
+}
+
+function getVaultSourceCandidates(entryId: string): string[] {
+  const originalPath = getOriginalVaultPath(entryId)
+  const basePaths = [...new Set([entryId, originalPath])]
+
+  return basePaths.flatMap((path) => [
+    `${VAULT_CONTENT_PATH}/${path}/index.md`,
+    `${VAULT_CONTENT_PATH}/${path}/index.mdx`,
+    `${VAULT_CONTENT_PATH}/${path}/README.md`,
+    `${VAULT_CONTENT_PATH}/${path}/README.mdx`,
+    `${VAULT_CONTENT_PATH}/${path}`,
+    `${VAULT_CONTENT_PATH}/${path}.md`,
+    `${VAULT_CONTENT_PATH}/${path}.mdx`
+  ])
+}
+
+function resolveVaultEntrySourcePath(entryId: string): string | null {
+  for (const candidate of getVaultSourceCandidates(entryId)) {
+    if (existsSync(candidate) && statSync(candidate).isFile()) return candidate
+  }
+
+  return null
+}
+
+function isFolderNote(entryId: string): boolean {
+  const sourcePath = resolveVaultEntrySourcePath(entryId)
+  return sourcePath ? /\/(index|README)\.(md|mdx)$/i.test(sourcePath) : false
+}
 
 //  Convert entry ID to URL-safe slug
 export function normalizeVaultSlug(id: string): string {
@@ -111,24 +240,42 @@ export function getVaultFolderDisplayPathFromEntryId(entryId: string): string {
  * - Preserves original casing/symbols in titles via originalNameMap
  * - Filters out unpublished notes in production (publish: false)
  */
-export async function getEnrichedVaultCollection() {
+export async function getEnrichedVaultCollection(
+  options: GetEnrichedVaultCollectionOptions = {}
+): Promise<EnrichedVaultEntry[]> {
+  const { includeUnlinkable = false } = options
   const vault = await getCollection('vault', ({ data }) => {
     // In production, filter out unpublished notes
     return prod ? data.publish !== false : true
   })
-  return vault
-    .map(entry => {
-        const slug = normalizeVaultSlug(entry.id)
-        
-        // Auto-generate title if missing
-        if (!entry.data.title) {
-            entry.data.title = originalNameMap[slug] || 
-                               entry.id.split('/').pop()?.replace(/\.(md|mdx)$/, '').replace(/[-_]/g, ' ') ||
-                               slug
-        }
-        
-        return { ...entry, slug }
-    })
+
+  const enriched = vault.map((entry): EnrichedVaultEntry => {
+    const slug = normalizeVaultSlug(entry.id)
+    const isFolder = isFolderNote(entry.id)
+    const isMetadataOnly = metadataOnlyFolderNoteSlugs.has(slug)
+
+    // Auto-generate title if missing
+    if (!entry.data.title) {
+      entry.data.title =
+        originalNameMap[slug] ||
+        entry.id
+          .split('/')
+          .pop()
+          ?.replace(/\.(md|mdx)$/, '')
+          .replace(/[-_]/g, ' ') ||
+        slug
+    }
+
+    return {
+      ...entry,
+      slug,
+      isFolderNote: isFolder,
+      isMetadataOnlyFolderNote: isMetadataOnly,
+      isLinkable: !isMetadataOnly
+    }
+  })
+
+  return includeUnlinkable ? enriched : enriched.filter((entry) => entry.isLinkable)
 }
 
 /**
@@ -138,62 +285,55 @@ export async function getEnrichedVaultCollection() {
  * - Sorts by order, then folders first, then alphabetically
  */
 export async function getVaultTree(): Promise<VaultNode[]> {
-  const entries = await getEnrichedVaultCollection()
-  const root: any = { children: {} }
+  const entries = await getEnrichedVaultCollection({ includeUnlinkable: true })
+  const root: VaultTreeBranch = {
+    title: 'Root',
+    children: {},
+    order: DEFAULT_VAULT_ORDER
+  }
 
   for (const entry of entries) {
     const parts = entry.id.split('/')
     const filename = parts[parts.length - 1]
-    
-    // Check for folder note pattern (index.md or README.md)
-    const isIndex = /^(index|readme)\.(md|mdx)$/i.test(filename)
-    
-    // Build path: "foo/bar/index.md" → ["foo", "bar"], "foo/bar.md" → ["foo", "bar"]
-    const pathParts = isIndex 
-      ? parts.slice(0, -1)
-      : [...parts.slice(0, -1), filename.replace(/\.(md|mdx)$/, '')]
+    const isIndex = entry.isFolderNote
+    const hasBodyContent = !entry.isMetadataOnlyFolderNote
+    const pathParts = isIndex ? parts : [...parts.slice(0, -1), filename.replace(/\.(md|mdx)$/, '')]
 
     let current = root
     let accumulatedPath: string[] = []
-    
-    // Traverse/create tree nodes
+
     for (const part of pathParts) {
       const normalizedPart = sanitizeSlugPart(part)
       accumulatedPath.push(normalizedPart)
-      
+
       if (!current.children[part]) {
         const lookupKey = accumulatedPath.join('/')
         current.children[part] = {
-          title: originalNameMap[lookupKey] || part.replace(/[-_]/g, ' '),
+          title: originalNameMap[lookupKey] || getFallbackTitle(part),
           children: {},
-          order: 999
+          order: DEFAULT_VAULT_ORDER
         }
       }
       current = current.children[part]
     }
-    
-    // Attach entry data to leaf node
+
     current.entry = entry
+    current.showLink = !isIndex || hasBodyContent
     if (entry.data.title) current.title = entry.data.title
     if (entry.data.order !== undefined) current.order = entry.data.order
   }
 
-  // Convert nested object to sorted array structure
-  const buildList = (childrenMap: Record<string, any>): VaultNode[] => {
-    return Object.values(childrenMap).map((node: any) => ({
-       title: node.title,
-       slug: node.entry?.slug,
-       children: buildList(node.children),
-       order: node.order,
-       entry: node.entry
-    })).sort((a, b) => {
-        if (a.order !== b.order) return a.order - b.order
-        const aIsFolder = a.children.length > 0
-        const bIsFolder = b.children.length > 0
-        if (aIsFolder && !bIsFolder) return -1
-        if (!aIsFolder && bIsFolder) return 1
-        return a.title.localeCompare(b.title)
-    })
+  const buildList = (childrenMap: Record<string, VaultTreeBranch>): VaultNode[] => {
+    return Object.values(childrenMap)
+      .map((node) => ({
+        title: node.title,
+        slug: node.entry?.slug,
+        children: buildList(node.children),
+        order: node.order,
+        entry: node.entry,
+        showLink: node.showLink ?? true
+      }))
+      .sort(compareVaultNodes)
   }
 
   return buildList(root.children)
@@ -209,7 +349,7 @@ export async function getVaultFlatList(): Promise<{ title: string; slug: string 
 
   const traverse = (nodes: VaultNode[]) => {
     for (const node of nodes) {
-      if (node.slug) list.push({ title: node.title, slug: node.slug })
+      if (node.slug && node.showLink !== false) list.push({ title: node.title, slug: node.slug })
       if (node.children.length > 0) traverse(node.children)
     }
   }
@@ -223,9 +363,7 @@ export async function getVaultFlatList(): Promise<{ title: string; slug: string 
  */
 export async function getUniqueVaultTags(): Promise<string[]> {
   const vault = await getEnrichedVaultCollection()
-  const allTags = vault
-    .flatMap(entry => entry.data.tags ?? [])
-    .map(tag => tag.toLowerCase())
+  const allTags = vault.flatMap((entry) => entry.data.tags ?? []).map((tag) => tag.toLowerCase())
   return [...new Set(allTags)]
 }
 
@@ -235,7 +373,7 @@ export async function getUniqueVaultTags(): Promise<string[]> {
 export async function getUniqueVaultTagsWithCount(): Promise<[string, number][]> {
   const vault = await getEnrichedVaultCollection()
   const tagMap = new Map<string, number>()
-  
+
   for (const entry of vault) {
     if (entry.data.tags) {
       for (const tag of entry.data.tags) {
@@ -244,6 +382,6 @@ export async function getUniqueVaultTagsWithCount(): Promise<[string, number][]>
       }
     }
   }
-  
+
   return [...tagMap.entries()].sort((a, b) => b[1] - a[1])
 }
