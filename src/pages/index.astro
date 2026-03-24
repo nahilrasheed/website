@@ -1,16 +1,44 @@
 ---
 import { Image } from 'astro:assets'
 
-import { PostPreview } from '@/components/pages'
-import { getBlogCollection, sortMDByDate } from '@/utils/blog'
+import PostPreview from '@/components/pages/PostPreview.astro'
+import { getBlogCollection } from '@/utils/blog'
+import { getEnrichedVaultCollection } from '@/utils/vault'
 import { Button, Icon, Label, Section } from '@/components/user'
 import PageLayout from '@/layouts/BaseLayout.astro'
 import { ProjectCard, ImageCard } from '@/components/about'
 import config from '@/site-config'
 
-const MAX_POSTS = 10
+const MAX_ITEMS = 5
+
+// Get posts and notes
 const allPosts = await getBlogCollection()
-const allPostsByDate = sortMDByDate(allPosts).slice(0, MAX_POSTS)
+const allNotes = await getEnrichedVaultCollection()
+
+// Create unified content list with type and date
+type ContentItem = 
+  | { type: 'post'; data: typeof allPosts[number]; date: Date }
+  | { type: 'note'; data: typeof allNotes[number]; date: Date }
+
+const contentItems: ContentItem[] = [
+  ...allPosts.map(post => ({
+    type: 'post' as const,
+    data: post,
+    date: post.data.updatedDate ?? post.data.publishDate
+  })),
+  ...allNotes
+    .filter(note => note.data.publishDate || note.data.updatedDate)
+    .map(note => ({
+      type: 'note' as const,
+      data: note,
+      date: (note.data.updatedDate ?? note.data.publishDate)!
+    }))
+]
+
+// Sort by date descending and take latest
+const latestContent = contentItems
+  .sort((a, b) => b.date.getTime() - a.date.getTime())
+  .slice(0, MAX_ITEMS)
 
 const imagePath = config.logo.src
 const images = import.meta.glob<{ default: ImageMetadata }>(
@@ -74,16 +102,17 @@ if (!images[imagePath])
       </Section>
       
       {
-        allPostsByDate.length > 0 && (
-          <Section title='Posts'>
+        latestContent.length > 0 && (
+          <Section title='Recent'>
             <ul class='flex flex-col gap-y-1.5 sm:gap-y-2'>
-              {allPostsByDate.map((p) => (
-                <li class='flex flex-col gap-x-2 sm:flex-row'>
-                  <PostPreview post={p} />
-                </li>
+              {latestContent.map((item) => (
+                item.type === 'post' ? (
+                  <PostPreview post={item.data} />
+                ) : (
+                  <PostPreview note={{ title: item.data.data.title || item.data.slug, slug: item.data.slug, date: item.date, draft: item.data.data.publish === false }} />
+                )
               ))}
             </ul>
-            <Button title='More posts' class='w-fit self-end' href='/blog' variant='ahead' />
           </Section>
         )
       }
@@ -106,23 +135,24 @@ if (!images[imagePath])
       </Section>
 
       <Section title='Certifications'>
-        <ImageCard
-          as='a'
-          heading='Google Cybersecurity Professional Certificate'
-          subheading='Google'
-          date='Dec 2025'
-          href='https://www.coursera.org/account/accomplishments/specialization/48W6CHQVROD8'
-          imagePath='/src/assets/about/gcpc.png'
-        />
-        <br />
-        <ImageCard
-          as='a'
-          heading='Cisco Ethical Hacker'
-          subheading='Cisco'
-          date='July 2025'
-          href='https://www.credly.com/badges/f806a313-6c62-4810-b196-eecc93dcb6a8/'
-          imagePath='/src/assets/about/cisco-eh.png'
-        />
+        <div class='flex flex-col gap-3'>
+          <ImageCard
+            as='a'
+            heading='Google Cybersecurity Professional Certificate'
+            subheading='Google'
+            date='Dec 2025'
+            href='https://www.coursera.org/account/accomplishments/specialization/48W6CHQVROD8'
+            imagePath='/src/assets/about/gcpc.png'
+          />
+          <ImageCard
+            as='a'
+            heading='Cisco Ethical Hacker'
+            subheading='Cisco'
+            date='July 2025'
+            href='https://www.credly.com/badges/f806a313-6c62-4810-b196-eecc93dcb6a8/'
+            imagePath='/src/assets/about/cisco-eh.png'
+          />
+        </div>
       </Section>
     </div>
   </main>

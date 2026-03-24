@@ -5,22 +5,36 @@ import { type CollectionEntry, type CollectionKey, render } from 'astro:content'
 import { cn } from '../../utils'
 import { Button, FormattedDate, Icon } from '../user'
 
+type NoteData = {
+  title: string
+  slug: string
+  date: Date
+  draft?: boolean
+}
+
 type Props<T extends CollectionKey> = {
-  post: CollectionEntry<T>
+  post?: CollectionEntry<T>
+  note?: NoteData
   detailed?: boolean
   class?: string
 }
 
-const { post, detailed = false, class: className } = Astro.props
-const { id, data } = post
-const { remarkPluginFrontmatter } = await render(post)
-const postDate = data.updatedDate ?? data.publishDate
+const { post, note, detailed = false, class: className } = Astro.props
+
+// Handle note (simple) or post (full collection entry)
+const isNote = !!note
+const title = isNote ? note.title : post!.data.title
+const href = isNote ? `/vault/${note.slug}` : `/blog/${post!.id}`
+const date = isNote ? note.date : (post!.data.updatedDate ?? post!.data.publishDate)
+const isDraft = isNote ? note.draft : post!.data.draft
+const data = isNote ? null : post!.data
+const remarkPluginFrontmatter = post ? (await render(post)).remarkPluginFrontmatter : null
 ---
 
 <li
   class={cn('post-preview', className)}
-  style={detailed &&
-    data.heroImage?.color &&
+  style={!isNote && detailed &&
+    data?.heroImage?.color &&
     `--preview-highlight:color-mix(in srgb,${data.heroImage.color} 40%,hsl(var(--foreground)/var(--un-text-opacity,1)));
     --preview-highlight-bg:hsl(from ${data.heroImage.color} h s l/20%)`}
 >
@@ -28,15 +42,15 @@ const postDate = data.updatedDate ?? data.publishDate
     class={cn(
       'block w-full relative group rounded-2xl border bg-background transition-colors ease-in-out px-5 py-2.5 hover:bg-muted hover:text-primary',
       detailed && 'max-sm:px-4 sm:py-5',
-      detailed && data.heroImage && 'max-md:pt-24'
+      detailed && data?.heroImage && 'max-md:pt-24'
     )}
-    href={`/blog/${id}`}
+    href={href}
     data-astro-prefetch
   >
     {
-      detailed && data.heroImage && (
+      !isNote && detailed && data?.heroImage && (
         <Image
-          alt={data.heroImage.alt || data.title}
+          alt={data.heroImage.alt || title}
           class='cover-image absolute end-0 top-0 z-0 h-2/3 w-full rounded-2xl object-cover opacity-50 transition-opacity duration-300 group-hover:opacity-70 md:h-full md:w-3/5'
           loading='eager'
           {...data.heroImage}
@@ -47,13 +61,13 @@ const postDate = data.updatedDate ?? data.publishDate
       class={cn('relative flex flex-col gap-1', !detailed && 'sm:flex-row sm:items-center')}
       style='z-index:1'
     >
-      <FormattedDate class='min-w-[95px] text-xs' date={postDate} />
+      <FormattedDate class='min-w-[95px] text-xs' date={date} />
 
       {/* title */}
       <div class='flex justify-between flex-grow'>
         <div class={detailed && 'font-medium'}>
-          {data.draft && <span class='text-red-500'>(Draft) </span>}
-          {data.title}
+          {isDraft && <span class='text-red-500'>(Draft) </span>}
+          {title}
         </div>
         <svg
           xmlns='http://www.w3.org/2000/svg'
@@ -78,7 +92,7 @@ const postDate = data.updatedDate ?? data.publishDate
         >
       </div>
       {
-        detailed && (
+        !isNote && detailed && data && (
           <>
             {/* desc */}
             <p
@@ -93,7 +107,7 @@ const postDate = data.updatedDate ?? data.publishDate
               {/* reading time */}
               <span class='flex items-center gap-1'>
                 <Icon name='time' class='size-4' />
-                {remarkPluginFrontmatter.minutesRead}
+                {remarkPluginFrontmatter?.minutesRead}
               </span>
               {/* language */}
               {data.language && (
