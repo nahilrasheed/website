@@ -9,38 +9,6 @@ function removeDupsAndLowerCase(array: string[]) {
   return Array.from(distinctItems)
 }
 
-// Define blog collection
-const blog = defineCollection({
-  // Load Markdown and MDX files in the `src/content/blog/` directory.
-  loader: glob({ base: './src/content/blog', pattern: '**/*.{md,mdx}' }),
-  // Required
-  schema: ({ image }) =>
-    z.object({
-      // Required
-      title: z.string().max(60).nullish().transform((val) => val ? val : ""),
-      description: z.string().max(160).nullish().transform((val) => val ? val : ""),
-      publishDate: z.coerce.date(),
-      // Optional
-      updatedDate: z.coerce.date().optional(),
-      heroImage: z
-        .object({
-          src: image(),
-          alt: z.string().optional(),
-          inferSize: z.boolean().optional(),
-          width: z.number().optional(),
-          height: z.number().optional(),
-
-          color: z.string().optional()
-        })
-        .optional(),
-      tags: z.array(z.string()).nullable().default([]).transform((val) => val ? removeDupsAndLowerCase(val) : []),
-      language: z.string().optional(),
-      draft: z.boolean().default(false),
-      // Special fields
-      comment: z.boolean().default(true)
-    })
-})
-
 const vault = defineCollection({
   loader: glob({ base: './src/content/vault', pattern: '**/*.{md,mdx}' }),
   schema: ({ image }) =>
@@ -50,12 +18,25 @@ const vault = defineCollection({
       publishDate: z.coerce.date().optional(),
       updatedDate: z.coerce.date().optional(),
       publish: z.boolean().default(true).optional(),
-      tags: z.array(z.string()).nullable().default([]).transform((val) => val ? val : []),
+      tags: z.array(z.string()).nullable().default([]).transform((val) => val ? removeDupsAndLowerCase(val) : []),
       permalink: z.string().optional(),
       image: image().optional(),
       cover: image().optional(),
-      order: z.number().default(999)
+      order: z.number().default(999),
+      type: z.string().default('note'),
+      heroImage: z
+        .object({
+          src: image(),
+          alt: z.string().optional(),
+          inferSize: z.boolean().optional(),
+          width: z.number().optional(),
+          height: z.number().optional(),
+          color: z.string().optional()
+        })
+        .optional(),
+      language: z.string().optional(),
+      comment: z.boolean().default(true).optional()
     })
 })
 
-export const collections = { blog, vault }
+export const collections = { vault }

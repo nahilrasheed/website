@@ -9,16 +9,16 @@ import remarkRehype from 'remark-rehype'
 import { unified } from 'unified'
 import { visit } from 'unist-util-visit'
 
-import { getBlogCollection, sortMDByDate } from '@/utils/blog'
-import { getEnrichedVaultCollection, getVaultFolderDisplayPathFromEntryId } from '@/utils/vault'
+import { getEnrichedVaultCollection, sortMDByDate, getVaultFolderDisplayPathFromEntryId } from '@/utils/vault'
+import type { EnrichedVaultEntry } from '@/utils/vault'
 import config from '@/site.config'
 
 // Get dynamic import of images as a map collection
 const imagesGlob = import.meta.glob<{ default: ImageMetadata }>(
-  '/src/content/blog/**/*.{jpeg,jpg,png,gif,avif,webp}' // add more image formats if needed
+  '/src/content/vault/**/*.{jpeg,jpg,png,gif,avif,webp}' // add more image formats if needed
 )
 
-const renderBlogContent = async (post: CollectionEntry<'blog'>, site: URL) => {
+const renderBlogContent = async (post: EnrichedVaultEntry, site: URL) => {
   // Replace image links with the correct path
   function remarkReplaceImageLink() {
     /**
@@ -30,7 +30,7 @@ const renderBlogContent = async (post: CollectionEntry<'blog'>, site: URL) => {
         if (node.url.startsWith('/images')) {
           node.url = `${site}${node.url.replace('/', '')}`
         } else {
-          const imagePathPrefix = `/src/content/blog/${post.id}/${node.url.replace('./', '')}`
+          const imagePathPrefix = `/src/content/vault/${post.id}/${node.url.replace('./', '')}`
           const promise = imagesGlob[imagePathPrefix]?.().then(async (res) => {
             const imagePath = res?.default
             if (imagePath) {
@@ -78,7 +78,7 @@ function sortFeedItemsByDate(items: FeedItem[]): FeedItem[] {
 }
 
 const GET = async (context: AstroGlobal) => {
-  const allPostsByDate = sortMDByDate(await getBlogCollection()) as CollectionEntry<'blog'>[]
+  const allPostsByDate = sortMDByDate(await getEnrichedVaultCollection({ type: 'post' }))
   const allVaultEntries = await getEnrichedVaultCollection()
   const siteUrl = context.site ?? new URL(import.meta.env.SITE)
 

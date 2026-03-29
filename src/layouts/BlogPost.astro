@@ -1,6 +1,6 @@
 ---
 import type { MarkdownHeading } from 'astro'
-import type { CollectionEntry } from 'astro:content'
+import type { EnrichedVaultEntry } from '@/utils/vault'
 
 // Plugin styles
 import 'katex/dist/katex.min.css'
@@ -11,8 +11,8 @@ import config from '@/site.config'
 import PageLayout from '@/layouts/ContentLayout.astro'
 
 interface Props {
-  post: CollectionEntry<'blog'>
-  posts: CollectionEntry<'blog'>[]
+  post: EnrichedVaultEntry
+  posts: EnrichedVaultEntry[]
   headings: MarkdownHeading[]
   remarkPluginFrontmatter: Record<string, unknown>
 }
@@ -37,12 +37,13 @@ const socialImage = heroImage
     ? heroImage.src
     : heroImage.src.src
   : config.socialCard
-const articleDate = updatedDate?.toISOString() ?? publishDate.toISOString()
+const articleDate = updatedDate?.toISOString() ?? publishDate?.toISOString()
 const primaryColor = data.heroImage?.color ?? 'hsl(var(--primary) / var(--un-text-opacity))'
+const safeTitle = title || ''
 ---
 
 <PageLayout
-  meta={{ articleDate, description, ogImage: socialImage, title }}
+  meta={{ articleDate, description, ogImage: socialImage, title: safeTitle }}
   highlightColor={primaryColor}
   back='/blog'
 >

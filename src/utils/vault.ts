@@ -9,6 +9,7 @@ const DEFAULT_VAULT_ORDER = Number.POSITIVE_INFINITY
 
 interface GetEnrichedVaultCollectionOptions {
   includeUnlinkable?: boolean
+  type?: string | string[]
 }
 
 export interface EnrichedVaultEntry extends VaultEntry {
@@ -243,10 +244,18 @@ export function getVaultFolderDisplayPathFromEntryId(entryId: string): string {
 export async function getEnrichedVaultCollection(
   options: GetEnrichedVaultCollectionOptions = {}
 ): Promise<EnrichedVaultEntry[]> {
-  const { includeUnlinkable = false } = options
+  const { includeUnlinkable = false, type } = options
   const vault = await getCollection('vault', ({ data }) => {
     // In production, filter out unpublished notes
-    return prod ? data.publish !== false : true
+    const published = prod ? data.publish !== false : true
+    if (!published) return false
+
+    if (type) {
+      if (Array.isArray(type)) return type.includes(data.type)
+      return data.type === type
+    }
+
+    return true
   })
 
   const enriched = vault.map((entry): EnrichedVaultEntry => {
@@ -370,8 +379,8 @@ export async function getUniqueVaultTags(): Promise<string[]> {
 /**
  * Get unique tags with their count from vault entries
  */
-export async function getUniqueVaultTagsWithCount(): Promise<[string, number][]> {
-  const vault = await getEnrichedVaultCollection()
+export async function getUniqueVaultTagsWithCount(options?: GetEnrichedVaultCollectionOptions): Promise<[string, number][]> {
+  const vault = await getEnrichedVaultCollection(options)
   const tagMap = new Map<string, number>()
 
   for (const entry of vault) {
@@ -384,4 +393,34 @@ export async function getUniqueVaultTagsWithCount(): Promise<[string, number][]>
   }
 
   return [...tagMap.entries()].sort((a, b) => b[1] - a[1])
+}
+
+function getYearFromCollection(collection: EnrichedVaultEntry): number | undefined {
+  const dateStr = collection.data.updatedDate ?? collection.data.publishDate
+  return dateStr ? new Date(dateStr).getFullYear() : undefined
+}
+
+export function groupCollectionsByYear(
+  collections: EnrichedVaultEntry[]
+): [number, EnrichedVaultEntry[]][] {
+  const collectionsByYear = collections.reduce((acc, collection) => {
+    const year = getYearFromCollection(collection)
+    if (year !== undefined) {
+      if (!acc.has(year)) {
+        acc.set(year, [])
+      }
+      acc.get(year)?.push(collection)
+    }
+    return acc
+  }, new Map<number, EnrichedVaultEntry[]>())
+
+  return Array.from(collectionsByYear.entries()).sort((a, b) => b[0] - a[0])
+}
+
+export function sortMDByDate(collections: EnrichedVaultEntry[]): EnrichedVaultEntry[] {
+  return collections.sort((a, b) => {
+    const aDate = new Date(a.data.updatedDate ?? a.data.publishDate ?? 0).valueOf()
+    const bDate = new Date(b.data.updatedDate ?? b.data.publishDate ?? 0).valueOf()
+    return bDate - aDate
+  })
 }
