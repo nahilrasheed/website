@@ -129,14 +129,6 @@ const dateTimeOptions: Intl.DateTimeFormatOptions = {
                {entry && (
                  <>
                     <Copyright data={entry.data} />
-                    {editPath && (
-                      <div class='flex justify-normal items-center mt-6 gap-x-12'>
-                        <Button title='Edit on GitHub' href={editPath} class='text-sm text-muted-foreground hover:text-foreground'>
-                        <Icon name='edit' slot='before' class='size-4' />
-                        Edit Page
-                        </Button>
-                      </div>
-                    )}
                     
                     {paginationProps && (
                       <div class='mt-6'>
