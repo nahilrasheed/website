@@ -5,14 +5,16 @@ import type { InferEntrySchema } from 'astro:content'
 import { FormattedDate, Icon } from '../user'
 
 interface Props {
-  data: InferEntrySchema<'blog'>
+  data: InferEntrySchema<'vault'>
   remarkPluginFrontmatter: Record<string, unknown>
 }
 
 const {
-  data: { title, description, draft, heroImage, publishDate, updatedDate, tags, language },
+  data: { title, description, publish, heroImage, publishDate, updatedDate, tags, language },
   remarkPluginFrontmatter
 } = Astro.props
+
+const draft = publish === false
 
 const dateTimeOptions: Intl.DateTimeFormatOptions = {
   month: 'short'
@@ -23,7 +25,7 @@ const dateTimeOptions: Intl.DateTimeFormatOptions = {
   heroImage && (
     <div class='hero-image relative mb-6'>
       <Image
-        alt={heroImage.alt || title}
+        alt={heroImage.alt || title || ''}
         class='cover-image relative z-10 h-auto w-full max-w-[65ch] rounded-2xl object-contain'
         fetchpriority='high'
         loading='eager'
@@ -48,7 +50,7 @@ const dateTimeOptions: Intl.DateTimeFormatOptions = {
     {/* Article date */}
     <div class='flex items-center gap-1'>
       <Icon name='calendar' class='size-5' />
-      <FormattedDate class='font-sans' date={publishDate} dateTimeOptions={dateTimeOptions} />
+      {publishDate && <FormattedDate class='font-sans' date={publishDate} dateTimeOptions={dateTimeOptions} />}
       {
         updatedDate && (
           <div class='flex items-center gap-1'>

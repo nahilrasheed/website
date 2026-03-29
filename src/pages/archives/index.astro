@@ -1,12 +1,12 @@
 ---
 import { PostPreview } from '@/components/pages'
-import { getBlogCollection, groupCollectionsByYear, sortMDByDate } from '@/utils/blog'
+import { getEnrichedVaultCollection, groupCollectionsByYear, sortMDByDate } from '@/utils/vault'
 import { Button } from '@/components/user'
 import PageLayout from '@/layouts/BaseLayout.astro'
 
 export const prerender = true
 
-const allPosts = await getBlogCollection()
+const allPosts = await getEnrichedVaultCollection({ type: 'post' })
 const allPostsByDate = sortMDByDate(allPosts)
 const allPostsByYear = groupCollectionsByYear(allPostsByDate)
 

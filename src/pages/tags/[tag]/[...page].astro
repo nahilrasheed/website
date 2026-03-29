@@ -1,38 +1,24 @@
 ---
 import type { GetStaticPaths, Page } from 'astro'
-import type { CollectionEntry } from 'astro:content'
 
 import { Paginator, PostPreview } from '@/components/pages'
-import { getBlogCollection, getUniqueTags, sortMDByDate } from '@/utils/blog'
 import { Button } from '@/components/user'
 import PageLayout from '@/layouts/BaseLayout.astro'
 import { getEnrichedVaultCollection, getUniqueVaultTags } from '@/utils/vault'
+import type { EnrichedVaultEntry } from '@/utils/vault'
 
 export const prerender = true
 
 export const getStaticPaths: GetStaticPaths = async ({ paginate }) => {
-  const allPosts = await getBlogCollection()
-  const allPostsByDate = sortMDByDate(allPosts)
   const allVault = await getEnrichedVaultCollection()
-  
-  // Get unique tags from both collections
-  const blogTags = getUniqueTags(allPostsByDate)
-  const vaultTags = await getUniqueVaultTags()
-  const uniqueTags = [...new Set([...blogTags, ...vaultTags])]
+  const uniqueTags = await getUniqueVaultTags()
 
   return uniqueTags.flatMap((tag) => {
-    // Filter blog posts and vault entries by tag
-    const filterPosts = allPostsByDate.filter((post) => 
-      (post.data.tags ?? []).includes(tag)
-    )
     const filterVault = allVault.filter((entry) => 
       (entry.data.tags ?? []).map((t: string) => t.toLowerCase()).includes(tag.toLowerCase())
     )
     
-    // Combine both collections
-    const combined = [...filterPosts, ...filterVault]
-    
-    return paginate(combined, {
+    return paginate(filterVault, {
       pageSize: 20,
       params: { tag }
     })
@@ -40,7 +26,7 @@ export const getStaticPaths: GetStaticPaths = async ({ paginate }) => {
 }
 
 interface Props {
-  page: Page<CollectionEntry<'blog'> | CollectionEntry<'vault'>>
+  page: Page<EnrichedVaultEntry>
 }
 
 const { page } = Astro.props
@@ -90,30 +76,22 @@ const paginationProps = {
             {page.data.map((item, index) => {
               if (index >= Math.ceil(page.data.length / 2)) return null
               
-              const isBlog = item.collection === 'blog'
+              const isPost = item.data.type === 'post'
               
-              if (isBlog) {
-                return <PostPreview post={item as any} detailed />
-              }
-            })}
-            {page.data.map((item, index) => {
-              if (index >= Math.ceil(page.data.length / 2)) return null
-              
-              const isVault = item.collection === 'vault'
-              
-              if (isVault) {
-                const vaultEntry = item as any
+              if (isPost) {
+                return <PostPreview post={item} detailed />
+              } else {
                 return (
                   <li class='mb-3 border-l border-muted-foreground/30 pl-4'>
                     <a 
-                      href={`/vault/${vaultEntry.slug}`}
+                      href={`/vault/${item.slug}`}
                       class='font-semibold text-foreground hover:text-primary transition-colors'
                     >
-                      {vaultEntry.data.title}
+                      {item.data.title}
                     </a>
-                    {vaultEntry.data.description && (
+                    {item.data.description && (
                       <p class='text-sm text-muted-foreground mt-1'>
-                        {vaultEntry.data.description}
+                        {item.data.description}
                       </p>
                     )}
                   </li>
@@ -127,30 +105,22 @@ const paginationProps = {
             {page.data.map((item, index) => {
               if (index < Math.ceil(page.data.length / 2)) return null
               
-              const isBlog = item.collection === 'blog'
+              const isPost = item.data.type === 'post'
               
-              if (isBlog) {
-                return <PostPreview post={item as any} detailed />
-              }
-            })}
-            {page.data.map((item, index) => {
-              if (index < Math.ceil(page.data.length / 2)) return null
-              
-              const isVault = item.collection === 'vault'
-              
-              if (isVault) {
-                const vaultEntry = item as any
+              if (isPost) {
+                return <PostPreview post={item} detailed />
+              } else {
                 return (
                   <li class='mb-3 border-l border-muted-foreground/30 pl-4'>
                     <a 
-                      href={`/vault/${vaultEntry.slug}`}
+                      href={`/vault/${item.slug}`}
                       class='font-semibold text-foreground hover:text-primary transition-colors'
                     >
-                      {vaultEntry.data.title}
+                      {item.data.title}
                     </a>
-                    {vaultEntry.data.description && (
+                    {item.data.description && (
                       <p class='text-sm text-muted-foreground mt-1'>
-                        {vaultEntry.data.description}
+                        {item.data.description}
                       </p>
                     )}
                   </li>

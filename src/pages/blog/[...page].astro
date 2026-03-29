@@ -1,9 +1,9 @@
 ---
 import type { GetStaticPaths, Page } from 'astro'
-import type { CollectionEntry } from 'astro:content'
 
 import { Paginator, PostPreview } from '@/components/pages'
-import { getBlogCollection, getUniqueTagsWithCount, sortMDByDate } from '@/utils/blog'
+import { getUniqueVaultTagsWithCount, sortMDByDate, getEnrichedVaultCollection } from '@/utils/vault'
+import type { EnrichedVaultEntry } from '@/utils/vault'
 import { Button, Icon } from '@/components/user'
 import PageLayout from '@/layouts/BaseLayout.astro'
 import config from '@/site-config'
@@ -11,8 +11,8 @@ import config from '@/site-config'
 export const prerender = true
 
 export const getStaticPaths = (async ({ paginate }) => {
-  const collections = sortMDByDate(await getBlogCollection())
-  const uniqueTags = getUniqueTagsWithCount(collections).map(([tag]) => tag)
+  const collections = sortMDByDate(await getEnrichedVaultCollection({ type: 'post' }))
+  const uniqueTags = (await getUniqueVaultTagsWithCount({ type: 'post' })).map(([tag]) => tag)
   const collectionsCount = collections.length
   return paginate(collections, {
     pageSize: config.content.blogPageSize,
@@ -21,7 +21,7 @@ export const getStaticPaths = (async ({ paginate }) => {
 }) satisfies GetStaticPaths
 
 interface Props {
-  page: Page<CollectionEntry<'blog'>>
+  page: Page<EnrichedVaultEntry>
   uniqueTags: string[]
   collectionsCount: number
 }

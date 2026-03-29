@@ -1,6 +1,6 @@
 ---
 import PageLayout from '@/layouts/BaseLayout.astro'
-import { Button, FormattedDate, Icon } from '@/components/user'
+import { FormattedDate, Icon } from '@/components/user'
 import type { SiteMeta } from '@/types/config'
 import VaultTree from '@/components/vault/VaultTree.astro'
 import { ArticleBottom, BackToTop, Copyright, TOC } from '@/components/pages'
@@ -20,7 +20,7 @@ interface Props {
   paginationProps?: any
 }
 
-const { meta, headings, currentSlug, entry, remarkPluginFrontmatter, editPath, paginationProps } = Astro.props
+const { meta, headings, currentSlug, entry, remarkPluginFrontmatter, paginationProps } = Astro.props
 
 const dateTimeOptions: Intl.DateTimeFormatOptions = {
   month: 'short'
