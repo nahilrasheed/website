@@ -1,4 +1,4 @@
-# Copilot Instructions for Personal Website
+# Agent Instructions for Personal Website
 
 ## Architecture Overview
 
@@ -7,9 +7,9 @@ This is a **standalone Astro static site** inspired by [Astro Theme Pure](https:
 ### Key Design Patterns
 
 1. **Content Collections** ([src/content.config.ts](src/content.config.ts)):
-   - `blog`: Strict schema requiring `title`, `description`, `publishDate`, optional `tags`, `heroImage`, `draft`
-   - `vault`: Flexible schema for Obsidian notes with auto-generated titles from filenames
-   - Both use Astro's `glob` loaders for markdown/MDX files
+   - **Unified `vault` collection**: Combines flexible schema for Obsidian notes (auto-generated titles) with strict typing for specialized content like blog posts (using a `type: 'post'` field).
+   - Uses Astro's `glob` loaders for markdown/MDX files.
+   - Standardized visibility controls using a boolean `publish` flag.
 
 2. **Dual Configuration System**:
    - [astro.config.ts](astro.config.ts): Framework config with explicit MDX/sitemap/UnoCSS integrations, markdown plugins, Shiki transformers
@@ -24,32 +24,35 @@ This is a **standalone Astro static site** inspired by [Astro Theme Pure](https:
 ### Development Commands
 
 ```bash
-bun dev          # Start dev server (localhost:4321)
-bun build        # Full build: astro check → astro build
-bun preview      # Preview production build
-bun deploy       # Deploy to Cloudflare with wrangler
+bun run dev          # Start dev server (localhost:4321)
+bun run build        # Full build: astro check → astro build
+bun run preview      # Preview production build
+bun run deploy       # Deploy to Cloudflare with wrangler
 
-bun check        # Astro type checking
-bun check-all    # Run lint → sync → check → format
-bun format       # Prettier formatting
-bun lint         # ESLint with astro plugin
-bun clean        # Remove .astro, .vercel, dist
+bun run check        # Astro type checking
+bun run check-all    # Run lint → sync → check → format
+bun run format       # Prettier formatting
+bun run lint         # ESLint with astro plugin
+bun run clean        # Remove .astro, .vercel, dist
 ```
 
 ### Creating Content
 
-- **Blog posts**: Add to `src/content/blog/` with required frontmatter:
+All content lives strictly in the unified `src/content/vault/` directory.
+
+- **Blog posts**: Add to `src/content/vault/posts/` with `type: 'post'` frontmatter:
   ```yaml
   ---
+  type: 'post'               # Flags as a blog post for special UI rendering
   title: "Post Title"        # Required, max 60 chars
   description: "..."         # Required, max 160 chars
   publishDate: 2024-01-01    # Required
   tags: ["tag1"]             # Optional
-  draft: false               # Filtered in production
+  publish: true              # Filtered in production if false
   ---
   ```
 
-- **Vault notes**: Add to `src/content/vault/` with optional frontmatter. Titles auto-generated from filenames. Use wikilinks `[[Note Name]]` for cross-references.
+- **Vault notes**: Add to `src/content/vault/` (or subfolders) with optional frontmatter. Titles auto-generated from filenames. Use wikilinks `[[Note Name]]` for cross-references.
 
 ## Markdown Processing Pipeline
 
@@ -90,8 +93,7 @@ Official transformers: `transformerNotationDiff`, `transformerNotationHighlight`
 
 ```typescript
 // Path aliases for internal code
-import { getBlogCollection, sortMDByDate } from '@/utils/blog'
-import { getVaultCollection, buildVaultTree } from '@/utils/vault'
+import { getEnrichedVaultCollection, buildVaultTree, sortMDByDate } from '@/utils/vault'
 import { cn } from '@/utils/class-merge'
 import PageLayout from '@/layouts/BaseLayout.astro'
 import config from '@/site-config'
@@ -120,19 +122,16 @@ function sanitizeSlugPart(part: string): string {
 
 This ensures URL consistency between wikilink resolution and actual page slugs. File paths in `src/content/vault/subfolder/My Note.md` become `/vault/subfolder/my-note`.
 
-### Content Helpers ([src/utils/blog.ts](src/utils/blog.ts), [src/utils/vault.ts](src/utils/vault.ts))
+### Content Helpers ([src/utils/vault.ts](src/utils/vault.ts))
 
 ```typescript
-// Blog helpers (filters drafts in production)
-getBlogCollection()         // Returns CollectionEntry<'blog'>[]
-sortMDByDate(posts)         // Sorts by updatedDate ?? publishDate
-groupCollectionsByYear()    // Groups for archives page
-getUniqueTagsWithCount()    // For tag cloud
-
-// Vault helpers
-getVaultCollection()        // Returns CollectionEntry<'vault'>[]
-buildVaultTree()            // Recursive tree for navigation
-sanitizeSlugPart()          // Match URL sanitization
+// Unified Vault helpers
+getEnrichedVaultCollection()  // Returns EnrichedVaultEntry[], automatically filtering publish: false
+sortMDByDate(posts)           // Sorts by updatedDate ?? publishDate
+groupCollectionsByYear()      // Groups posts for archives page
+getUniqueVaultTagsWithCount() // Unified tag cloud matching
+buildVaultTree()              // Recursive tree for navigation
+sanitizeSlugPart()            // Match URL sanitization
 ```
 
 ### Styling with UnoCSS
@@ -166,7 +165,7 @@ sanitizeSlugPart()          // Match URL sanitization
 ## Common Pitfalls
 
 1. **Shiki transformer types**: Always `@ts-ignore` custom transformers due to nested `@shikijs/types` versions
-2. **Draft filtering**: Use `getBlogCollection()` helper, NOT raw `getCollection('blog')` to filter drafts in production
+2. **Visibility filtering**: Use `getEnrichedVaultCollection()` helper, NOT raw `getCollection('vault')` to ensure entries with `publish: false` are filtered out in production.
 3. **Vault URL matching**: Sanitization must match exactly between:
    - Permalink map generation ([astro.config.ts](astro.config.ts) L43-52)
    - `sanitizeSlugPart()` in [src/utils/vault.ts](src/utils/vault.ts)
@@ -181,8 +180,7 @@ sanitizeSlugPart()          // Match URL sanitization
 
 - [astro.config.ts](astro.config.ts) - Framework config with plugins, integrations, Shiki setup
 - [src/site.config.ts](src/site.config.ts) - Site metadata and feature flags
-- [src/content.config.ts](src/content.config.ts) - Content collection schemas (strict blog, flexible vault)
-- [src/utils/blog.ts](src/utils/blog.ts) - Blog helpers with draft filtering
+- [src/content.config.ts](src/content.config.ts) - Unified content collection schema with type extensibility
 - [src/utils/vault.ts](src/utils/vault.ts) - Vault tree building and sanitization
 - [uno.config.ts](uno.config.ts) - Typography presets and theme customization
 - [package.json](package.json) - Scripts and dependency versions

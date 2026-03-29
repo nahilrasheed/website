@@ -64,26 +64,26 @@ bun install
 
 ```shell
 # Start dev server (localhost:4321)
-bun dev
+bun run dev
 
 # Build for production
-bun build
+bun run build
 
 # Preview production build
-bun preview
+bun run preview
 ```
 
 ### Maintenance
 
 ```shell
 # Run type checks
-bun check
+bun run check
 
 # Format code with Prettier
-bun format
+bun run format
 
 # Lint and fix code
-bun lint
+bun run lint
 ```
 
 ---
@@ -92,19 +92,23 @@ bun lint
 
 ### Creating Content
 
+All content lives strictly in the unified `src/content/vault/` directory.
+
 #### Blog Posts
-Add `.md` or `.mdx` files to `src/content/blog/` with required frontmatter:
+Add `.md` or `.mdx` files to `src/content/vault/posts/` with the `type: 'post'` explicitly declared:
 ```yaml
 ---
+type: 'post'
 title: "Your Post Title"
 description: "Brief description"
 publishDate: 2024-01-01
 tags: ["tag1", "tag2"]
+publish: true
 ---
 ```
 
 #### Vault Documents
-Add files to `src/content/vault/` - organized by folders:
+Add files to `src/content/vault/` (or any subfolder) natively:
 - **Optional frontmatter** - titles auto-generated from filenames
 - **Wikilinks** - Use `[[Note Name]]` to link between notes
 - **Folder notes** - Create `index.md` or `README.md` for folder descriptions
@@ -130,7 +134,7 @@ Add files to `src/content/vault/` - organized by folders:
 
 - **`astro.config.ts`** - Astro framework config with explicit MDX, sitemap, UnoCSS integrations and remark/rehype plugins
 - **`src/site.config.ts`** - Site metadata, theme options, header/footer (validated with Zod schemas)
-- **`src/content.config.ts`** - Content collection schemas for blog and vault
+- **`src/content.config.ts`** - Unified content collection schema for the vault
 - **`uno.config.ts`** - UnoCSS configuration with typography presets and theme colors
 - **`tsconfig.json`** - TypeScript paths and compiler options
 
@@ -169,8 +173,7 @@ Configured in `tsconfig.json`:
 ```
 ├── src/
 │   ├── content/          # Content collections
-│   │   ├── blog/         # Blog posts
-│   │   └── vault/        # Obsidian vault
+│   │   └── vault/        # Unified Obsidian vault (includes posts, notes, workflows)
 │   ├── components/       # Reusable Astro components
 │   │   ├── advanced/     # Advanced components (GithubCard, LinkPreview, etc)
 │   │   ├── basic/        # Layout components (Header, Footer, ThemeProvider)
