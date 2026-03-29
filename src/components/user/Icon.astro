@@ -1,34 +1,28 @@
 ---
 import { Icons } from '../../libs/icons'
 
-interface Props {
+export interface Props extends astroHTML.JSX.SVGAttributes {
   name: keyof typeof Icons
   label?: string
   color?: string
-  size?: string
+  size?: number | string
   class?: string
 }
 
-const { name, label, size = '1em', color, class: className, ...props } = Astro.props
+const { name, label, size = '1.5em', color, class: className, style, ...props } = Astro.props
 const a11yAttrs = label ? ({ 'aria-label': label } as const) : ({ 'aria-hidden': 'true' } as const)
+
+const inlineStyle = color ? `color: ${color};${style ? ` ${style}` : ''}` : style;
 ---
 
 <svg
   {...a11yAttrs}
   class={className}
-  width='22'
-  height='22'
+  width={size}
+  height={size}
   viewBox='0 0 24 24'
   fill='currentColor'
   set:html={Icons[name]}
+  style={inlineStyle}
   {...props}
 />
-
-<style define:vars={{ 'sl-icon-color': color, 'sl-icon-size': size }}>
-  svg {
-    color: var(--sl-icon-color);
-    font-size: var(--sl-icon-size, 1em);
-    width: 1.5em;
-    height: 1.5em;
-  }
-</style>

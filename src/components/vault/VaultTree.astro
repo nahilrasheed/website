@@ -1,6 +1,7 @@
 ---
 import { getVaultTree } from '@/utils/vault'
 import { cn } from '@/utils'
+import { Icon } from '@/components/user'
 import type { VaultNode } from '@/utils/vault'
 
 interface Props {
@@ -34,23 +35,7 @@ const canLink = !!node?.slug && node.showLink !== false
       <div class={cn('flex items-center mb-2 px-2', title ? 'justify-between' : 'justify-end')}>
         {title && (
           <div class='font-semibold text-foreground flex items-center gap-2'>
-            <svg
-              xmlns='http://www.w3.org/2000/svg'
-              width='16'
-              height='16'
-              viewBox='0 0 24 24'
-              fill='none'
-              stroke='currentColor'
-              stroke-width='2'
-              stroke-linecap='round'
-              stroke-linejoin='round'
-              class='lucide lucide-library'
-            >
-              <path d='m16 6 4 14' />
-              <path d='M12 6v14' />
-              <path d='M8 8v12' />
-              <path d='M4 4v16' />
-            </svg>
+            <Icon name='library' class='size-4' />
             {title}
           </div>
         )}
@@ -60,36 +45,8 @@ const canLink = !!node?.slug && node.showLink !== false
           aria-label='Expand all'
           title='Expand all'
         >
-          <svg
-            class='icon-expand'
-            xmlns='http://www.w3.org/2000/svg'
-            width='16'
-            height='16'
-            viewBox='0 0 24 24'
-            fill='none'
-            stroke='currentColor'
-            stroke-width='2'
-            stroke-linecap='round'
-            stroke-linejoin='round'
-          >
-            <path d='m7 15 5 5 5-5' />
-            <path d='m7 9 5 5 5-5' />
-          </svg>
-          <svg
-            class='icon-collapse hidden'
-            xmlns='http://www.w3.org/2000/svg'
-            width='16'
-            height='16'
-            viewBox='0 0 24 24'
-            fill='none'
-            stroke='currentColor'
-            stroke-width='2'
-            stroke-linecap='round'
-            stroke-linejoin='round'
-          >
-            <path d='m7 15 5-5 5 5' />
-            <path d='m7 9 5-5 5 5' />
-          </svg>
+          <Icon name='expand-all' class='icon-expand size-4' />
+          <Icon name='collapse-all' class='icon-collapse hidden size-4' />
         </button>
       </div>
       <ul class='space-y-0.5'>
@@ -159,20 +116,7 @@ const canLink = !!node?.slug && node.showLink !== false
         <details open={isOpen} class='group/details'>
           <summary class='flex items-center gap-1 cursor-pointer list-none py-1 text-sm text-muted-foreground hover:text-foreground transition-colors'>
             {/* Arrow Icon */}
-            <svg
-              xmlns='http://www.w3.org/2000/svg'
-              width='14'
-              height='14'
-              viewBox='0 0 24 24'
-              fill='none'
-              stroke='currentColor'
-              stroke-width='2'
-              stroke-linecap='round'
-              stroke-linejoin='round'
-              class='shrink-0 transition-transform duration-200 group-open/details:rotate-90 text-muted-foreground/50'
-            >
-              <path d='m9 18 6-6-6-6' />
-            </svg>
+            <Icon name='chevron-right' class='w-3.5 h-3.5 shrink-0 transition-transform duration-200 group-open/details:rotate-90 text-muted-foreground/50' />
 
             {canLink ? (
               <a
