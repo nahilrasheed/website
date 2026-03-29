@@ -2,6 +2,7 @@
 import type { HTMLTag, Polymorphic } from 'astro/types'
 
 import { cn } from '../../utils'
+import Icon from './Icon.astro'
 
 type Props<Tag extends HTMLTag> = Polymorphic<{ as: Tag }> & {
   as?: string
@@ -29,29 +30,7 @@ const { as: Tag = 'a', class: className, title, href, variant = 'button', ...pro
   <slot name='before'>
     {
       variant === 'back' && (
-        <svg
-          xmlns='http://www.w3.org/2000/svg'
-          width='16'
-          height='16'
-          viewBox='0 0 24 24'
-          fill='none'
-          stroke-width='2.5'
-          stroke-linecap='round'
-          stroke-linejoin='round'
-          class='stroke-muted-foreground group-hover:stroke-primary'
-        >
-          <line
-            x1='19'
-            y1='12'
-            x2='5'
-            y2='12'
-            class='translate-x-3 scale-x-0 transition-all duration-300 ease-in-out group-hover:translate-x-0 group-hover:scale-x-100'
-          />
-          <polyline
-            points='12 19 5 12 12 5'
-            class='translate-x-1 transition-all duration-300 ease-in-out group-hover:translate-x-0'
-          />
-        </svg>
+        <Icon name='arrow-left-animated' class='size-4 stroke-muted-foreground group-hover:stroke-primary' />
       )
     }
   </slot>
@@ -61,29 +40,7 @@ const { as: Tag = 'a', class: className, title, href, variant = 'button', ...pro
   <slot name='after'>
     {
       variant === 'ahead' && (
-        <svg
-          xmlns='http://www.w3.org/2000/svg'
-          width='16'
-          height='16'
-          viewBox='0 0 24 24'
-          fill='none'
-          stroke-width='2.5'
-          stroke-linecap='round'
-          stroke-linejoin='round'
-          class='stroke-muted-foreground group-hover:stroke-primary'
-        >
-          <line
-            x1='5'
-            y1='12'
-            x2='19'
-            y2='12'
-            class='translate-x-4 scale-x-0 transition-all duration-300 ease-in-out group-hover:translate-x-1 group-hover:scale-x-100'
-          />
-          <polyline
-            points='12 5 19 12 12 19'
-            class='translate-x-0 transition-all duration-300 ease-in-out group-hover:translate-x-1'
-          />
-        </svg>
+        <Icon name='arrow-right-animated' class='size-4 stroke-muted-foreground group-hover:stroke-primary' />
       )
     }
   </slot>
