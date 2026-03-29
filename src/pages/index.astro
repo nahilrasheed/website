@@ -1,12 +1,12 @@
 ---
 import { Image } from 'astro:assets'
 
+import PageLayout from '@/layouts/BaseLayout.astro'
+import { ImageCard, ProjectCard } from '@/components/about'
 import PostPreview from '@/components/pages/PostPreview.astro'
+import { Button, Icon, Label, Section } from '@/components/user'
 import { getBlogCollection } from '@/utils/blog'
 import { getEnrichedVaultCollection } from '@/utils/vault'
-import { Button, Icon, Label, Section } from '@/components/user'
-import PageLayout from '@/layouts/BaseLayout.astro'
-import { ProjectCard, ImageCard } from '@/components/about'
 import config from '@/site-config'
 
 const MAX_ITEMS = 5
@@ -16,19 +16,19 @@ const allPosts = await getBlogCollection()
 const allNotes = await getEnrichedVaultCollection()
 
 // Create unified content list with type and date
-type ContentItem = 
-  | { type: 'post'; data: typeof allPosts[number]; date: Date }
-  | { type: 'note'; data: typeof allNotes[number]; date: Date }
+type ContentItem =
+  | { type: 'post'; data: (typeof allPosts)[number]; date: Date }
+  | { type: 'note'; data: (typeof allNotes)[number]; date: Date }
 
 const contentItems: ContentItem[] = [
-  ...allPosts.map(post => ({
+  ...allPosts.map((post) => ({
     type: 'post' as const,
     data: post,
     date: post.data.updatedDate ?? post.data.publishDate
   })),
   ...allNotes
-    .filter(note => note.data.publishDate || note.data.updatedDate)
-    .map(note => ({
+    .filter((note) => note.data.publishDate || note.data.updatedDate)
+    .map((note) => ({
       type: 'note' as const,
       data: note,
       date: (note.data.updatedDate ?? note.data.publishDate)!
@@ -70,8 +70,16 @@ if (!images[imagePath])
           <Label title='Github' as='a' href='https://github.com/nahilrasheed' target='_blank'>
             <Icon name='github' class='size-5' slot='icon' />
           </Label>
-          <Label title='Linkedin' as='a' href='https://linkedin.com/in/nahilrasheed' target='_blank'>
+          <Label
+            title='Linkedin'
+            as='a'
+            href='https://linkedin.com/in/nahilrasheed'
+            target='_blank'
+          >
             <Icon name='linkedin' class='size-5' slot='icon' />
+          </Label>
+          <Label title='Email' as='a' href='mailto:hi@nahil.xyz' target='_blank'>
+            <Icon name='email' class='size-5' slot='icon' />
           </Label>
         </div>
       </div>
@@ -84,31 +92,46 @@ if (!images[imagePath])
           <span class='font-mono tracking-tight'> aka <span class='text-primary'>0xnhl</span></span>
         </p>
         <p>
-          Cybersecurity enthusiast, developer, and lifelong learner. I break things to understand how they work, and build them back securely. Welcome to my digital vault of security research, code experiments, and tech adventures!
+          Cybersecurity enthusiast, developer, and lifelong learner. I break things to understand
+          how they work, and build them back securely. Welcome to my digital vault of security
+          research, code experiments, and tech adventures!
         </p>
         <div class='flex flex-wrap items-center gap-3'>
-          <a href='/vault' class='group flex flex-col items-start gap-x-3 gap-y-2 rounded-2xl border bg-background px-4 py-2 text-sm shadow-sm transition-shadow hover:shadow-md'>
+          <a
+            href='/vault'
+            class='group flex flex-col items-start gap-x-3 gap-y-2 rounded-2xl border bg-background px-4 py-2 text-sm shadow-sm transition-shadow hover:shadow-md'
+          >
             <div class='flex flex-row items-center gap-x-3'>
               <p class='font-medium text-muted-foreground'>🗃️ Explore the Vault</p>
-              <Icon name='arrow-right-animated' class='size-4 stroke-muted-foreground group-hover:stroke-primary ml-auto' />
+              <Icon
+                name='arrow-right-animated'
+                class='size-4 stroke-muted-foreground group-hover:stroke-primary ml-auto'
+              />
             </div>
             <span class='text-xs text-muted-foreground'>A collection of my notes and writeups</span>
           </a>
           <Button title='More about me' class='ml-auto w-fit' href='/about' variant='ahead' />
         </div>
       </Section>
-      
+
       {
         latestContent.length > 0 && (
           <Section title='Recent'>
             <ul class='flex flex-col gap-y-1.5 sm:gap-y-2'>
-              {latestContent.map((item) => (
+              {latestContent.map((item) =>
                 item.type === 'post' ? (
                   <PostPreview post={item.data} />
                 ) : (
-                  <PostPreview note={{ title: item.data.data.title || item.data.slug, slug: item.data.slug, date: item.date, draft: item.data.data.publish === false }} />
+                  <PostPreview
+                    note={{
+                      title: item.data.data.title || item.data.slug,
+                      slug: item.data.slug,
+                      date: item.date,
+                      draft: item.data.data.publish === false
+                    }}
+                  />
                 )
-              ))}
+              )}
             </ul>
           </Section>
         )

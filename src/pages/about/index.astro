@@ -1,9 +1,9 @@
 ---
-import { Spoiler, Timeline, Icon } from '@/components/user'
 import PageLayout from '@/layouts/CommonPage.astro'
 import { ImageCard } from '@/components/about'
-// import SkillLayout from '@/components/home/SkillLayout.astro'
+import { Icon, Spoiler, Timeline } from '@/components/user'
 
+// import SkillLayout from '@/components/home/SkillLayout.astro'
 
 // const languages = [ 'Python', 'C', 'Java', 'HTML', 'CSS', 'JavaScript', 'Shell', 'PHP']
 // const frontend = ['TypeScript', 'React', 'Vite', 'Astro','Tailwind CSS']
@@ -20,15 +20,19 @@ const headings = [
   <p>Student / Developer / Cybersecurity Enthusiast</p>
   <p>Hi, I'm Nahil Rasheed.</p>
   <p>
-    I'm a third-year undergraduate student at IIIT Kottayam, pursuing a B.Tech in Computer Science and Engineering with a specialization in Cybersecurity. 
-    I'm deeply interested in cybersecurity, technology, and computer science, and I spend a lot of
-    my time learning, experimenting, and documenting my journey. I enjoy working on projects that
-    involve security testing, programming, and problem-solving, and I use this space to share my
-    notes, ideas, and experiments. My goal is to keep growing in the field while also making
-    knowledge accessible for others who share the same curiosity.
+    I'm a third-year undergraduate student at IIIT Kottayam, pursuing a B.Tech in Computer Science
+    and Engineering with a specialization in Cybersecurity. I'm deeply interested in cybersecurity,
+    technology, and computer science, and I spend a lot of my time learning, experimenting, and
+    documenting my journey. I enjoy working on projects that involve security testing, programming,
+    and problem-solving, and I use this space to share my notes, ideas, and experiments. My goal is
+    to keep growing in the field while also making knowledge accessible for others who share the
+    same curiosity.
   </p>
   <p>
     My motto: Knowledge is power. <Spoiler>Hack the planet!</Spoiler>
+  </p>
+  <p>
+    Reach out to me via email at <a href='mailto:hi@nahil.xyz'>hi@nahil.xyz</a>.
   </p>
 
   <h2 id='education'>Education</h2>
@@ -51,7 +55,7 @@ const headings = [
     href='https://www.coursera.org/account/accomplishments/specialization/48W6CHQVROD8'
     imagePath='/src/assets/about/gcpc.png'
   />
-  <br/>
+  <br />
   <ImageCard
     as='a'
     heading='Cisco Ethical Hacker'
@@ -63,28 +67,40 @@ const headings = [
 
   {/* social-networks */}
   <h2 id='social-networks'>Social Networks</h2>
-  <div class="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-4 my-6">
-    <a href="https://github.com/nahilrasheed" target="_blank" class="flex items-center gap-4 p-4 border border-c-border rounded-2xl no-underline! transition-all duration-200 bg-c-bg-mute hover:border-c-brand hover:-translate-y-0.5 hover:shadow-lg">
-      <Icon name="github" class="w-10 h-10 shrink-0 text-c-text-1" />
-      <div class="flex flex-col gap-1">
-        <span class="font-semibold text-c-text-1 text-base">GitHub</span>
-        <span class="text-c-text-2 text-sm">@nahilrasheed</span>
+  <div class='grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-4 my-6'>
+    <a
+      href='https://github.com/nahilrasheed'
+      target='_blank'
+      class='flex items-center gap-4 p-4 border border-c-border rounded-2xl no-underline! transition-all duration-200 bg-c-bg-mute hover:border-c-brand hover:-translate-y-0.5 hover:shadow-lg'
+    >
+      <Icon name='github' class='w-10 h-10 shrink-0 text-c-text-1' />
+      <div class='flex flex-col gap-1'>
+        <span class='font-semibold text-c-text-1 text-base'>GitHub</span>
+        <span class='text-c-text-2 text-sm'>@nahilrasheed</span>
       </div>
     </a>
-    
-    <a href="https://www.linkedin.com/in/nahilrasheed" target="_blank" class="flex items-center gap-4 p-4 border border-c-border rounded-2xl no-underline! transition-all duration-200 bg-c-bg-mute hover:border-c-brand hover:-translate-y-0.5 hover:shadow-lg">
-      <Icon name="linkedin" class="w-10 h-10 shrink-0 text-c-text-1" />
-      <div class="flex flex-col gap-1">
-        <span class="font-semibold text-c-text-1 text-base">LinkedIn</span>
-        <span class="text-c-text-2 text-sm">@nahilrasheed</span>
+
+    <a
+      href='https://www.linkedin.com/in/nahilrasheed'
+      target='_blank'
+      class='flex items-center gap-4 p-4 border border-c-border rounded-2xl no-underline! transition-all duration-200 bg-c-bg-mute hover:border-c-brand hover:-translate-y-0.5 hover:shadow-lg'
+    >
+      <Icon name='linkedin' class='w-10 h-10 shrink-0 text-c-text-1' />
+      <div class='flex flex-col gap-1'>
+        <span class='font-semibold text-c-text-1 text-base'>LinkedIn</span>
+        <span class='text-c-text-2 text-sm'>@nahilrasheed</span>
       </div>
     </a>
-    
-    <a href="https://x.com/0xnhl" target="_blank" class="flex items-center gap-4 p-4 border border-c-border rounded-2xl no-underline! transition-all duration-200 bg-c-bg-mute hover:border-c-brand hover:-translate-y-0.5 hover:shadow-lg">
-      <Icon name="x" class="w-10 h-10 shrink-0 text-c-text-1" />
-      <div class="flex flex-col gap-1">
-        <span class="font-semibold text-c-text-1 text-base">Twitter</span>
-        <span class="text-c-text-2 text-sm">@0xnhl</span>
+
+    <a
+      href='https://x.com/0xnhl'
+      target='_blank'
+      class='flex items-center gap-4 p-4 border border-c-border rounded-2xl no-underline! transition-all duration-200 bg-c-bg-mute hover:border-c-brand hover:-translate-y-0.5 hover:shadow-lg'
+    >
+      <Icon name='x' class='w-10 h-10 shrink-0 text-c-text-1' />
+      <div class='flex flex-col gap-1'>
+        <span class='font-semibold text-c-text-1 text-base'>Twitter</span>
+        <span class='text-c-text-2 text-sm'>@0xnhl</span>
       </div>
     </a>
   </div>
@@ -110,12 +126,18 @@ const headings = [
     ]}
   />
   <p>
-    This website's operation and customization are supported by the following projects and service providers:
+    This website's operation and customization are supported by the following projects and service
+    providers:
   </p>
   <ul>
     <!-- <li>Domain: <a href='https://cloudflare.com/' target='_blank'>Cloudflare</a></li> -->
     <li>
-      Framework & Theme: <a href='https://astro.build/' target='_blank'>Astro</a> + My <a href="https://github.com/nahilrasheed/website" target="_blank">theme</a> inspired from <a href='https://github.com/cworld1/astro-theme-pure' target='_blank'>Astro Theme Pure</a>
+      Framework & Theme: <a href='https://astro.build/' target='_blank'>Astro</a> + My <a
+        href='https://github.com/nahilrasheed/website'
+        target='_blank'>theme</a
+      > inspired from <a href='https://github.com/cworld1/astro-theme-pure' target='_blank'
+        >Astro Theme Pure</a
+      >
     </li>
     <li>
       Site hosting: <a href='https://cloudflare.com/' target='_blank'>Cloudflare</a>
