@@ -1,0 +1,50 @@
+---
+import { Icon } from '@/components/user'
+import { getVaultGraphData } from '@/utils/graph'
+
+interface Props {
+  currentSlug?: string
+}
+
+const { currentSlug } = Astro.props
+const graphData = await getVaultGraphData()
+
+let backlinks: { title: string; url: string }[] = []
+
+if (currentSlug && graphData.backlinksMap[currentSlug]) {
+  const linkingSlugs = graphData.backlinksMap[currentSlug]
+  backlinks = linkingSlugs.map((slug) => {
+    const node = graphData.nodes.find((n) => n.id === slug)
+    return {
+      title: node?.name || slug,
+      url: `/vault/${slug}`
+    }
+  })
+}
+---
+
+{
+  backlinks.length > 0 && (
+    <details class='group mt-6 border-t border-border/50 pt-4' open>
+      <summary class='font-semibold py-2 flex items-center justify-between text-muted-foreground uppercase text-xs tracking-wider cursor-pointer list-none select-none hover:text-foreground'>
+        <span class='flex items-center gap-2'>
+          Backlinks
+          <Icon name='link' class='size-4' />
+        </span>
+        <Icon name='chevron-down' class='size-4 transition-transform duration-200 group-open:rotate-180' />
+      </summary>
+      <ul class='flex flex-col mt-2 py-1 list-none overflow-hidden space-y-1'>
+        {backlinks.map((link) => (
+          <li class='group'>
+            <a
+              href={link.url}
+              class='block py-2 px-3 rounded-md text-sm text-muted-foreground hover:bg-muted hover:text-foreground transition-all duration-200'
+            >
+              {link.title}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </details>
+  )
+}
