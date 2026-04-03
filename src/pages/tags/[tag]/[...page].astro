@@ -76,7 +76,7 @@ const paginationProps = {
             {page.data.map((item, index) => {
               if (index >= Math.ceil(page.data.length / 2)) return null
               
-              const isPost = item.data.type === 'post'
+              const isPost = item.data.type.includes('post')
               
               if (isPost) {
                 return <PostPreview post={item} detailed />
@@ -105,7 +105,7 @@ const paginationProps = {
             {page.data.map((item, index) => {
               if (index < Math.ceil(page.data.length / 2)) return null
               
-              const isPost = item.data.type === 'post'
+              const isPost = item.data.type.includes('post')
               
               if (isPost) {
                 return <PostPreview post={item} detailed />

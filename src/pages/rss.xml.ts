@@ -79,7 +79,7 @@ function sortFeedItemsByDate(items: FeedItem[]): FeedItem[] {
 
 const GET = async (context: AstroGlobal) => {
   const allPostsByDate = sortMDByDate(await getEnrichedVaultCollection({ type: 'post' }))
-  const allVaultEntries = await getEnrichedVaultCollection()
+  const allVaultEntries = await getEnrichedVaultCollection({ type: 'vault' })
   const siteUrl = context.site ?? new URL(import.meta.env.SITE)
 
   const blogItems: FeedItem[] = await Promise.all(
@@ -93,7 +93,7 @@ const GET = async (context: AstroGlobal) => {
         title: `[Blog] ${post.data.title}`,
         description: post.data.description,
         pubDate: post.data.publishDate,
-        link: `/blog/${post.id}`,
+        link: `/blog/${post.slug || post.id}`,
         customData: heroSrc
           ? `<h:img src="${heroSrc}" /><enclosure url="${heroSrc}" />`
           : undefined,

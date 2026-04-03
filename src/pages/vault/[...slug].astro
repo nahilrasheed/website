@@ -4,7 +4,6 @@ import type { CollectionEntry } from 'astro:content'
 
 import { MediumZoom } from '@/components/advanced'
 import VaultLayout from '@/layouts/VaultLayout.astro'
-import BlogPost from '@/layouts/BlogPost.astro'
 import { getEnrichedVaultCollection, getVaultFlatList } from '@/utils/vault'
 
 export const prerender = true
@@ -23,7 +22,7 @@ interface Props {
 
 const { entry, slug } = Astro.props as Props
 const { Content, headings, remarkPluginFrontmatter } = await render(entry)
-const { title, description, publishDate, type } = entry.data
+const { title, description, publishDate } = entry.data
 
 const displayTitle = title || ''
 const editPath = `https://github.com/nahilrasheed/website/edit/main/src/content/vault/${entry.id}`
@@ -48,26 +47,17 @@ const paginationProps = {
     }
   })
 }
-
-const isPost = type === 'post'
-const allPosts = isPost ? await getEnrichedVaultCollection({ type: 'post' }) : []
 ---
 
-{isPost ? (
-  <BlogPost post={entry as any} posts={allPosts} {headings} {remarkPluginFrontmatter}>
-    <Content />
-  </BlogPost>
-) : (
-  <VaultLayout 
-    meta={{ title: displayTitle, description: description ?? displayTitle, articleDate: publishDate?.toISOString() }} 
-    {headings} 
-    currentSlug={slug}
-    entry={entry}
-    remarkPluginFrontmatter={remarkPluginFrontmatter}
-    paginationProps={paginationProps}
-    editPath={editPath}
-  >
-    <Content />
-  </VaultLayout>
-  <MediumZoom />
-)}
+<VaultLayout 
+  meta={{ title: displayTitle, description: description ?? displayTitle, articleDate: publishDate?.toISOString() }} 
+  {headings} 
+  currentSlug={slug}
+  entry={entry}
+  remarkPluginFrontmatter={remarkPluginFrontmatter}
+  paginationProps={paginationProps}
+  editPath={editPath}
+>
+  <Content />
+</VaultLayout>
+<MediumZoom />
