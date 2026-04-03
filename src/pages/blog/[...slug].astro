@@ -1,0 +1,29 @@
+---
+import { render } from 'astro:content'
+import type { CollectionEntry } from 'astro:content'
+
+import BlogPost from '@/layouts/BlogPost.astro'
+import { getEnrichedVaultCollection } from '@/utils/vault'
+
+export const prerender = true
+
+export async function getStaticPaths() {
+  const posts = await getEnrichedVaultCollection({ type: 'post' })
+  return posts.map((entry) => ({
+    params: { slug: entry.slug },
+    props: { entry }
+  }))
+}
+interface Props {
+  entry: CollectionEntry<'vault'>
+}
+
+const { entry } = Astro.props as Props
+const { Content, headings, remarkPluginFrontmatter } = await render(entry)
+
+const allPosts = await getEnrichedVaultCollection({ type: 'post' })
+---
+
+<BlogPost post={entry as any} posts={allPosts} {headings} {remarkPluginFrontmatter}>
+  <Content />
+</BlogPost>

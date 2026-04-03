@@ -24,7 +24,7 @@ const { post, note, detailed = false, class: className } = Astro.props
 // Handle note (simple) or post (full collection entry)
 const isNote = !!note
 const title = isNote ? note.title : post!.data.title
-const href = isNote ? `/vault/${note.slug}` : `/vault/${(post as any).slug || post!.id}`
+const href = isNote ? `/vault/${note.slug}` : `/blog/${(post as any).slug || post!.id}`
 const date = isNote ? note.date : (post!.data.updatedDate ?? post!.data.publishDate)
 const isDraft = isNote ? note.draft : post!.data.publish === false
 const data = isNote ? null : post!.data

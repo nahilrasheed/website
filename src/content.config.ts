@@ -23,7 +23,7 @@ const vault = defineCollection({
       image: image().optional(),
       cover: image().optional(),
       order: z.number().default(999),
-      type: z.string().default('note'),
+      type: z.union([z.string(), z.array(z.string())]).default('vault').transform((val) => Array.isArray(val) ? val : [val]),
       heroImage: z
         .object({
           src: image(),

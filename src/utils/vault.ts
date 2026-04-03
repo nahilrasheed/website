@@ -251,8 +251,8 @@ export async function getEnrichedVaultCollection(
     if (!published) return false
 
     if (type) {
-      if (Array.isArray(type)) return type.includes(data.type)
-      return data.type === type
+      const typeArray = Array.isArray(type) ? type : [type]
+      return typeArray.some(t => data.type.includes(t))
     }
 
     return true
@@ -294,7 +294,7 @@ export async function getEnrichedVaultCollection(
  * - Sorts by order, then folders first, then alphabetically
  */
 export async function getVaultTree(): Promise<VaultNode[]> {
-  const entries = await getEnrichedVaultCollection({ includeUnlinkable: true })
+  const entries = await getEnrichedVaultCollection({ includeUnlinkable: true, type: 'vault' })
   const root: VaultTreeBranch = {
     title: 'Root',
     children: {},
