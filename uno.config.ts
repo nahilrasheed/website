@@ -37,7 +37,7 @@ const typographyConfig = {
     'h2,h3,h4,h5,h6': {
       'scroll-margin-top': '4rem'
     },
-    'h1>a,h2>a,h3>a,h4>a,h5>a,h6>a': {
+    'h1>a.anchor,h2>a.anchor,h3>a.anchor,h4>a.anchor,h5>a.anchor,h6>a.anchor': {
       'margin-inline-start': '0.75rem',
       color: fgMuted,
       transition: 'opacity 0.2s ease',
@@ -46,18 +46,16 @@ const typographyConfig = {
     },
     // Make content links inside headings always visible
     'h1>a:not(.anchor),h2>a:not(.anchor),h3>a:not(.anchor),h4>a:not(.anchor),h5>a:not(.anchor),h6>a:not(.anchor)': {
-      opacity: '1',
       color: 'hsl(var(--primary))',
-      'text-decoration': 'underline',
-      'user-select': 'auto'
+      'text-decoration': 'underline'
     },
-    'h1>a:focus,h2>a:focus,h3>a:focus,h4>a:focus,h5>a:focus,h6>a:focus': {
+    'h1>a.anchor:focus,h2>a.anchor:focus,h3>a.anchor:focus,h4>a.anchor:focus,h5>a.anchor:focus,h6>a.anchor:focus': {
       opacity: 1
     },
-    'h1:hover>a,h2:hover>a,h3:hover>a,h4:hover>a,h5:hover>a,h6:hover>a': {
+    'h1:hover>a.anchor,h2:hover>a.anchor,h3:hover>a.anchor,h4:hover>a.anchor,h5:hover>a.anchor,h6:hover>a.anchor': {
       opacity: 1
     },
-    'h1:target>a,h2:target>a,h3:target>a,h4:target>a,h5:target>a,h6:target>a': {
+    'h1:target>a.anchor,h2:target>a.anchor,h3:target>a.anchor,h4:target>a.anchor,h5:target>a.anchor,h6:target>a.anchor': {
       opacity: 1
     },
     // Links
