@@ -119,16 +119,18 @@ const canLink = !!node?.slug && node.showLink !== false
             <Icon name='chevron-right' class='w-3.5 h-3.5 shrink-0 transition-transform duration-200 group-open/details:rotate-90 text-muted-foreground/50' />
 
             {canLink ? (
-              <a
-                href={`/vault/${node.slug}`}
-                class={cn(
-                  'flex-1 truncate underline decoration-dotted underline-offset-4 hover:decoration-solid',
-                  isActive && 'text-primary font-medium text-foreground decoration-solid'
-                )}
-              >
-                {node.title}
-                {node.entry?.data.publish === false && <span class='text-red-500 text-xs ml-1'>(Unpublished)</span>}
-              </a>
+              <span class='flex-1 truncate'>
+                <a
+                  href={`/vault/${node.slug}`}
+                  class={cn(
+                    'underline decoration-dotted underline-offset-4 hover:decoration-solid',
+                    isActive && 'text-primary font-medium text-foreground decoration-solid'
+                  )}
+                >
+                  {node.title}
+                  {node.entry?.data.publish === false && <span class='text-red-500 text-xs ml-1'>(Unpublished)</span>}
+                </a>
+              </span>
             ) : (
               <span class='flex-1 truncate font-medium'>{node.title}</span>
             )}
