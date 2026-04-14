@@ -21,7 +21,7 @@ type ContentItem =
 const latestContent: ContentItem[] = allVault.map((entry) => ({
   type: (entry.data.type.includes('post') ? 'post' : 'note') as 'post' | 'note',
   data: entry,
-  date: entry.data.updatedDate ?? entry.data.publishDate ?? new Date(0)
+  date: entry.data.publishDate ?? entry.data.updatedDate ?? new Date(0)
 })).sort((a, b) => b.date.getTime() - a.date.getTime()).slice(0, MAX_ITEMS)
 
 const imagePath = config.logo.src
