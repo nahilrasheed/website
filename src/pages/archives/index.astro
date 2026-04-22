@@ -6,12 +6,15 @@ import PageLayout from '@/layouts/BaseLayout.astro'
 
 export const prerender = true
 
-const allPosts = await getEnrichedVaultCollection({ type: 'post' })
-const allPostsByDate = sortMDByDate(allPosts)
-const allPostsByYear = groupCollectionsByYear(allPostsByDate)
+const allContent = await getEnrichedVaultCollection()
+const allContentByDate = sortMDByDate(allContent)
+const datedContent = allContentByDate.filter((entry) => entry.data.updatedDate ?? entry.data.publishDate)
+const allContentByYear = groupCollectionsByYear(datedContent)
+
+const isPost = (entry: (typeof allContent)[number]) => entry.data.type.includes('post')
 
 const meta = {
-  description: 'A list of all the years of creating my posts',
+  description: 'A list of everything I have written, including notes and posts',
   title: 'Archives'
 }
 ---
@@ -24,11 +27,11 @@ const meta = {
       <h1 class='mb-6 text-3xl font-medium'>Archives</h1>
     </div>
 
-    {allPosts.length === 0 && <p>No posts yet.</p>}
+    {allContent.length === 0 && <p>No content yet.</p>}
 
-    <section id='content' class='animate' aria-label='Blog post list'>
+    <section id='content' class='animate' aria-label='Archive list'>
       {
-        allPostsByYear.map(([year, posts]) => (
+        allContentByYear.map(([year, entries]) => (
           <div class='relative mt-20'>
             <h2
               class='absolute -start-6 -top-16 z-0 text-9xl font-bold text-transparent opacity-12 dark:opacity-25'
@@ -37,11 +40,23 @@ const meta = {
               <samp>{year}</samp>
             </h2>
             <p class='px-5 text-muted-foreground'>
-              {posts.length} post{posts.length > 1 && 's'}
+              {entries.length} item{entries.length > 1 && 's'}
             </p>
             <ul class='flex flex-col text-start'>
-              {posts.map((p) => (
-                <PostPreview post={p} class='border-0 bg-transparent py-2' />
+              {entries.map((entry) => (
+                isPost(entry) ? (
+                  <PostPreview post={entry} class='border-0 bg-transparent py-2' />
+                ) : (
+                  <PostPreview
+                    note={{
+                      title: entry.data.title || entry.slug,
+                      slug: entry.slug,
+                      date: entry.data.updatedDate ?? entry.data.publishDate ?? new Date(0),
+                      draft: entry.data.publish === false
+                    }}
+                    class='border-0 bg-transparent py-2'
+                  />
+                )
               ))}
             </ul>
           </div>
