@@ -70,8 +70,9 @@ const canLink = (node: (typeof tree)[number]) => !!node.slug && node.showLink !=
           {topTags.map(([tag]) => (
             <Button title={tag} href={`/tags/${tag}`} variant='pill' class='text-sm sm:text-xs' />
           ))}
-          <a aria-label='View all vault tags' href='/tags' data-astro-prefetch class='text-base sm:text-xs whitespace-nowrap'>
-            View all →
+          <a aria-label='View all vault tags' href='/tags' data-astro-prefetch class='group inline-flex items-center gap-1 text-base sm:text-xs whitespace-nowrap'>
+            View all
+            <Icon name='arrow-right-animated' class='size-4 stroke-muted-foreground group-hover:stroke-primary' />
           </a>
         </div>
       )}
@@ -129,6 +130,17 @@ const canLink = (node: (typeof tree)[number]) => !!node.slug && node.showLink !=
     <!-- List View (Tree) -->
     <div id='list-view' class='animate vault-animate-grid hidden'>
       <VaultTree class='text-base' collapsed />
+    </div>
+
+    <div class='animate mt-8 flex justify-start'>
+      <a
+        href='/archives'
+        data-astro-prefetch
+        class='group inline-flex items-center gap-1 rounded-lg px-2 py-1 text-base font-medium text-muted-foreground hover:text-primary hover:bg-muted whitespace-nowrap'
+      >
+        Browse full archive
+        <Icon name='arrow-right-animated' class='size-4 stroke-muted-foreground group-hover:stroke-primary' />
+      </a>
     </div>
   </div>
 </PageLayout>
