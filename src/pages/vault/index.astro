@@ -15,11 +15,11 @@ const topTags = allTags.slice(0, 4)
 const canLink = (node: (typeof tree)[number]) => !!node.slug && node.showLink !== false
 ---
 
-<PageLayout meta={meta} wide>
+<PageLayout meta={meta}>
   <div class='mt-4 max-w-[90rem] mx-auto px-4 lg:px-0'>
-    <h1 class='text-3xl font-bold mb-4 tracking-tight text-foreground'>Vault</h1>
+    <h1 id='content-header' class='animate text-3xl font-bold mb-4 tracking-tight text-foreground'>Vault</h1>
     
-    <div class='flex flex-col sm:flex-row flex-wrap items-start sm:items-center sm:justify-between gap-4 mb-8'>
+    <div class='animate vault-animate-intro flex flex-col sm:flex-row flex-wrap items-start sm:items-center sm:justify-between gap-4 mb-8'>
       <div class='flex items-center justify-between w-full sm:w-auto gap-4'>
         <p class='text-muted-foreground text-lg'>Welcome to my digital garden. Explore the notes below.</p>
         <div class='flex sm:hidden items-center gap-0.5 bg-muted rounded-lg p-0.5'>
@@ -77,7 +77,7 @@ const canLink = (node: (typeof tree)[number]) => !!node.slug && node.showLink !=
       )}
     </div>
 
-    <div id='grid-view' class='vault-grid grid gap-4 sm:grid-cols-2 lg:grid-cols-3 items-start'>
+    <div id='grid-view' class='animate vault-animate-grid vault-grid grid gap-4 sm:grid-cols-2 lg:grid-cols-3 items-start'>
       {tree.map((node) => (
         node.children.length > 0 ? (
           <details class='vault-folder group relative border rounded-xl bg-card/60 text-card-foreground shadow-sm transition-all duration-200 hover:bg-card/80 hover:z-30 open:z-50 open:bg-card open:shadow-2xl open:rounded-b-none'>
@@ -127,7 +127,7 @@ const canLink = (node: (typeof tree)[number]) => !!node.slug && node.showLink !=
     </div>
 
     <!-- List View (Tree) -->
-    <div id='list-view' class='hidden'>
+    <div id='list-view' class='animate vault-animate-grid hidden'>
       <VaultTree class='text-base' collapsed />
     </div>
   </div>
@@ -136,6 +136,14 @@ const canLink = (node: (typeof tree)[number]) => !!node.slug && node.showLink !=
 <style>
   .vault-folder {
     contain: layout style;
+  }
+
+  .vault-animate-intro {
+    animation-delay: 100ms;
+  }
+
+  .vault-animate-grid {
+    animation-delay: 150ms;
   }
 
   .vault-content {
