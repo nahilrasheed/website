@@ -5,7 +5,8 @@ import ProjectSection from '@/components/projects/ProjectSection.astro'
 
 const headings = [
   { depth: 2, slug: 'projects', text: 'Personal Projects' },
-  { depth: 2, slug: 'works', text: 'Works' }
+  { depth: 2, slug: 'works', text: 'Works' },
+  { depth: 2, slug: 'ctf-participations', text: 'CTF Participations' }
   ]
 ---
 
@@ -15,6 +16,15 @@ const headings = [
     <img
       src='https://ghchart.rshah.org/659eb9/nahilrasheed'
       alt='github activities'
+      loading='lazy'
+    />
+  </p>
+
+  <p>TryHackMe Badge:</p>
+  <p>
+    <img
+      src='https://tryhackme-badges.s3.amazonaws.com/0xnhl.png?update=1'
+      alt='tryhackme badge'
       loading='lazy'
     />
   </p>
@@ -48,6 +58,23 @@ const headings = [
           {
             type: 'site',
             href: 'https://sgou.org/'
+          }
+        ]
+      }
+    ]}
+  />
+
+  <h2 id='ctf-participations'>CTF Participations</h2>
+  <ProjectSection
+    projects={[
+      {
+        name: 'ApoorvCTF 26',
+        description:
+          'Annual CTF organized by the Cybersecurity club at IIIT Kottayam. Placed 47th among 2500+ teams.',
+        links: [
+          {
+            type: 'doc',
+            href: '/vault/writeups/apoorvctf2026'
           }
         ]
       }
