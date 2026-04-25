@@ -3,6 +3,8 @@ import PageLayout from '@/layouts/BaseLayout.astro'
 import { FormattedDate, Icon } from '@/components/user'
 import type { SiteMeta } from '@/types/config'
 import VaultTree from '@/components/vault/VaultTree.astro'
+import VaultGraph from '@/components/vault/VaultGraph.astro'
+import Backlinks from '@/components/vault/Backlinks.astro'
 import { ArticleBottom, BackToTop, Copyright, TOC } from '@/components/pages'
 
 // Plugin styles
@@ -142,7 +144,7 @@ const dateTimeOptions: Intl.DateTimeFormatOptions = {
     </main>
     <!-- Right Sidebar: TOC -->
     <aside 
-       class='animate lg:w-64 shrink-0 lg:sticky lg:top-24 hidden xl:block pl-4 z-40 fixed lg:order-2 lg:shrink-0 max-lg:border max-lg:px-4 max-lg:py-3 max-lg:bg-muted max-lg:rounded-xl right-0 top-20 h-[calc(100vh-7rem)] overflow-y-scroll max-lg:hidden'
+       class='animate lg:w-64 shrink-0 lg:sticky lg:top-24 hidden xl:block pl-4 z-40 fixed lg:order-2 lg:shrink-0 max-lg:border max-lg:px-4 max-lg:py-3 max-lg:bg-muted max-lg:rounded-xl right-0 top-20 h-[calc(100vh-7rem)] overflow-y-auto custom-scrollbar max-lg:hidden'
        id='sidebar'
     >
         <!-- Mobile Vault Navigation (Inside Drawer) -->
@@ -161,9 +163,16 @@ const dateTimeOptions: Intl.DateTimeFormatOptions = {
         </details>
 
         {!!headings?.length && (
-            <div class='max-h-[calc(100vh-10rem)] overflow-y-auto custom-scrollbar pr-2 text-sm'>
+            <div class='pr-2 text-sm'>
                 <TOC {headings} />
             </div>
+        )}
+
+        {currentSlug && (
+          <div class="mt-6 border-t border-border/50 pt-4 pr-2">
+             <VaultGraph localSlug={currentSlug} height={200} class="mb-4" />
+             <Backlinks currentSlug={currentSlug} />
+          </div>
         )}
     </aside>
 
