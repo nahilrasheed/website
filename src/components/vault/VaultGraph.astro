@@ -42,9 +42,9 @@ if (localSlug) {
   {
     localSlug ? (
       <details class='group' open>
-        <summary class='flex items-center justify-between mb-3 pl-1 font-semibold text-muted-foreground uppercase text-xs tracking-wider cursor-pointer list-none select-none hover:text-foreground'>
+        <summary class='font-medium py-2 flex items-center justify-between text-muted-foreground uppercase text-xs tracking-wider cursor-pointer list-none select-none hover:text-foreground'>
           <span class='flex items-center gap-2'>
-            Graph
+            GRAPH
           </span>
           <div class='flex items-center gap-2'>
             <slot name='controls'>
@@ -52,7 +52,6 @@ if (localSlug) {
                 class='global-graph-btn text-muted-foreground hover:text-foreground transition-colors p-0.5 rounded-sm cursor-pointer'
                 title='Global Graph'
                 aria-label='Open Global Graph'
-                onclick='event.preventDefault(); event.stopPropagation();'
               >
                 <svg
                   class='size-4'
@@ -195,7 +194,7 @@ if (localSlug) {
       .width(wrapper.offsetWidth)
       .height(wrapper.offsetHeight)
       .nodeId('id')
-      .nodeLabel('name')
+      .nodeLabel(localSlug ? () => '' : 'name')
       .nodeVal('val')
       .onNodeHover((node: any) => {
         hoverNode = node
@@ -337,7 +336,9 @@ if (localSlug) {
       if (btn && modal && globalGraphContainer) {
         let globalGraphInstance: any = null
 
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault()
+          e.stopPropagation()
           // @ts-ignore
           modal.showModal()
           modal.classList.remove('opacity-0', 'pointer-events-none')
