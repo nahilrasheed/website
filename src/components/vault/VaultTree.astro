@@ -59,6 +59,9 @@ const canLink = !!node?.slug && node.showLink !== false
         class VaultTree extends HTMLElement {
           constructor() {
             super()
+          }
+
+          connectedCallback() {
             const btn = this.querySelector('.toggle-all')
             const expandIcon = this.querySelector('.icon-expand')
             const collapseIcon = this.querySelector('.icon-collapse')

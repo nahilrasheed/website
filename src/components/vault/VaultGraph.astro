@@ -296,6 +296,12 @@ if (localSlug) {
     })
     resizeObserver.observe(wrapper)
 
+    document.addEventListener('astro:before-swap', () => {
+      resizeObserver.disconnect()
+      // @ts-ignore
+      if (Graph.pauseAnimation) Graph.pauseAnimation()
+    }, { once: true })
+
     return Graph
   }
 
