@@ -25,7 +25,8 @@ let cachedGraphData: GraphData | null = null
 export async function getVaultGraphData(): Promise<GraphData> {
   if (cachedGraphData) return cachedGraphData
 
-  const entries = await getEnrichedVaultCollection()
+  // Only include vault-type entries; blog posts are served under /blog and have their own route
+  const entries = await getEnrichedVaultCollection({ type: 'vault' })
   const nodes: GraphNode[] = []
   const links: GraphLink[] = []
   
@@ -34,6 +35,16 @@ export async function getVaultGraphData(): Promise<GraphData> {
 
   // 1. Create a set of all valid slugs we can link to
   const validSlugs = new Set(entries.map(e => e.slug))
+
+  // Precompute basename -> matching slugs map for O(1) fallback lookups
+  const basenameMap = new Map<string, string[]>()
+  for (const slug of validSlugs) {
+    const basename = slug.split('/').pop()
+    if (!basename) continue
+    const existing = basenameMap.get(basename)
+    if (existing) existing.push(slug)
+    else basenameMap.set(basename, [slug])
+  }
 
   // Helper to init sets and add links
   const addLink = (source: string, target: string) => {
@@ -68,9 +79,9 @@ export async function getVaultGraphData(): Promise<GraphData> {
       if (validSlugs.has(targetSlug)) {
         addLink(sourceSlug, targetSlug)
       } else {
-        // sometimes wikilinks omit the folder path, let's try to match by basename
-        const possibleTargets = Array.from(validSlugs).filter(s => s.endsWith(targetSlug))
-        if (possibleTargets.length === 1) {
+        // Wikilinks sometimes omit the folder path; use precomputed map for O(1) basename lookup
+        const possibleTargets = basenameMap.get(targetSlug)
+        if (possibleTargets?.length === 1) {
            addLink(sourceSlug, possibleTargets[0])
         }
       }
@@ -92,11 +103,11 @@ export async function getVaultGraphData(): Promise<GraphData> {
       if (validSlugs.has(resolved)) {
         addLink(sourceSlug, resolved)
       } else {
-        // Try to match just the base name natively
+        // Try to match just the base name; use precomputed map for O(1) lookup
         const baseName = cleanHref.split('/').pop() || ''
         const baseSlug = normalizeVaultSlug(baseName)
-        const possibleTargets = Array.from(validSlugs).filter(s => s.endsWith(baseSlug))
-        if (possibleTargets.length === 1) {
+        const possibleTargets = basenameMap.get(baseSlug)
+        if (possibleTargets?.length === 1) {
            addLink(sourceSlug, possibleTargets[0])
         }
       }

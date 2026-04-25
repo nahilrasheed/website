@@ -52,6 +52,7 @@ if (localSlug) {
                 class='global-graph-btn text-muted-foreground hover:text-foreground transition-colors p-0.5 rounded-sm cursor-pointer'
                 title='Global Graph'
                 aria-label='Open Global Graph'
+                onclick='event.preventDefault(); event.stopPropagation();'
               >
                 <svg
                   class='size-4'
@@ -157,7 +158,6 @@ if (localSlug) {
           <div class='flex-1 w-full bg-card rounded-xl border border-border/50 overflow-hidden relative shadow-2xl'>
             <div
               class='vault-graph w-full h-full'
-              data-graph={JSON.stringify({ nodes: allData.nodes, links: allData.links })}
               data-global='true'
             />
           </div>
@@ -178,7 +178,7 @@ if (localSlug) {
     const parseHsl = (varName: string, alpha = 1) => {
       const val = style.getPropertyValue(varName).trim()
       if (!val) return `rgba(150, 150, 150, ${alpha})`
-      return `hsl(${val.replace(/\s+/g, ', ')}, ${alpha})`
+      return `hsl(${val} / ${alpha})`
     }
 
     const primary = parseHsl('--primary')
@@ -338,15 +338,16 @@ if (localSlug) {
           document.body.style.overflow = 'hidden'
 
           if (!globalGraphInstance) {
-            // @ts-ignore
-            const rawData = globalGraphContainer.dataset.graph
-            if (rawData) {
-              // Wait a microtick for dialog to layout its dimensions
-              setTimeout(() => {
-                const gData = JSON.parse(rawData)
+            // Lazily fetch global graph data on first open to avoid embedding it in every page
+            setTimeout(async () => {
+              try {
+                const response = await fetch('/vault/graph.json')
+                const gData = await response.json()
                 globalGraphInstance = createGraph(globalGraphContainer, gData, '')
-              }, 10)
-            }
+              } catch (err) {
+                console.error('Failed to load global graph data. Please refresh the page or check your network connection.', err)
+              }
+            }, 10)
           }
         })
 

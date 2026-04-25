@@ -88,8 +88,8 @@ const toc = generateToc(headings)
       })
 
       this.tocLinks.forEach(({ element: el, progressBar: bar, slug }, i) => {
-        const { inView, progress } = this.headingProgress[slug]
         if (this.headingProgress[slug]) {
+          const { inView, progress } = this.headingProgress[slug]
           if (inView && firstInViewIndex === -1) {
              firstInViewIndex = i;
           }
@@ -97,13 +97,13 @@ const toc = generateToc(headings)
           el.classList.toggle('highlight-bg-translucent', inView)
           el.classList.toggle(
             'rounded-t-2xl',
-            inView && (i === 0 || !this.headingProgress[this.tocLinks[i - 1]?.slug].inView)
+            inView && (i === 0 || !this.headingProgress[this.tocLinks[i - 1]?.slug]?.inView)
           )
           el.classList.toggle(
             'rounded-b-2xl',
             inView &&
               (i === this.tocLinks.length - 1 ||
-                !this.headingProgress[this.tocLinks[i + 1]?.slug].inView)
+                !this.headingProgress[this.tocLinks[i + 1]?.slug]?.inView)
           )
           bar.classList.toggle('is-read', !inView && progress === 1)
           bar.classList.toggle('highlight-bg', inView)
