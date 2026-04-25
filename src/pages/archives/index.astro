@@ -45,14 +45,16 @@ const meta = {
             <ul class='flex flex-col text-start'>
               {entries.map((entry) => (
                 isPost(entry) ? (
-                  <PostPreview post={entry} class='border-0 bg-transparent py-2' />
+                  <PostPreview post={entry} withType class='border-0 bg-transparent py-2' />
                 ) : (
                   <PostPreview
+                    withType
                     note={{
                       title: entry.data.title || entry.slug,
                       slug: entry.slug,
                       date: entry.data.updatedDate ?? entry.data.publishDate ?? new Date(0),
-                      draft: entry.data.publish === false
+                      draft: entry.data.publish === false,
+                      type: entry.data.type || 'note'
                     }}
                     class='border-0 bg-transparent py-2'
                   />

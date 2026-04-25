@@ -9,7 +9,7 @@ import { getEnrichedVaultCollection, getVaultFlatList } from '@/utils/vault'
 export const prerender = true
 
 export async function getStaticPaths() {
-  const vault = await getEnrichedVaultCollection({ type: 'vault' })
+  const vault = await getEnrichedVaultCollection({ type: 'note' })
   return vault.map((entry) => ({
     params: { slug: entry.slug },
     props: { entry, slug: entry.slug }
