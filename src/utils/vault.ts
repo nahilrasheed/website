@@ -298,7 +298,7 @@ export async function getEnrichedVaultCollection(
  * - Sorts by order, then folders first, then alphabetically
  */
 export async function getVaultTree(): Promise<VaultNode[]> {
-  const entries = await getEnrichedVaultCollection({ includeUnlinkable: true, type: 'vault' })
+  const entries = await getEnrichedVaultCollection({ includeUnlinkable: true, type: 'note' })
   const root: VaultTreeBranch = {
     title: 'Root',
     children: Object.create(null),

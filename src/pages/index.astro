@@ -4,11 +4,11 @@ import { Image } from 'astro:assets'
 import PageLayout from '@/layouts/BaseLayout.astro'
 import { ImageCard, ProjectCard } from '@/components/about'
 import PostPreview from '@/components/pages/PostPreview.astro'
-import { Button, Icon, Label, Section } from '@/components/user'
+import { Icon, Label, Section } from '@/components/user'
 import { getEnrichedVaultCollection } from '@/utils/vault'
 import config from '@/site-config'
 
-const MAX_ITEMS = 5
+const MAX_ITEMS = 7
 
 // Get unified collection
 const allVault = await getEnrichedVaultCollection()
@@ -18,11 +18,14 @@ type ContentItem =
   | { type: 'note'; data: (typeof allVault)[number]; date: Date }
 
 // Map all vault entries, sort by date descending and take latest
-const latestContent: ContentItem[] = allVault.map((entry) => ({
-  type: (entry.data.type.includes('post') ? 'post' : 'note') as 'post' | 'note',
-  data: entry,
-  date: entry.data.publishDate ?? entry.data.updatedDate ?? new Date(0)
-})).sort((a, b) => b.date.getTime() - a.date.getTime()).slice(0, MAX_ITEMS)
+const latestContent: ContentItem[] = allVault
+  .map((entry) => ({
+    type: (entry.data.type.includes('post') ? 'post' : 'note') as 'post' | 'note',
+    data: entry,
+    date: entry.data.publishDate ?? entry.data.updatedDate ?? new Date(0)
+  }))
+  .sort((a, b) => b.date.getTime() - a.date.getTime())
+  .slice(0, MAX_ITEMS)
 
 const imagePath = config.logo.src
 const images = import.meta.glob<{ default: ImageMetadata }>(
@@ -76,24 +79,35 @@ if (!images[imagePath])
           <span class='font-mono tracking-tight'> aka <span class='text-primary'>0xnhl</span></span>
         </p>
         <p>
-         A Cybersecurity Enthusiast & Developer. This space acts as a personal repository for my work in cybersecurity, documenting everything from technical labs and CTF challenges to my latest software experiments.
-        </p>
-        <div class='flex flex-wrap items-center gap-3'>
+          A Cybersecurity Enthusiast & Developer. This space acts as a personal repository for my
+          work in cybersecurity, documenting everything from technical labs and CTF challenges to my
+          latest software experiments.
           <a
-            href='/vault'
-            class='group flex flex-col items-start gap-x-3 gap-y-2 rounded-2xl border bg-background px-4 py-2 text-sm shadow-sm transition-shadow hover:shadow-md'
+            href='/about'
+            class='group float-right ml-2 inline-flex items-center gap-x-1 text-sm text-muted-foreground transition-colors hover:text-foreground'
           >
-            <div class='flex flex-row items-center gap-x-3'>
-              <p class='font-medium text-muted-foreground'>🗃️ Explore the Vault</p>
-              <Icon
-                name='arrow-right-animated'
-                class='size-4 stroke-muted-foreground group-hover:stroke-primary ml-auto'
-              />
-            </div>
-            <span class='text-xs text-muted-foreground'>A collection of my notes and writeups</span>
+            More about me
+            <Icon
+              name='arrow-right-animated'
+              class='size-4 shrink-0 stroke-muted-foreground group-hover:stroke-foreground'
+            />
           </a>
-          <Button title='More about me' class='ml-auto w-fit' href='/about' variant='ahead' />
-        </div>
+        </p>
+        <a
+          href='/vault'
+          class='group flex w-full flex-row items-center gap-x-3 rounded-2xl border bg-background px-4 py-3 text-sm transition-colors ease-in-out hover:bg-muted hover:text-primary'
+        >
+          <div class='flex flex-col items-start gap-y-1'>
+            <p class='font-medium text-muted-foreground transition-colors group-hover:text-primary'>
+              🗃️ Explore the Vault
+            </p>
+            <span class='text-xs text-muted-foreground'>A collection of my notes and writeups</span>
+          </div>
+          <Icon
+            name='arrow-right-animated'
+            class='size-4 shrink-0 stroke-muted-foreground transition-colors group-hover:stroke-primary ml-auto'
+          />
+        </a>
       </Section>
 
       {
@@ -102,14 +116,16 @@ if (!images[imagePath])
             <ul class='flex flex-col gap-y-1.5 sm:gap-y-2'>
               {latestContent.map((item) =>
                 item.type === 'post' ? (
-                  <PostPreview post={item.data} />
+                  <PostPreview post={item.data} withType />
                 ) : (
                   <PostPreview
+                    withType
                     note={{
                       title: item.data.data.title || item.data.slug,
                       slug: item.data.slug,
                       date: item.date,
-                      draft: item.data.data.publish === false
+                      draft: item.data.data.publish === false,
+                      type: item.data.data.type || 'note'
                     }}
                   />
                 )

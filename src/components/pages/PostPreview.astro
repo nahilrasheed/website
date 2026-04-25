@@ -10,16 +10,18 @@ type NoteData = {
   slug: string
   date: Date
   draft?: boolean
+  type?: string | string[]
 }
 
 type Props<T extends CollectionKey> = {
   post?: CollectionEntry<T>
   note?: NoteData
   detailed?: boolean
+  withType?: boolean
   class?: string
 }
 
-const { post, note, detailed = false, class: className } = Astro.props
+const { post, note, detailed = false, withType = false, class: className } = Astro.props
 
 // Handle note (simple) or post (full collection entry)
 const isNote = !!note
@@ -29,6 +31,11 @@ const date = isNote ? note.date : (post!.data.updatedDate ?? post!.data.publishD
 const isDraft = isNote ? note.draft : post!.data.publish === false
 const data = isNote ? null : post!.data
 const remarkPluginFrontmatter = post ? (await render(post)).remarkPluginFrontmatter : null
+
+const rawType = isNote ? note?.type : data?.type
+const displayType = Array.isArray(rawType) 
+  ? (rawType[0] || 'note') 
+  : (rawType || 'note')
 ---
 
 <li
@@ -69,7 +76,14 @@ const remarkPluginFrontmatter = post ? (await render(post)).remarkPluginFrontmat
           {isDraft && <span class='text-red-500'>(Draft) </span>}
           {title}
         </div>
-        <Icon name='arrow-right-animated' class='preview-redirect my-1 size-4 stroke-muted-foreground group-hover:stroke-primary' />
+        <div class='flex items-center gap-2'>
+          {withType && (
+            <span class='text-xs text-muted-foreground'>
+              [{displayType}]
+            </span>
+          )}
+          <Icon name='arrow-right-animated' class='preview-redirect my-1 size-4 stroke-muted-foreground group-hover:stroke-primary' />
+        </div>
       </div>
       {
         !isNote && detailed && data && (
