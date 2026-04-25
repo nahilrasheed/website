@@ -148,8 +148,8 @@ function buildOriginalNameMap(basePath: string, prefix = ''): Record<string, str
 }
 
 // Build the map once at module load for performance
-const originalNameMap = buildOriginalNameMap(VAULT_CONTENT_PATH)
-const metadataOnlyFolderNoteSlugs = buildMetadataOnlyFolderNoteSlugSet(VAULT_CONTENT_PATH)
+let originalNameMap = buildOriginalNameMap(VAULT_CONTENT_PATH)
+let metadataOnlyFolderNoteSlugs = buildMetadataOnlyFolderNoteSlugSet(VAULT_CONTENT_PATH)
 
 function getOriginalVaultPath(entryId: string): string {
   const parts = entryId.split('/')
@@ -244,6 +244,10 @@ export function getVaultFolderDisplayPathFromEntryId(entryId: string): string {
 export async function getEnrichedVaultCollection(
   options: GetEnrichedVaultCollectionOptions = {}
 ): Promise<EnrichedVaultEntry[]> {
+  if (!prod) {
+    originalNameMap = buildOriginalNameMap(VAULT_CONTENT_PATH)
+    metadataOnlyFolderNoteSlugs = buildMetadataOnlyFolderNoteSlugSet(VAULT_CONTENT_PATH)
+  }
   const { includeUnlinkable = false, type } = options
   const vault = await getCollection('vault', ({ data }) => {
     // In production, filter out unpublished notes
@@ -297,7 +301,7 @@ export async function getVaultTree(): Promise<VaultNode[]> {
   const entries = await getEnrichedVaultCollection({ includeUnlinkable: true, type: 'vault' })
   const root: VaultTreeBranch = {
     title: 'Root',
-    children: {},
+    children: Object.create(null),
     order: DEFAULT_VAULT_ORDER
   }
 
@@ -319,7 +323,7 @@ export async function getVaultTree(): Promise<VaultNode[]> {
         const lookupKey = accumulatedPath.join('/')
         current.children[part] = {
           title: originalNameMap[lookupKey] || getFallbackTitle(part),
-          children: {},
+          children: Object.create(null),
           order: DEFAULT_VAULT_ORDER
         }
       }

@@ -54,32 +54,22 @@ const toc = generateToc(headings)
 
     constructor() {
       super()
-      // Initialize the headings and tocLinks
-      this.headings = Array.from(
-        document.querySelectorAll(
-          'article h1, article h2, article h3, article h4, article h5, article h6'
-        )
-      )
-      this.tocLinks = Array.from(this.querySelectorAll('a[href^="#"]')).map((link) => ({
-        element: link as HTMLAnchorElement,
-        progressBar: link.previousElementSibling as HTMLElement,
-        slug: (link.getAttribute('href') || '').substring(1)
-      }))
     }
 
     updatePositionAndStyle = () => {
       const windowHeight = window.innerHeight
-      const pageOffset =
-        window.scrollY - ((document.querySelector('#content') as HTMLElement)?.offsetTop || 0)
-      const postOffset =
-        ((document.querySelector('#content') as HTMLElement)?.offsetHeight || 0) + 127
+      const content = document.querySelector('#content') as HTMLElement
+      const pageOffset = window.scrollY - (content?.offsetTop || 0)
+      const postOffset = (content?.offsetHeight || 0) + 127
 
       let firstInViewIndex = -1;
 
       this.headings.forEach((el, index) => {
         const nextHeadingTop = this.headings[index + 1]?.offsetTop || postOffset
         const range = [el.offsetTop - pageOffset, nextHeadingTop - pageOffset - el.offsetHeight]
-        const progress = (windowHeight - range[0]) / (range[1] - range[0])
+        // Prevent division by zero
+        const rangeDelta = (range[1] - range[0]) || 1
+        const progress = (windowHeight - range[0]) / rangeDelta
 
         this.headingProgress[el.id] = {
           inView: range[0] < windowHeight && range[1] > 0,
@@ -130,14 +120,26 @@ const toc = generateToc(headings)
     }
 
     connectedCallback() {
-      // Smooth scroll
+      // 1. Move DOM querying here so nodes are guaranteed to exist
+      this.headings = Array.from(
+        document.querySelectorAll(
+          'article h1, article h2, article h3, article h4, article h5, article h6'
+        )
+      )
+      
+      this.tocLinks = Array.from(this.querySelectorAll('a[href^="#"]')).map((link) => ({
+        element: link as HTMLAnchorElement,
+        progressBar: link.previousElementSibling as HTMLElement,
+        slug: (link.getAttribute('href') || '').substring(1)
+      }))
+
+      // 2. Smooth scroll intercept
       this.tocLinks.forEach((link) => {
         link.element.addEventListener('click', (e) => {
           e.preventDefault()
           // Push the history to add the hash at the end of the URL
           const directHeading = this.headings.find((heading) => heading.id === link.slug)
           if (directHeading) {
-            // Push the history to add the hash at the end of the URL
             history.pushState(
               null,
               directHeading.textContent || '',
@@ -150,9 +152,16 @@ const toc = generateToc(headings)
         })
       })
 
-      // Initial first and listen to scroll event
-      setInterval(this.updatePositionAndStyle, 100)
+      // 3. Initialize layout and attach listeners
+      this.updatePositionAndStyle()
       window.addEventListener('scroll', this.updatePositionAndStyle)
+      window.addEventListener('resize', this.updatePositionAndStyle)
+    }
+
+    disconnectedCallback() {
+      // 4. Clean up global listeners to prevent memory leaks
+      window.removeEventListener('scroll', this.updatePositionAndStyle)
+      window.removeEventListener('resize', this.updatePositionAndStyle)
     }
   }
 
