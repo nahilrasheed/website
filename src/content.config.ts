@@ -20,8 +20,6 @@ const vault = defineCollection({
       publish: z.boolean().default(true).optional(),
       tags: z.array(z.string()).nullable().default([]).transform((val) => val ? removeDupsAndLowerCase(val) : []),
       permalink: z.string().optional(),
-      image: image().optional(),
-      cover: image().optional(),
       order: z.number().default(999),
       type: z.union([z.string(), z.array(z.string())]).default('note').transform((val) => Array.isArray(val) ? val : [val]),
       heroImage: z
