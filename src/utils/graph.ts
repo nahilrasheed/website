@@ -25,8 +25,8 @@ let cachedGraphData: GraphData | null = null
 export async function getVaultGraphData(): Promise<GraphData> {
   if (cachedGraphData && import.meta.env.PROD) return cachedGraphData
 
-  // Only include vault-type entries; blog posts are served under /blog and have their own route
-  const entries = await getEnrichedVaultCollection({ type: 'note' })
+  // Include all published entries (both notes and posts) as they are unified under /vault
+  const entries = await getEnrichedVaultCollection()
   const nodes: GraphNode[] = []
   const links: GraphLink[] = []
   

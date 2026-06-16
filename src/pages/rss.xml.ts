@@ -93,7 +93,7 @@ const GET = async (context: AstroGlobal) => {
         title: `[Blog] ${post.data.title}`,
         description: post.data.description,
         pubDate: post.data.publishDate,
-        link: `/blog/${post.slug || post.id}`,
+        link: `/vault/${post.slug || post.id}`,
         customData: heroSrc
           ? `<h:img src="${heroSrc}" /><enclosure url="${heroSrc}" />`
           : undefined,

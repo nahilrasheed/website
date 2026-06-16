@@ -1,4 +1,6 @@
 ---
+import { Image } from 'astro:assets'
+
 import PageLayout from '@/layouts/BaseLayout.astro'
 import { FormattedDate, Icon } from '@/components/user'
 import type { SiteMeta } from '@/types/config'
@@ -27,9 +29,12 @@ const { meta, headings, currentSlug, entry, remarkPluginFrontmatter, paginationP
 const dateTimeOptions: Intl.DateTimeFormatOptions = {
   month: 'short'
 }
+
+const heroImage = entry?.data?.heroImage
+const highlightColor = entry?.data?.heroImage?.color ?? entry?.data?.cover?.color
 ---
 
-<PageLayout {meta} wide>
+<PageLayout {meta} wide {highlightColor}>
   <div class='flex flex-col lg:flex-row gap-6 lg:gap-12 items-start relative mt-4 px-4 lg:px-0'>
     
     <!-- Left Sidebar: Vault Navigation (Desktop) -->
@@ -52,6 +57,27 @@ const dateTimeOptions: Intl.DateTimeFormatOptions = {
        <article>
            <div id='content-header' class='animate'>
                <slot name='header' />
+                {
+                  entry && heroImage && (
+                    <div class='hero-image relative mb-6'>
+                      <Image
+                        alt={heroImage.alt || entry.data.title || ''}
+                        class='cover-image relative z-10 h-auto w-full max-w-[65ch] rounded-2xl object-contain'
+                        fetchpriority='high'
+                        loading='eager'
+                        {...heroImage}
+                      />
+                      <Image
+                        alt='Blur image'
+                        fetchpriority='high'
+                        loading='eager'
+                        id='blurImage'
+                        class='absolute end-0 top-4 z-0 mt-0 h-full max-w-[65ch] rounded-3xl opacity-60 transition-opacity duration-300'
+                        {...heroImage}
+                      />
+                    </div>
+                  )
+                }
                 {entry && (
                   <>
                     <h1 class='text-2xl font-bold sm:mb-2 sm:text-3xl tracking-tight text-foreground'>
@@ -215,9 +241,34 @@ const dateTimeOptions: Intl.DateTimeFormatOptions = {
   sidebarButton?.addEventListener('click', () => {
     toggleSidebar()
   })
+
+  // Blur image scroll effect
+  const viewportHeight = window.innerHeight
+  const threshold1 = viewportHeight / 9
+  const threshold2 = (viewportHeight * 2) / 9
+  const threshold3 = (viewportHeight * 3) / 9
+  const image = document.getElementById('blurImage') as HTMLImageElement
+
+  if (image) {
+    window.addEventListener('scroll', () => {
+      const scrollDistance = window.scrollY
+      if (scrollDistance >= threshold3) {
+        image.style.opacity = '0.15'
+      } else if (scrollDistance >= threshold2) {
+        image.style.opacity = '0.3'
+      } else if (scrollDistance >= threshold1) {
+        image.style.opacity = '0.45'
+      }
+    })
+  }
 </script>
 
 <style>
+  #blurImage {
+    --un-blur: blur(24px);
+    filter: var(--un-blur);
+  }
+
 /* Mobile TOC Drawer Styles overrides */
   @media (min-width: 1280px) {
     /* XL is the breakpoint where it becomes a normal sidebar */
