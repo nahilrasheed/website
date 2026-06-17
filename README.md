@@ -25,6 +25,11 @@ A fast, elegant personal website combining **blog** and **knowledge vault** - bu
 - **Smart Navigation**: Auto-closes other folders when opening one for cleaner UX
 - **Unified Tree Component**: Recursive `VaultTree.astro` component for both sidebar and dashboard
 - **Active State Tracking**: Highlights current page in navigation
+- **Grid / List View Toggle**: Support for toggling between a folder card grid and a tree list view, saved persistently in `localStorage`
+
+#### 🕸️ Interactive Vault Network Graph & Backlinks
+- **Force-Directed Graph**: Visual interactive network graph mapping note connections and tags (built with `force-graph` and processed via `src/utils/graph.ts`). Renders a local neighborhood graph on individual notes and supports a full global graph overlay modal.
+- **Backlinks Discovery**: Dynamic tracking and display of other notes referencing the current note under a collapsible sidebar section.
 
 #### 🔍 Full-Site Search
 - **Pagefind Integration**: Fast, efficient search across all content
@@ -37,9 +42,9 @@ A fast, elegant personal website combining **blog** and **knowledge vault** - bu
 - **Code Blocks**: Custom transformers with syntax highlighting, copy button, and collapse
 
 #### 🎨 UI Optimization
-- **Clean Design**: Minimal, distraction-free interface with custom typography
+- **Clean Design**: Minimal, distraction-free interface with custom typography (Satoshi font via native fonts system)
 - **Dark Mode**: Built-in theme switching
-- **Responsive**: Mobile-first design adapted for all devices
+- **Responsive Sidebar Drawer**: Organizes vault navigation, Table of Contents, graph, and backlinks into desktop sidebars that collapse to a drawer (below 1280px width) toggled by a floating list button.
 - **Image Optimization**: Fast loading with optional zoom lightbox
 
 ---
@@ -94,24 +99,42 @@ bun run lint
 
 All content lives strictly in the unified `src/content/vault/` directory.
 
-#### Blog Posts
-Add `.md` or `.mdx` files to `src/content/vault/posts/` with the `type: 'post'` explicitly declared:
+#### Unified Content Workflow
+* **Creation**: Place any `.md` or `.mdx` file anywhere under `src/content/vault/` (subfolders like `posts/` or `writeups/` are recommended for organization).
+* **Routing**: All documents are compiled under the unified `/vault/[...slug]` path.
+* **Listing**:
+  - **Blog posts** (entries containing `type: 'post'` in frontmatter) are displayed on the `/blog` index page and link directly to `/vault/[...slug]`.
+  - **Vault notes** (entries containing `type: 'note'` or defaulting to it) show up in the left tree navigation sidebar and dashboard grid folders.
+
+#### Frontmatter Reference
+
+Here is the list of properties validated by Zod (`src/content.config.ts`):
+
 ```yaml
 ---
-type: 'post'
-title: "Your Post Title"
-description: "Brief description"
-publishDate: 2024-01-01
-tags: ["tag1", "tag2"]
-publish: true
+# Classification
+type: 'note'                 # String or array of strings. Defaults to 'note'. Use 'post' for blog entries.
+                             # e.g., type: ['post'] or type: ['note', 'post']
+
+# Standard Metadata
+title: "Title Override"      # Optional. Defaults to auto-generating from filename.
+description: "Description"   # Optional. Synopsis shown under headers and in metadata.
+publishDate: 2026-06-16      # Optional. Document creation date.
+updatedDate: 2026-06-16      # Optional. Document last updated date.
+publish: true                # Optional. Set to false to exclude from production builds.
+tags: ["testing", "docs"]    # Optional. Duplicates are auto-removed and normalized to lowercase.
+permalink: "custom-slug"     # Optional. Custom slug override.
+order: 999                   # Optional. Sorting priority in tree navigation/indexes.
+language: "en"               # Optional. Page language attribute.
+comment: true                # Optional. Set to false to disable comment layouts.
+
+# Media & Custom Theme
+heroImage:                   # Optional. Renders a cover image layout with a blur overlay scroll effect:
+  src: "./thumbnail.jpg"     # Required. Cover image path.
+  alt: "Alternate description"# Optional. Image alt text.
+  color: "#659EB9"           # Optional. Hex/HSL color color code for page glow and TOC highlights.
 ---
 ```
-
-#### Vault Documents
-Add files to `src/content/vault/` (or any subfolder) natively:
-- **Optional frontmatter** - titles auto-generated from filenames
-- **Wikilinks** - Use `[[Note Name]]` to link between notes
-- **Folder notes** - Create `index.md` or `README.md` for folder descriptions
 
 ### Using Wikilinks
 
@@ -177,7 +200,7 @@ Configured in `tsconfig.json`:
 │   ├── components/       # Reusable Astro components
 │   │   ├── advanced/     # Advanced components (GithubCard, LinkPreview, etc)
 │   │   ├── basic/        # Layout components (Header, Footer, ThemeProvider)
-│   │   ├── pages/        # Page-specific components (Hero, PostPreview, TOC)
+│   │   ├── pages/        # Page-specific components (PostPreview, TOC, Paginator)
 │   │   ├── user/         # UI components (Button, Card, Tabs, Timeline)
 │   │   ├── projects/     # Project-specific components
 │   │   └── vault/        # Vault navigation components
@@ -197,14 +220,15 @@ Configured in `tsconfig.json`:
 
 Inspired by [Astro Theme Pure](https://github.com/cworld1/astro-theme-pure), built as a standalone project:
 
-- **Framework**: [Astro](https://astro.build) 5.17.1
+- **Framework**: [Astro](https://astro.build) 6.0.5 (Astro v6)
 - **Runtime**: [Bun](https://bun.sh) (Node.js compatible)
-- **Styling**: [UnoCSS](https://unocss.dev) 0.61.9 with @unocss/preset-typography
+- **Styling**: [UnoCSS](https://unocss.dev) 0.66.6 with @unocss/preset-typography
+- **Graph Visualization**: [force-graph](https://github.com/vasturiano/force-graph)
 - **Markdown Processing**: 
   - **Remark**: remark-math, remark-breaks, @flowershow/remark-wiki-link, reading-time
   - **Rehype**: rehype-katex, rehype-callouts, rehype-autolink-headings
-  - **Custom plugins**: Shiki transformers, code collapse, external links, steps/tabs
-- **Search**: [Pagefind](https://pagefind.app/)
+  - **Custom plugins**: Shiki transformers, code collapse, external links, steps/tabs, image zoom
+- **Search**: [Pagefind](https://pagefind.app/) (automatically indexed post-build)
 - **Type System**: TypeScript with Zod for config validation
 - **Deployment**: [Cloudflare](https://cloudflare.com)
 
@@ -240,11 +264,15 @@ All components are organized in `src/components/` with barrel exports:
 `GithubCard`, `LinkPreview`, `Quote`, `QRCode`, `MediumZoom`
 
 **Page Components** (`@/components/pages`):
-`Hero`, `PostPreview`, `TOC`, `Paginator`, `BackToTop`, `ArticleBottom`
+`PostPreview`, `TOC`, `Paginator`, `BackToTop`, `ArticleBottom`
+
+**Vault Components** (used for navigation and graph views):
+`VaultTree` (sidebar/dashboard tree), `VaultGraph` (force-directed graph visualizer), `Backlinks` (referenced notes list)
 
 **Import Examples**:
 ```typescript
 import { Button, Card, Timeline } from '@/components/user'
 import { GithubCard } from '@/components/advanced'
 import { PostPreview } from '@/components/pages'
+import { VaultGraph, Backlinks } from '@/components/vault'
 ```

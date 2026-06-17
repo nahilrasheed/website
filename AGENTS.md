@@ -2,20 +2,25 @@
 
 ## Architecture Overview
 
-This is a **standalone Astro static site** inspired by [Astro Theme Pure](https://github.com/cworld1/astro-theme-pure), combining a blog with Obsidian-compatible vault integration. Deployed on Cloudflare Pages with Wrangler.
+This is a **standalone Astro (v6) static site** inspired by [Astro Theme Pure](https://github.com/cworld1/astro-theme-pure), combining a blog with Obsidian-compatible vault integration. Deployed on Cloudflare Pages with Wrangler.
 
 ### Key Design Patterns
 
 1. **Content Collections** ([src/content.config.ts](src/content.config.ts)):
-   - **Unified `vault` collection**: Combines flexible schema for Obsidian notes (auto-generated titles) with strict typing for specialized content like blog posts (using a `type: 'post'` field).
+   - **Unified `vault` collection**: Combines flexible schema for Obsidian notes (auto-generated titles) with strict typing for specialized content like blog posts.
+   - **Schema Support**: Supports array-based content types (`type` field accepts a string or array of strings, e.g. `type: 'post'` for blog posts, `type: 'note'` for knowledge vault entries, defaulting to `['note']`).
    - Uses Astro's `glob` loaders for markdown/MDX files.
    - Standardized visibility controls using a boolean `publish` flag.
 
-2. **Dual Configuration System**:
-   - [astro.config.ts](astro.config.ts): Framework config with explicit MDX/sitemap/UnoCSS integrations, markdown plugins, Shiki transformers
+2. **Unified Route Handling**:
+   - Both blog posts (entries containing `type: 'post'`) and vault notes (entries containing `type: 'note'`) are resolved and served under the unified `/vault/...` route handled by `src/pages/vault/[...slug].astro`.
+   - The `/blog` route (handled by `src/pages/blog/[...page].astro`) provides a paginated listing of blog posts which link directly to their respective `/vault/...` pages.
+
+3. **Dual Configuration System**:
+   - [astro.config.ts](astro.config.ts): Framework config with native fonts integration, MDX/sitemap/UnoCSS integrations, markdown plugins, Shiki transformers
    - [src/site.config.ts](src/site.config.ts): Site metadata validated with Zod (author, locale, header/footer, social links, feature flags)
 
-3. **Path Aliases** ([tsconfig.json](tsconfig.json)):
+4. **Path Aliases** ([tsconfig.json](tsconfig.json)):
    - `@/*` → `src/*` (primary import pattern)
    - `@/utils`, `@/components/*`, `@/layouts/*`, `@/site-config` for specific imports
 
@@ -40,19 +45,42 @@ bun run clean        # Remove .astro, .vercel, dist
 
 All content lives strictly in the unified `src/content/vault/` directory.
 
-- **Blog posts**: Add to `src/content/vault/posts/` with `type: 'post'` frontmatter:
-  ```yaml
-  ---
-  type: 'post'               # Flags as a blog post for special UI rendering
-  title: "Post Title"        # Required, max 60 chars
-  description: "..."         # Required, max 160 chars
-  publishDate: 2024-01-01    # Required
-  tags: ["tag1"]             # Optional
-  publish: true              # Filtered in production if false
-  ---
-  ```
+#### Unified Content Workflow
+* **Creation**: Create a `.md` or `.mdx` file anywhere under `src/content/vault/` (subfolders like `posts/` or `writeups/` are recommended for organization).
+* **Routing**: All documents are compiled under the unified `/vault/[...slug]` path.
+* **Listing**:
+  - **Blog posts** (entries with `type: 'post'`) are displayed on the `/blog` index page and link directly to `/vault/[...slug]`.
+  - **Vault notes** (entries with `type: 'note'`) are visible in the left navigation sidebar tree and dashboard grid folders.
 
-- **Vault notes**: Add to `src/content/vault/` (or subfolders) with optional frontmatter. Titles auto-generated from filenames. Use wikilinks `[[Note Name]]` for cross-references.
+#### Frontmatter Schema Reference
+
+Here is the complete set of frontmatter properties validated by Zod ([src/content.config.ts](src/content.config.ts)):
+
+```yaml
+---
+# Classification (Unified Router)
+type: 'note'                 # String or array of strings. Defaults to 'note'. Use 'post' for blog entries.
+                             # e.g., type: ['post'] or type: ['note', 'post']
+
+# Standard Metadata
+title: "Title Override"      # Optional string. If omitted, the title is auto-generated from the filename.
+description: "Description"   # Optional string. Brief synopsis shown under header and in meta tags.
+publishDate: 2026-06-16      # Optional date. Document creation date.
+updatedDate: 2026-06-16      # Optional date. Document modification date.
+publish: true                # Optional boolean. Default: true. Set to false to exclude from production builds.
+tags: ["cyber", "astro"]     # Optional string array. Category tags. Duplicates are auto-removed and normalized to lowercase.
+permalink: "custom-slug"     # Optional string. Custom URL override.
+order: 999                   # Optional number. Default: 999. Ascending sort order inside tree navigation/indexes.
+language: "en"               # Optional string. Language code for base page markup.
+comment: true                # Optional boolean. Default: true. Toggles comment system visibility.
+
+# Media & Aesthetics
+heroImage:                   # Optional object. Renders a cover image layout with a blur overlay scroll effect:
+  src: "./thumbnail.jpg"     # Required image path. Optimized cover image asset.
+  alt: "Image description"   # Optional string. Image alternate text.
+  color: "#659EB9"           # Optional string. Hex/HSL accent color code. Overrides top page wash and TOC highlights.
+---
+```
 
 ## Markdown Processing Pipeline
 
@@ -93,7 +121,7 @@ Official transformers: `transformerNotationDiff`, `transformerNotationHighlight`
 
 ```typescript
 // Path aliases for internal code
-import { getEnrichedVaultCollection, buildVaultTree, sortMDByDate } from '@/utils/vault'
+import { getEnrichedVaultCollection, getVaultTree, sortMDByDate } from '@/utils/vault'
 import { cn } from '@/utils/class-merge'
 import PageLayout from '@/layouts/BaseLayout.astro'
 import config from '@/site-config'
@@ -130,7 +158,8 @@ getEnrichedVaultCollection()  // Returns EnrichedVaultEntry[], automatically fil
 sortMDByDate(posts)           // Sorts by updatedDate ?? publishDate
 groupCollectionsByYear()      // Groups posts for archives page
 getUniqueVaultTagsWithCount() // Unified tag cloud matching
-buildVaultTree()              // Recursive tree for navigation
+getVaultTree()                // Recursive tree for navigation (used by sidebar and dashboard)
+getVaultFlatList()            // Flattened list of notes for pagination
 sanitizeSlugPart()            // Match URL sanitization
 ```
 
@@ -149,18 +178,24 @@ sanitizeSlugPart()            // Match URL sanitization
 - **Requires** `prerender: true` in site config
 - Search UI at `/search` using `@pagefind/default-ui`
 - Assets loaded on-demand (zero-JS until search activated)
+- Search index is generated post-build via `pagefind --site dist` as part of the `bun run build` script.
+
+### Interactive Vault Features
+
+- **Vault Network Graph**: Interactive node-link network visualization of vault notes and tags built with `force-graph` and processed via `src/utils/graph.ts`. Renders a local neighborhood view on note pages (`src/components/vault/VaultGraph.astro`) and lazy-loads the global graph JSON (`/vault/graph.json`) when launching the global graph modal.
+- **Backlinks Module**: Calculates incoming connections for notes and renders them under a collapsible section (`src/components/vault/Backlinks.astro`) in the right sidebar.
+- **Responsive Collapsible Sidebars**: Vault layout (`src/layouts/VaultLayout.astro`) organizes content with a left sidebar for desktop tree navigation and a right sidebar for table of contents, local graph, and backlinks. On viewport widths below 1280px (XL breakpoint), the right sidebar collapses into a drawer toggled by a floating list button.
+- **Grid / List Toggle**: Vault dashboard supports toggling between card grid (collapsible folders) and tree list view, with preference saved in `localStorage`.
 
 ### Cloudflare Deployment
 
 - Deploy with `bun deploy` (uses `wrangler pages deploy dist`)
 - Static output mode (`output: 'static'` in [astro.config.ts](astro.config.ts))
-- Site URL: `https://nahil.pages.dev/`
+- Site URL: `https://nahil.xyz/`
 
-### Experimental Features ([astro.config.ts](astro.config.ts) L179-202)
+### Fonts Configuration ([astro.config.ts](astro.config.ts) L99-108)
 
-- `contentIntellisense: true` - Content collection intellisense
-- `svgo: true` - SVG optimization
-- `fonts` - Fontshare provider for "Satoshi" font (weights 400, 500)
+- Configured directly under Astro's native `fonts` array config (using `fontProviders.fontshare()` for the "Satoshi" font).
 
 ## Common Pitfalls
 
@@ -181,7 +216,11 @@ sanitizeSlugPart()            // Match URL sanitization
 - [astro.config.ts](astro.config.ts) - Framework config with plugins, integrations, Shiki setup
 - [src/site.config.ts](src/site.config.ts) - Site metadata and feature flags
 - [src/content.config.ts](src/content.config.ts) - Unified content collection schema with type extensibility
-- [src/utils/vault.ts](src/utils/vault.ts) - Vault tree building and sanitization
+- [src/utils/vault.ts](src/utils/vault.ts) - Vault tree building, sanitization, and queries
+- [src/utils/graph.ts](src/utils/graph.ts) - Precomputes node-link graph relationships and backlinks
+- [src/components/vault/VaultGraph.astro](src/components/vault/VaultGraph.astro) - Force-directed interactive network graph
+- [src/components/vault/Backlinks.astro](src/components/vault/Backlinks.astro) - Backlinks list UI component
+- [src/pages/vault/graph.json.ts](src/pages/vault/graph.json.ts) - Lazy global graph data JSON endpoint
 - [uno.config.ts](uno.config.ts) - Typography presets and theme customization
 - [package.json](package.json) - Scripts and dependency versions
 - [README.md](README.md) - Project overview, component catalog, tech stack
