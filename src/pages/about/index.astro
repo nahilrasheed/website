@@ -144,3 +144,39 @@ const headings = [
     </li>
   </ul>
 </PageLayout>
+
+<script is:inline>
+  document.addEventListener('DOMContentLoaded', function () {
+    // Track certification card clicks
+    var certLinks = [
+      {
+        href: 'https://www.coursera.org/account/accomplishments/specialization/48W6CHQVROD8',
+        name: 'Google Cybersecurity Professional Certificate'
+      },
+      {
+        href: 'https://www.credly.com/badges/f806a313-6c62-4810-b196-eecc93dcb6a8/',
+        name: 'Cisco Ethical Hacker'
+      }
+    ]
+    certLinks.forEach(function (cert) {
+      document.querySelector('a[href="' + cert.href + '"]')?.addEventListener('click', function () {
+        window.posthog?.capture('certification_clicked', { name: cert.name })
+      })
+    })
+
+    // Track social network card clicks from the About page
+    var socialLinks = [
+      { href: 'https://github.com/nahilrasheed', platform: 'github' },
+      { href: 'https://www.linkedin.com/in/nahilrasheed', platform: 'linkedin' },
+      { href: 'https://x.com/0xnhl', platform: 'twitter' }
+    ]
+    socialLinks.forEach(function (item) {
+      document.querySelector('a[href="' + item.href + '"]')?.addEventListener('click', function () {
+        window.posthog?.capture('social_link_clicked', {
+          platform: item.platform,
+          source: 'about_page'
+        })
+      })
+    })
+  })
+</script>

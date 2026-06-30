@@ -52,6 +52,31 @@ import '@pagefind/default-ui/css/ui.css'
   customElements.define('site-search', SiteSearch)
 </script>
 
+<script is:inline>
+  // Track search queries after Pagefind UI initialises
+  document.addEventListener('DOMContentLoaded', function () {
+    var observer = new MutationObserver(function () {
+      var input = document.querySelector('#site-search input[type="text"]')
+      if (!input) return
+      observer.disconnect()
+      var debounce = null
+      input.addEventListener('input', function () {
+        clearTimeout(debounce)
+        debounce = setTimeout(function () {
+          var query = input.value.trim()
+          if (query.length > 1) {
+            window.posthog?.capture('search_performed', { query: query })
+          }
+        }, 800)
+      })
+    })
+    observer.observe(document.getElementById('site-search') || document.body, {
+      childList: true,
+      subtree: true
+    })
+  })
+</script>
+
 <style>
   #site-search {
     --pagefind-ui-scale: 0.8;

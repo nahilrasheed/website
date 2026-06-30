@@ -81,3 +81,30 @@ const headings = [
     ]}
   />
 </PageLayout>
+
+<script is:inline>
+  document.addEventListener('DOMContentLoaded', function () {
+    // Track project link clicks
+    var projectLinks = document.querySelectorAll(
+      'a[href^="https://revx-7r6"], a[href^="https://sgou.org"], a[href^="https://github.com/nahilrasheed/RevX"]'
+    )
+    projectLinks.forEach(function (el) {
+      el.addEventListener('click', function () {
+        window.posthog?.capture('project_link_clicked', {
+          href: el.getAttribute('href'),
+          source: 'projects_page'
+        })
+      })
+    })
+
+    // Track CTF writeup link clicks
+    var ctfLinks = document.querySelectorAll('a[href^="/vault/writeups"]')
+    ctfLinks.forEach(function (el) {
+      el.addEventListener('click', function () {
+        window.posthog?.capture('ctf_writeup_link_clicked', {
+          href: el.getAttribute('href')
+        })
+      })
+    })
+  })
+</script>

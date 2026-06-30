@@ -366,3 +366,21 @@ const canLink = (node: (typeof tree)[number]) => !!node.slug && node.showLink !=
   // Re-initialize on view transitions (Astro navigation)
   document.addEventListener('astro:page-load', initializeVault)
 </script>
+
+<script is:inline>
+  // Track vault folder expansions
+  document.addEventListener('DOMContentLoaded', function () {
+    var grid = document.querySelector('.vault-grid')
+    if (!grid) return
+    grid.querySelectorAll('.vault-folder').forEach(function (folder) {
+      folder.querySelector('summary')?.addEventListener('click', function () {
+        if (!folder.hasAttribute('open')) {
+          var titleEl = folder.querySelector('summary a, summary span')
+          window.posthog?.capture('vault_folder_expanded', {
+            folder_title: titleEl ? titleEl.textContent?.trim() : undefined
+          })
+        }
+      })
+    })
+  })
+</script>

@@ -38,6 +38,36 @@ if (!images[imagePath])
 ---
 
 <PageLayout meta={{ title: 'Home' }} highlightColor='#659EB9'>
+  <script is:inline>
+    document.addEventListener('DOMContentLoaded', function () {
+      // Track "Explore the Vault" CTA click
+      document.querySelector('a[href="/vault"]')?.addEventListener('click', function () {
+        window.posthog?.capture('vault_explore_clicked')
+      })
+
+      // Track social link clicks from homepage
+      var socialLinks = [
+        { selector: 'a[href="https://github.com/nahilrasheed"]', platform: 'github' },
+        { selector: 'a[href="https://linkedin.com/in/nahilrasheed"]', platform: 'linkedin' },
+        { selector: 'a[href="mailto:hi@nahil.xyz"]', platform: 'email' }
+      ]
+      socialLinks.forEach(function (item) {
+        document.querySelector(item.selector)?.addEventListener('click', function () {
+          window.posthog?.capture('social_link_clicked', {
+            platform: item.platform,
+            source: 'homepage'
+          })
+        })
+      })
+
+      // Track homepage project card clicks
+      document.querySelectorAll('a[href^="https://revx-7r6"]').forEach(function (el) {
+        el.addEventListener('click', function () {
+          window.posthog?.capture('project_link_clicked', { project: 'RevX', source: 'homepage' })
+        })
+      })
+    })
+  </script>
   <main class='flex w-full flex-col items-center'>
     <section class='animate mb-10 flex flex-col items-center gap-y-7' id='content-header'>
       <Image

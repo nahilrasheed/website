@@ -61,3 +61,14 @@ const paginationProps = {
   <Content />
 </VaultLayout>
 <MediumZoom />
+
+<script
+  is:inline
+  define:vars={{ entryTitle: displayTitle, entrySlug: slug, entryTags: entry.data.tags ?? [] }}
+>
+  window.posthog?.capture('vault_entry_viewed', {
+    title: entryTitle,
+    slug: entrySlug,
+    tags: entryTags
+  })
+</script>
