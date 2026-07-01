@@ -1,4 +1,5 @@
 import type { APIRoute } from 'astro'
+
 import { getVaultGraphData } from '@/utils/graph'
 
 export const prerender = true

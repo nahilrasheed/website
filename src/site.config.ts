@@ -1,4 +1,9 @@
-import { UserConfigSchema, type ConfigOutput, type IntegrationUserConfig, type ThemeUserConfig } from './types/config'
+import {
+  UserConfigSchema,
+  type ConfigOutput,
+  type IntegrationUserConfig,
+  type ThemeUserConfig
+} from './types/config'
 
 export const theme: ThemeUserConfig = {
   // [Basic]
@@ -7,7 +12,7 @@ export const theme: ThemeUserConfig = {
   /** Will be used in index page & copyright declaration */
   author: 'Nahil Rasheed',
   /** Description metadata for your website. Can be used in page metadata. */
-  description: "My Personal Website where i publish by blogs, writeups and notes.",
+  description: 'My Personal Website where i publish by blogs, writeups and notes.',
   /** The default favicon for your site which should be a path to an image in the `public/` directory. */
   favicon: '/favicon/favicon.ico',
   /** The default social card image for your site which should be a path to an image in the `public/` directory. */

@@ -1,11 +1,15 @@
 ---
 import type { GetStaticPaths, Page } from 'astro'
 
-import { Paginator, PostPreview } from '@/components/pages'
-import { getUniqueVaultTagsWithCount, sortMDByDate, getEnrichedVaultCollection } from '@/utils/vault'
-import type { EnrichedVaultEntry } from '@/utils/vault'
-import { Button, Icon } from '@/components/user'
 import PageLayout from '@/layouts/BaseLayout.astro'
+import { Paginator, PostPreview } from '@/components/pages'
+import { Button, Icon } from '@/components/user'
+import {
+  getEnrichedVaultCollection,
+  getUniqueVaultTagsWithCount,
+  sortMDByDate
+} from '@/utils/vault'
+import type { EnrichedVaultEntry } from '@/utils/vault'
 import config from '@/site-config'
 
 export const prerender = true
@@ -66,9 +70,17 @@ const paginationProps = {
               <span class='text-muted-foreground'>
                 Page {page.currentPage} - Showing {page.data.length} of {collectionsCount} posts
               </span>
-              <a aria-label='View all blog by years' href='/archives' data-astro-prefetch class='group inline-flex items-center gap-1'>
+              <a
+                aria-label='View all blog by years'
+                href='/archives'
+                data-astro-prefetch
+                class='group inline-flex items-center gap-1'
+              >
                 View all posts by years
-                <Icon name='arrow-right-animated' class='size-4 stroke-muted-foreground group-hover:stroke-primary' />
+                <Icon
+                  name='arrow-right-animated'
+                  class='size-4 stroke-muted-foreground group-hover:stroke-primary'
+                />
               </a>
             </div>
             {/* posts */}
@@ -98,9 +110,17 @@ const paginationProps = {
                 }
               </ul>
               <span class='mt-4 block sm:text-end'>
-                <a aria-label='View all blog categories' href='/tags' data-astro-prefetch class='group inline-flex items-center gap-1'>
+                <a
+                  aria-label='View all blog categories'
+                  href='/tags'
+                  data-astro-prefetch
+                  class='group inline-flex items-center gap-1'
+                >
                   View all
-                  <Icon name='arrow-right-animated' class='size-4 stroke-muted-foreground group-hover:stroke-primary' />
+                  <Icon
+                    name='arrow-right-animated'
+                    class='size-4 stroke-muted-foreground group-hover:stroke-primary'
+                  />
                 </a>
               </span>
             </aside>

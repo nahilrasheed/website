@@ -256,7 +256,7 @@ export async function getEnrichedVaultCollection(
 
     if (type) {
       const typeArray = Array.isArray(type) ? type : [type]
-      return typeArray.some(t => data.type.includes(t))
+      return typeArray.some((t) => data.type.includes(t))
     }
 
     return true
@@ -383,7 +383,9 @@ export async function getUniqueVaultTags(): Promise<string[]> {
 /**
  * Get unique tags with their count from vault entries
  */
-export async function getUniqueVaultTagsWithCount(options?: GetEnrichedVaultCollectionOptions): Promise<[string, number][]> {
+export async function getUniqueVaultTagsWithCount(
+  options?: GetEnrichedVaultCollectionOptions
+): Promise<[string, number][]> {
   const vault = await getEnrichedVaultCollection(options)
   const tagMap = new Map<string, number>()
 

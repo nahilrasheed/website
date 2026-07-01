@@ -1,6 +1,6 @@
 ---
 import { Image } from 'astro:assets'
-import { type CollectionEntry, type CollectionKey, render } from 'astro:content'
+import { render, type CollectionEntry, type CollectionKey } from 'astro:content'
 
 import { cn } from '../../utils'
 import { Button, FormattedDate, Icon } from '../user'
@@ -33,14 +33,13 @@ const data = isNote ? null : post!.data
 const remarkPluginFrontmatter = post ? (await render(post)).remarkPluginFrontmatter : null
 
 const rawType = isNote ? note?.type : data?.type
-const displayType = Array.isArray(rawType) 
-  ? (rawType[0] || 'note') 
-  : (rawType || 'note')
+const displayType = Array.isArray(rawType) ? rawType[0] || 'note' : rawType || 'note'
 ---
 
 <li
   class={cn('post-preview', className)}
-  style={!isNote && detailed &&
+  style={!isNote &&
+    detailed &&
     data?.heroImage?.color &&
     `--preview-highlight:color-mix(in srgb,${data.heroImage.color} 40%,hsl(var(--foreground)/var(--un-text-opacity,1)));
     --preview-highlight-bg:hsl(from ${data.heroImage.color} h s l/20%)`}
@@ -77,12 +76,11 @@ const displayType = Array.isArray(rawType)
           {title}
         </div>
         <div class='flex items-center gap-2'>
-          {withType && (
-            <span class='text-xs text-muted-foreground'>
-              [{displayType}]
-            </span>
-          )}
-          <Icon name='arrow-right-animated' class='preview-redirect my-1 size-4 stroke-muted-foreground group-hover:stroke-primary' />
+          {withType && <span class='text-xs text-muted-foreground'>[{displayType}]</span>}
+          <Icon
+            name='arrow-right-animated'
+            class='preview-redirect my-1 size-4 stroke-muted-foreground group-hover:stroke-primary'
+          />
         </div>
       </div>
       {
@@ -130,13 +128,18 @@ const displayType = Array.isArray(rawType)
 
   <style>
     .post-preview {
-      --preview-highlight-final: var( --preview-highlight, hsl(var(--primary) / var(--un-text-opacity, 1))
+      --preview-highlight-final: var(
+        --preview-highlight,
+        hsl(var(--primary) / var(--un-text-opacity, 1))
       );
     }
     .post-preview:hover {
       & > a,
       & .tag-list a {
-        background-color: var( --preview-highlight-bg, hsl(var(--muted) / var(--un-bg-opacity, 1))) !important;
+        background-color: var(
+          --preview-highlight-bg,
+          hsl(var(--muted) / var(--un-bg-opacity, 1))
+        ) !important;
       }
       & > a,
       & .tag-list a:hover {

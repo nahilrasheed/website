@@ -1,23 +1,21 @@
 import { rehypeHeadingIds } from '@astrojs/markdown-remark'
 import mdx from '@astrojs/mdx'
 import sitemap from '@astrojs/sitemap'
-import UnoCSS from 'unocss/astro'
-import { defineConfig, fontProviders } from 'astro/config'
-import rehypeKatex from 'rehype-katex'
-import rehypeCallouts from 'rehype-callouts'
-import remarkMath from 'remark-math'
-import remarkBreaks from 'remark-breaks'
 import remarkWikiLink from '@flowershow/remark-wiki-link'
+import { defineConfig, fontProviders } from 'astro/config'
 import { globSync } from 'glob'
+import rehypeCallouts from 'rehype-callouts'
+import rehypeKatex from 'rehype-katex'
+import remarkBreaks from 'remark-breaks'
+import remarkMath from 'remark-math'
+import UnoCSS from 'unocss/astro'
 
 // Local integrations
 import rehypeAutolinkHeadings from './src/plugins/rehype-auto-link-headings.ts'
-import { remarkNormalizeLinks } from './src/plugins/remark-normalize-links.ts'
 import rehypeExternalLinks from './src/plugins/rehype-external-links.ts'
 import rehypeTable from './src/plugins/rehype-table.ts'
+import { remarkNormalizeLinks } from './src/plugins/remark-normalize-links.ts'
 import { remarkAddZoomable, remarkReadingTime } from './src/plugins/remark-plugins.ts'
-import config from './src/site.config.ts'
-
 // Shiki
 import {
   addCollapse,
@@ -31,6 +29,7 @@ import {
   transformerNotationHighlight,
   transformerRemoveNotationEscape
 } from './src/plugins/shiki-official/transformers.ts'
+import config from './src/site.config.ts'
 
 const vaultFiles = globSync('./src/content/vault/**/*.{md,mdx,jpg,jpeg,png,webp,gif,svg}')
 const contentFiles = vaultFiles.map((f) => f.replace(/\\/g, '/'))
@@ -39,14 +38,16 @@ const contentFiles = vaultFiles.map((f) => f.replace(/\\/g, '/'))
  * Sanitize a path segment for use in URLs - must match vault.ts sanitization
  */
 function sanitizeSlugPart(part: string): string {
-  return part
-    .toLowerCase()
-    // Remove special characters
-    .replace(/[&()[\]{}]/g, '')        // Remove &, brackets, parens
-    .replace(/[,;:!?@#$%^*+=|\\/<>"'`~]/g, '') // Remove punctuation
-    .replace(/\s+/g, '-')             // Spaces → dashes
-    .replace(/--+/g, '-')             // Multiple dashes → single
-    .replace(/^-+|-+$/g, '')          // Trim dashes from ends
+  return (
+    part
+      .toLowerCase()
+      // Remove special characters
+      .replace(/[&()[\]{}]/g, '') // Remove &, brackets, parens
+      .replace(/[,;:!?@#$%^*+=|\\/<>"'`~]/g, '') // Remove punctuation
+      .replace(/\s+/g, '-') // Spaces → dashes
+      .replace(/--+/g, '-') // Multiple dashes → single
+      .replace(/^-+|-+$/g, '')
+  ) // Trim dashes from ends
 }
 
 const permalinks = Object.fromEntries(
@@ -62,7 +63,7 @@ const permalinks = Object.fromEntries(
       return [file, `/vault/${slug}`]
     }
     // For images/assets, use the dynamic vault attachment route
-    return [file, `/vault/${relativePath}`] 
+    return [file, `/vault/${relativePath}`]
   })
 )
 
@@ -75,7 +76,7 @@ export default defineConfig({
   trailingSlash: 'ignore',
   // root: './my-project-directory',
   server: { host: true },
-  
+
   // [Adapter]
   // https://docs.astro.build/en/guides/deploy/
   // Cloudflare Workers
@@ -118,7 +119,7 @@ export default defineConfig({
         {
           format: 'shortestPossible',
           files: vaultFiles,
-          permalinks,
+          permalinks
         }
       ],
       [remarkAddZoomable, config.integ.mediumZoom.options],
@@ -177,12 +178,7 @@ export default defineConfig({
   },
 
   // [Integrations]
-  integrations: [
-    mdx({ optimize: true }),
-    sitemap(),
-    UnoCSS({ injectReset: true })
-  ],
-
+  integrations: [mdx({ optimize: true }), sitemap(), UnoCSS({ injectReset: true })],
 
   // [Experimental]
   experimental: {
@@ -191,7 +187,7 @@ export default defineConfig({
     contentIntellisense: true,
     // Enable SVGO optimization for SVG assets
     // https://docs.astro.build/en/reference/experimental-flags/svg-optimization/
-    svgo: true,
+    svgo: true
     // Enable font preloading and optimization
     // https://docs.astro.build/en/reference/experimental-flags/fonts/
   }

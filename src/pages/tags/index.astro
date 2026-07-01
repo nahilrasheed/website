@@ -1,7 +1,7 @@
 ---
+import PageLayout from '@/layouts/BaseLayout.astro'
 import { Button } from '@/components/user'
 import { cn } from '@/utils'
-import PageLayout from '@/layouts/BaseLayout.astro'
 import { getUniqueVaultTagsWithCount } from '@/utils/vault'
 
 const allTags = await getUniqueVaultTagsWithCount()

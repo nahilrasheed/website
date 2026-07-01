@@ -2,8 +2,8 @@
 import { render } from 'astro:content'
 import type { CollectionEntry } from 'astro:content'
 
-import { MediumZoom } from '@/components/advanced'
 import VaultLayout from '@/layouts/VaultLayout.astro'
+import { MediumZoom } from '@/components/advanced'
 import { getEnrichedVaultCollection, getVaultFlatList } from '@/utils/vault'
 
 export const prerender = true
@@ -49,9 +49,13 @@ const paginationProps = {
 }
 ---
 
-<VaultLayout 
-  meta={{ title: displayTitle, description: description ?? displayTitle, articleDate: publishDate?.toISOString() }} 
-  {headings} 
+<VaultLayout
+  meta={{
+    title: displayTitle,
+    description: description ?? displayTitle,
+    articleDate: publishDate?.toISOString()
+  }}
+  {headings}
   currentSlug={slug}
   entry={entry}
   remarkPluginFrontmatter={remarkPluginFrontmatter}

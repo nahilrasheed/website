@@ -30,7 +30,10 @@ const { as: Tag = 'a', class: className, title, href, variant = 'button', ...pro
   <slot name='before'>
     {
       variant === 'back' && (
-        <Icon name='arrow-left-animated' class='size-4 stroke-muted-foreground group-hover:stroke-primary' />
+        <Icon
+          name='arrow-left-animated'
+          class='size-4 stroke-muted-foreground group-hover:stroke-primary'
+        />
       )
     }
   </slot>
@@ -40,7 +43,10 @@ const { as: Tag = 'a', class: className, title, href, variant = 'button', ...pro
   <slot name='after'>
     {
       variant === 'ahead' && (
-        <Icon name='arrow-right-animated' class='size-4 stroke-muted-foreground group-hover:stroke-primary' />
+        <Icon
+          name='arrow-right-animated'
+          class='size-4 stroke-muted-foreground group-hover:stroke-primary'
+        />
       )
     }
   </slot>

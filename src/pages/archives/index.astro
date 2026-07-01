@@ -1,14 +1,16 @@
 ---
-import { PostPreview } from '@/components/pages'
-import { getEnrichedVaultCollection, groupCollectionsByYear, sortMDByDate } from '@/utils/vault'
-import { Button } from '@/components/user'
 import PageLayout from '@/layouts/BaseLayout.astro'
+import { PostPreview } from '@/components/pages'
+import { Button } from '@/components/user'
+import { getEnrichedVaultCollection, groupCollectionsByYear, sortMDByDate } from '@/utils/vault'
 
 export const prerender = true
 
 const allContent = await getEnrichedVaultCollection()
 const allContentByDate = sortMDByDate(allContent)
-const datedContent = allContentByDate.filter((entry) => entry.data.updatedDate ?? entry.data.publishDate)
+const datedContent = allContentByDate.filter(
+  (entry) => entry.data.updatedDate ?? entry.data.publishDate
+)
 const allContentByYear = groupCollectionsByYear(datedContent)
 
 const isPost = (entry: (typeof allContent)[number]) => entry.data.type.includes('post')
@@ -43,7 +45,7 @@ const meta = {
               {entries.length} item{entries.length > 1 && 's'}
             </p>
             <ul class='flex flex-col text-start'>
-              {entries.map((entry) => (
+              {entries.map((entry) =>
                 isPost(entry) ? (
                   <PostPreview post={entry} withType class='border-0 bg-transparent py-2' />
                 ) : (
@@ -59,7 +61,7 @@ const meta = {
                     class='border-0 bg-transparent py-2'
                   />
                 )
-              ))}
+              )}
             </ul>
           </div>
         ))

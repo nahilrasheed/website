@@ -1,9 +1,9 @@
 ---
 import PageLayout from '@/layouts/BaseLayout.astro'
-import { getVaultTree, getUniqueVaultTagsWithCount } from '@/utils/vault'
-import VaultTree from '@/components/vault/VaultTree.astro'
-import VaultGraph from '@/components/vault/VaultGraph.astro'
 import { Button, Icon } from '@/components/user'
+import VaultGraph from '@/components/vault/VaultGraph.astro'
+import VaultTree from '@/components/vault/VaultTree.astro'
+import { getUniqueVaultTagsWithCount, getVaultTree } from '@/utils/vault'
 
 const meta = {
   title: 'Vault',
@@ -19,13 +19,19 @@ const canLink = (node: (typeof tree)[number]) => !!node.slug && node.showLink !=
 <PageLayout meta={meta}>
   <div class='mt-4 max-w-[90rem] mx-auto px-4 lg:px-0'>
     <div class='flex items-center justify-between mb-6 w-full'>
-      <h1 id='content-header' class='animate text-3xl font-bold tracking-tight text-foreground'>Vault</h1>
+      <h1 id='content-header' class='animate text-3xl font-bold tracking-tight text-foreground'>
+        Vault
+      </h1>
       <VaultGraph modalOnly class='animate' />
     </div>
-    
-    <div class='animate vault-animate-intro flex flex-col sm:flex-row flex-wrap items-start sm:items-center sm:justify-between gap-4 mb-8'>
+
+    <div
+      class='animate vault-animate-intro flex flex-col sm:flex-row flex-wrap items-start sm:items-center sm:justify-between gap-4 mb-8'
+    >
       <div class='flex items-center justify-between w-full sm:w-auto gap-4'>
-        <p class='text-muted-foreground text-lg'>Welcome to my digital garden. Explore the notes below.</p>
+        <p class='text-muted-foreground text-lg'>
+          Welcome to my digital garden. Explore the notes below.
+        </p>
         <div class='flex sm:hidden items-center gap-0.5 bg-muted rounded-lg p-0.5'>
           <button
             type='button'
@@ -47,88 +53,112 @@ const canLink = (node: (typeof tree)[number]) => !!node.slug && node.showLink !=
           </button>
         </div>
       </div>
-      
-      {!!topTags.length && (
-        <div class='flex items-center gap-3 text-base sm:text-sm flex-wrap sm:ml-auto'>
 
-          <div class='hidden sm:flex items-center gap-0.5 bg-muted rounded-lg p-0.5'>
-            <button
-              type='button'
-              id='grid-view-btn'
-              class='view-toggle-btn p-1.5 rounded-md transition-colors active'
-              aria-label='Grid view'
-              title='Grid view'
+      {
+        !!topTags.length && (
+          <div class='flex items-center gap-3 text-base sm:text-sm flex-wrap sm:ml-auto'>
+            <div class='hidden sm:flex items-center gap-0.5 bg-muted rounded-lg p-0.5'>
+              <button
+                type='button'
+                id='grid-view-btn'
+                class='view-toggle-btn p-1.5 rounded-md transition-colors active'
+                aria-label='Grid view'
+                title='Grid view'
+              >
+                <Icon name='grid' class='size-4.5' />
+              </button>
+              <button
+                type='button'
+                id='list-view-btn'
+                class='view-toggle-btn p-1.5 rounded-md transition-colors'
+                aria-label='List view'
+                title='List view'
+              >
+                <Icon name='list-lucide' class='size-4.5' />
+              </button>
+            </div>
+            <Icon name='tag-2' class='size-5 text-muted-foreground' />
+            {topTags.map(([tag]) => (
+              <Button title={tag} href={`/tags/${tag}`} variant='pill' class='text-sm sm:text-xs' />
+            ))}
+            <a
+              aria-label='View all vault tags'
+              href='/tags'
+              data-astro-prefetch
+              class='group inline-flex items-center gap-1 text-base sm:text-xs whitespace-nowrap'
             >
-              <Icon name='grid' class='size-4.5' />
-            </button>
-            <button
-              type='button'
-              id='list-view-btn'
-              class='view-toggle-btn p-1.5 rounded-md transition-colors'
-              aria-label='List view'
-              title='List view'
-            >
-              <Icon name='list-lucide' class='size-4.5' />
-            </button>
+              View all
+              <Icon
+                name='arrow-right-animated'
+                class='size-4 stroke-muted-foreground group-hover:stroke-primary'
+              />
+            </a>
           </div>
-          <Icon name='tag-2' class='size-5 text-muted-foreground' />
-          {topTags.map(([tag]) => (
-            <Button title={tag} href={`/tags/${tag}`} variant='pill' class='text-sm sm:text-xs' />
-          ))}
-          <a aria-label='View all vault tags' href='/tags' data-astro-prefetch class='group inline-flex items-center gap-1 text-base sm:text-xs whitespace-nowrap'>
-            View all
-            <Icon name='arrow-right-animated' class='size-4 stroke-muted-foreground group-hover:stroke-primary' />
-          </a>
-        </div>
-      )}
+        )
+      }
     </div>
 
-    <div id='grid-view' class='animate vault-animate-grid vault-grid grid gap-4 sm:grid-cols-2 lg:grid-cols-3 items-start'>
-      {tree.map((node) => (
-        node.children.length > 0 ? (
-          <details class='vault-folder group relative border rounded-xl bg-card/60 text-card-foreground shadow-sm transition-all duration-200 hover:bg-card/80 hover:z-30 open:z-50 open:bg-card open:shadow-2xl open:rounded-b-none'>
-            <summary class='flex items-center gap-2 p-4 cursor-pointer list-none transition-colors select-none'>
-              <Icon
-                name='chevron-right'
-                 class='size-4.5 shrink-0 transition-transform duration-200 ease-out group-open:rotate-90 text-muted-foreground'
-              />
+    <div
+      id='grid-view'
+      class='animate vault-animate-grid vault-grid grid gap-4 sm:grid-cols-2 lg:grid-cols-3 items-start'
+    >
+      {
+        tree.map((node) =>
+          node.children.length > 0 ? (
+            <details class='vault-folder group relative border rounded-xl bg-card/60 text-card-foreground shadow-sm transition-all duration-200 hover:bg-card/80 hover:z-30 open:z-50 open:bg-card open:shadow-2xl open:rounded-b-none'>
+              <summary class='flex items-center gap-2 p-4 cursor-pointer list-none transition-colors select-none'>
+                <Icon
+                  name='chevron-right'
+                  class='size-4.5 shrink-0 transition-transform duration-200 ease-out group-open:rotate-90 text-muted-foreground'
+                />
                 {canLink(node) ? (
-                  <a href={`/vault/${node.slug}`} class='font-semibold text-lg decoration-dotted underline underline-offset-4 hover:decoration-solid hover:text-primary break-words'>
-                       {node.title}
-                       {node.entry?.data.publish === false && <span class='text-red-500 text-sm ml-1'>(Unpublished)</span>}
-                   </a>
-               ) : (
-                   <span class='font-semibold text-lg flex-1 break-words'>{node.title}</span>
-               )}
-            </summary>
-            <div class='vault-content absolute top-[calc(100%-1px)] left-[-1px] right-[-1px] border-x border-b border-border bg-card rounded-b-xl shadow-xl overflow-hidden'>
+                  <a
+                    href={`/vault/${node.slug}`}
+                    class='font-semibold text-lg decoration-dotted underline underline-offset-4 hover:decoration-solid hover:text-primary break-words'
+                  >
+                    {node.title}
+                    {node.entry?.data.publish === false && (
+                      <span class='text-red-500 text-sm ml-1'>(Unpublished)</span>
+                    )}
+                  </a>
+                ) : (
+                  <span class='font-semibold text-lg flex-1 break-words'>{node.title}</span>
+                )}
+              </summary>
+              <div class='vault-content absolute top-[calc(100%-1px)] left-[-1px] right-[-1px] border-x border-b border-border bg-card rounded-b-xl shadow-xl overflow-hidden'>
                 <div class='vault-inner px-4 pb-4 pt-2'>
                   <ul class='pt-2 space-y-0.5'>
-                      {node.children.map((child) => (
-                         <VaultTree node={child} collapsed />
-                      ))}
+                    {node.children.map((child) => (
+                      <VaultTree node={child} collapsed />
+                    ))}
                   </ul>
                 </div>
+              </div>
+            </details>
+          ) : canLink(node) ? (
+            <a
+              href={`/vault/${node.slug}`}
+              class='block p-4 relative border rounded-xl bg-card/60 text-card-foreground shadow-sm transition-all duration-300 hover:bg-card/80 hover:z-30'
+            >
+              <span class='font-semibold text-lg pl-6 block break-words'>
+                {node.title}
+                {node.entry?.data.publish === false && (
+                  <span class='text-red-500 text-sm ml-1'>(Unpublished)</span>
+                )}
+              </span>
+            </a>
+          ) : (
+            <div class='block p-4 relative border rounded-xl bg-card/60 text-card-foreground shadow-sm'>
+              <span class='font-semibold text-lg pl-6 block break-words'>
+                {node.title}
+                {node.entry?.data.publish === false && (
+                  <span class='text-red-500 text-sm ml-1'>(Unpublished)</span>
+                )}
+              </span>
             </div>
-          </details>
-        ) : (
-           canLink(node) ? (
-             <a href={`/vault/${node.slug}`} class='block p-4 relative border rounded-xl bg-card/60 text-card-foreground shadow-sm transition-all duration-300 hover:bg-card/80 hover:z-30'>
-                <span class='font-semibold text-lg pl-6 block break-words'>
-                    {node.title}
-                    {node.entry?.data.publish === false && <span class='text-red-500 text-sm ml-1'>(Unpublished)</span>}
-                </span>
-             </a>
-           ) : (
-             <div class='block p-4 relative border rounded-xl bg-card/60 text-card-foreground shadow-sm'>
-                <span class='font-semibold text-lg pl-6 block break-words'>
-                    {node.title}
-                    {node.entry?.data.publish === false && <span class='text-red-500 text-sm ml-1'>(Unpublished)</span>}
-                </span>
-             </div>
-           )
+          )
         )
-      ))}
+      }
       <div id='grid-spacer' class='col-span-full' aria-hidden='true'></div>
     </div>
 
@@ -144,7 +174,10 @@ const canLink = (node: (typeof tree)[number]) => !!node.slug && node.showLink !=
         class='group inline-flex items-center gap-1 rounded-lg px-2 py-1 text-base font-medium text-muted-foreground hover:text-primary hover:bg-muted whitespace-nowrap'
       >
         Browse full archive
-        <Icon name='arrow-right-animated' class='size-4 stroke-muted-foreground group-hover:stroke-primary' />
+        <Icon
+          name='arrow-right-animated'
+          class='size-4 stroke-muted-foreground group-hover:stroke-primary'
+        />
       </a>
     </div>
   </div>
@@ -166,7 +199,9 @@ const canLink = (node: (typeof tree)[number]) => !!node.slug && node.showLink !=
   .vault-content {
     opacity: 0;
     transform: translateY(-4px);
-    transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+    transition:
+      opacity 0.2s ease-out,
+      transform 0.2s ease-out;
     max-height: 0;
   }
 
@@ -174,7 +209,10 @@ const canLink = (node: (typeof tree)[number]) => !!node.slug && node.showLink !=
     opacity: 1;
     transform: translateY(0);
     max-height: 1000px;
-    transition: opacity 0.2s ease-out, transform 0.2s ease-out, max-height 0.3s ease-out;
+    transition:
+      opacity 0.2s ease-out,
+      transform 0.2s ease-out,
+      max-height 0.3s ease-out;
   }
 
   .vault-inner {
@@ -242,13 +280,13 @@ const canLink = (node: (typeof tree)[number]) => !!node.slug && node.showLink !=
     if (!grid) return
 
     const folders = grid.querySelectorAll('.vault-folder')
-    
+
     // Mark as initialized to enable animations
     setTimeout(() => grid.classList.add('initialized'), 100)
 
     const updateSpacer = () => {
       if (!spacer) return
-      
+
       const openFolder = grid.querySelector('.vault-folder[open]')
       if (openFolder) {
         const content = openFolder.querySelector('.vault-content')
@@ -262,9 +300,13 @@ const canLink = (node: (typeof tree)[number]) => !!node.slug && node.showLink !=
     }
 
     // Listen for any toggle events inside the grid (including subfolders)
-    grid.addEventListener('toggle', () => {
-      setTimeout(updateSpacer, 50)
-    }, true)
+    grid.addEventListener(
+      'toggle',
+      () => {
+        setTimeout(updateSpacer, 50)
+      },
+      true
+    )
 
     folders.forEach((folder) => {
       const summary = folder.querySelector('summary')
@@ -272,7 +314,7 @@ const canLink = (node: (typeof tree)[number]) => !!node.slug && node.showLink !=
 
       summary.addEventListener('click', () => {
         const isOpen = folder.hasAttribute('open')
-        
+
         if (!isOpen) {
           // Close all other folders with smooth animation
           folders.forEach((otherFolder) => {
@@ -280,7 +322,7 @@ const canLink = (node: (typeof tree)[number]) => !!node.slug && node.showLink !=
               otherFolder.removeAttribute('open')
             }
           })
-          
+
           // Update spacer and scroll into view after opening
           setTimeout(() => {
             updateSpacer()

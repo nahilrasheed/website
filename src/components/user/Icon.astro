@@ -12,7 +12,7 @@ export interface Props extends astroHTML.JSX.SVGAttributes {
 const { name, label, size = '1.5em', color, class: className, style, ...props } = Astro.props
 const a11yAttrs = label ? ({ 'aria-label': label } as const) : ({ 'aria-hidden': 'true' } as const)
 
-const inlineStyle = color ? `color: ${color};${style ? ` ${style}` : ''}` : style;
+const inlineStyle = color ? `color: ${color};${style ? ` ${style}` : ''}` : style
 ---
 
 <svg

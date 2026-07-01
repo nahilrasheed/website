@@ -29,12 +29,12 @@ export async function getVaultGraphData(): Promise<GraphData> {
   const entries = await getEnrichedVaultCollection()
   const nodes: GraphNode[] = []
   const links: GraphLink[] = []
-  
+
   const backlinksMap: Record<string, Set<string>> = {}
   const linksMap: Record<string, Set<string>> = {}
 
   // 1. Create a set of all valid slugs we can link to
-  const validSlugs = new Set(entries.map(e => e.slug))
+  const validSlugs = new Set(entries.map((e) => e.slug))
 
   // Precompute basename -> matching slugs map for O(1) fallback lookups
   const basenameMap = new Map<string, string[]>()
@@ -57,11 +57,13 @@ export async function getVaultGraphData(): Promise<GraphData> {
   // 2. Extract links
   for (const entry of entries) {
     const sourceSlug = entry.slug
-    
+
     nodes.push({
       id: sourceSlug,
       name: entry.data.title || sourceSlug,
-      group: (entry.data.tags?.length ? (entry.data.tags[0]?.toLowerCase() ?? 'note') : (sourceSlug.split('/')[0] || 'note')) as string,
+      group: (entry.data.tags?.length
+        ? (entry.data.tags[0]?.toLowerCase() ?? 'note')
+        : sourceSlug.split('/')[0] || 'note') as string,
       val: 2
     })
 
@@ -74,7 +76,7 @@ export async function getVaultGraphData(): Promise<GraphData> {
       const inner = match[1]
       const target = inner.split('|')[0].trim() // use actual target, ignore alias
       const targetSlug = normalizeVaultSlug(target)
-      
+
       // If it's a valid targeted file
       if (validSlugs.has(targetSlug)) {
         addLink(sourceSlug, targetSlug)
@@ -82,7 +84,7 @@ export async function getVaultGraphData(): Promise<GraphData> {
         // Wikilinks sometimes omit the folder path; use precomputed map for O(1) basename lookup
         const possibleTargets = basenameMap.get(targetSlug)
         if (possibleTargets?.length === 1) {
-           addLink(sourceSlug, possibleTargets[0])
+          addLink(sourceSlug, possibleTargets[0])
         }
       }
     }
@@ -94,10 +96,10 @@ export async function getVaultGraphData(): Promise<GraphData> {
       const href = mdMatch[2].trim()
       // Skip external links and anchors
       if (href.startsWith('http') || href.startsWith('#') || href.startsWith('mailto:')) continue
-      
+
       const cleanHref = href.split('#')[0].split('?')[0]
       if (!cleanHref) continue
-      
+
       // Clean relative paths
       const resolved = normalizeVaultSlug(cleanHref.replace(/^(?:\.\.\/)+|^(?:\.\/)+/, ''))
       if (validSlugs.has(resolved)) {
@@ -108,7 +110,7 @@ export async function getVaultGraphData(): Promise<GraphData> {
         const baseSlug = normalizeVaultSlug(baseName)
         const possibleTargets = basenameMap.get(baseSlug)
         if (possibleTargets?.length === 1) {
-           addLink(sourceSlug, possibleTargets[0])
+          addLink(sourceSlug, possibleTargets[0])
         }
       }
     }
@@ -124,7 +126,7 @@ export async function getVaultGraphData(): Promise<GraphData> {
   // Convert Sets to Arrays
   const finalLinksMap: Record<string, string[]> = {}
   const finalBacklinksMap: Record<string, string[]> = {}
-  
+
   for (const k in linksMap) finalLinksMap[k] = Array.from(linksMap[k])
   for (const k in backlinksMap) finalBacklinksMap[k] = Array.from(backlinksMap[k])
 

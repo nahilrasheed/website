@@ -1,8 +1,8 @@
 ---
 import { Font } from 'astro:assets'
+import config from '@/site.config'
 
 import type { SiteMeta } from '@/types/config'
-import config from '@/site.config'
 
 type Props = SiteMeta
 
@@ -14,7 +14,10 @@ const socialImageURL = new URL(ogImage ? ogImage : config.socialCard, Astro.url)
 ---
 
 <meta charset='utf-8' />
-<meta content='width=device-width, initial-scale=1.0, shrink-to-fit=no, viewport-fit=cover' name='viewport' />
+<meta
+  content='width=device-width, initial-scale=1.0, shrink-to-fit=no, viewport-fit=cover'
+  name='viewport'
+/>
 <meta content='IE=edge' http-equiv='X-UA-Compatible' />
 <title>{siteTitle}</title>
 
@@ -85,5 +88,8 @@ const socialImageURL = new URL(ogImage ? ogImage : config.socialCard, Astro.url)
 
 <meta content={Astro.generator} name='generator' />
 
-<script is:inline defer src="https://cloud.umami.is/script.js" data-website-id="14ffce1c-2fe7-4287-8c07-5281940eae5b"></script>
-
+<script
+  is:inline
+  defer
+  src='https://cloud.umami.is/script.js'
+  data-website-id='14ffce1c-2fe7-4287-8c07-5281940eae5b'></script>

@@ -1,5 +1,5 @@
-import { glob } from 'astro/loaders'
 import { defineCollection } from 'astro:content'
+import { glob } from 'astro/loaders'
 import { z } from 'astro/zod'
 
 function removeDupsAndLowerCase(array: string[]) {
@@ -13,15 +13,28 @@ const vault = defineCollection({
   loader: glob({ base: './src/content/vault', pattern: '**/*.{md,mdx}' }),
   schema: ({ image }) =>
     z.object({
-      title: z.string().nullish().transform((val) => val ? val : undefined),
-      description: z.string().nullish().transform((val) => val ? val : undefined),
+      title: z
+        .string()
+        .nullish()
+        .transform((val) => (val ? val : undefined)),
+      description: z
+        .string()
+        .nullish()
+        .transform((val) => (val ? val : undefined)),
       publishDate: z.coerce.date().optional(),
       updatedDate: z.coerce.date().optional(),
       publish: z.boolean().default(true).optional(),
-      tags: z.array(z.string()).nullable().default([]).transform((val) => val ? removeDupsAndLowerCase(val) : []),
+      tags: z
+        .array(z.string())
+        .nullable()
+        .default([])
+        .transform((val) => (val ? removeDupsAndLowerCase(val) : [])),
       permalink: z.string().optional(),
       order: z.number().default(999),
-      type: z.union([z.string(), z.array(z.string())]).default('note').transform((val) => Array.isArray(val) ? val : [val]),
+      type: z
+        .union([z.string(), z.array(z.string())])
+        .default('note')
+        .transform((val) => (Array.isArray(val) ? val : [val])),
       heroImage: z
         .object({
           src: image(),

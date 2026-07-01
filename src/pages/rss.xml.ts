@@ -2,6 +2,7 @@ import type { AstroGlobal, ImageMetadata } from 'astro'
 import { getImage } from 'astro:assets'
 import type { CollectionEntry } from 'astro:content'
 import rss from '@astrojs/rss'
+import config from '@/site.config'
 import type { Root } from 'mdast'
 import rehypeStringify from 'rehype-stringify'
 import remarkParse from 'remark-parse'
@@ -9,9 +10,12 @@ import remarkRehype from 'remark-rehype'
 import { unified } from 'unified'
 import { visit } from 'unist-util-visit'
 
-import { getEnrichedVaultCollection, sortMDByDate, getVaultFolderDisplayPathFromEntryId } from '@/utils/vault'
+import {
+  getEnrichedVaultCollection,
+  getVaultFolderDisplayPathFromEntryId,
+  sortMDByDate
+} from '@/utils/vault'
 import type { EnrichedVaultEntry } from '@/utils/vault'
-import config from '@/site.config'
 
 // Get dynamic import of images as a map collection
 const imagesGlob = import.meta.glob<{ default: ImageMetadata }>(
@@ -104,7 +108,13 @@ const GET = async (context: AstroGlobal) => {
 
   const vaultItems: FeedItem[] = await Promise.all(
     allVaultEntries.map(async (entry) => {
-      const title = entry.data.title ?? entry.id.split('/').pop()?.replace(/\.(md|mdx)$/, '') ?? entry.id
+      const title =
+        entry.data.title ??
+        entry.id
+          .split('/')
+          .pop()
+          ?.replace(/\.(md|mdx)$/, '') ??
+        entry.id
       const folderPath = getVaultFolderDisplayPathFromEntryId(entry.id)
       return {
         title: `[Vault: ${folderPath}] ${title}`,

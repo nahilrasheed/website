@@ -45,19 +45,23 @@ const typographyConfig = {
       'user-select': 'none'
     },
     // Make content links inside headings always visible
-    'h1>a:not(.anchor),h2>a:not(.anchor),h3>a:not(.anchor),h4>a:not(.anchor),h5>a:not(.anchor),h6>a:not(.anchor)': {
-      color: 'hsl(var(--primary))',
-      'text-decoration': 'underline'
-    },
-    'h1>a.anchor:focus,h2>a.anchor:focus,h3>a.anchor:focus,h4>a.anchor:focus,h5>a.anchor:focus,h6>a.anchor:focus': {
-      opacity: 1
-    },
-    'h1:hover>a.anchor,h2:hover>a.anchor,h3:hover>a.anchor,h4:hover>a.anchor,h5:hover>a.anchor,h6:hover>a.anchor': {
-      opacity: 1
-    },
-    'h1:target>a.anchor,h2:target>a.anchor,h3:target>a.anchor,h4:target>a.anchor,h5:target>a.anchor,h6:target>a.anchor': {
-      opacity: 1
-    },
+    'h1>a:not(.anchor),h2>a:not(.anchor),h3>a:not(.anchor),h4>a:not(.anchor),h5>a:not(.anchor),h6>a:not(.anchor)':
+      {
+        color: 'hsl(var(--primary))',
+        'text-decoration': 'underline'
+      },
+    'h1>a.anchor:focus,h2>a.anchor:focus,h3>a.anchor:focus,h4>a.anchor:focus,h5>a.anchor:focus,h6>a.anchor:focus':
+      {
+        opacity: 1
+      },
+    'h1:hover>a.anchor,h2:hover>a.anchor,h3:hover>a.anchor,h4:hover>a.anchor,h5:hover>a.anchor,h6:hover>a.anchor':
+      {
+        opacity: 1
+      },
+    'h1:target>a.anchor,h2:target>a.anchor,h3:target>a.anchor,h4:target>a.anchor,h5:target>a.anchor,h6:target>a.anchor':
+      {
+        opacity: 1
+      },
     // Links
     a: {
       'word-wrap': 'break-word',
