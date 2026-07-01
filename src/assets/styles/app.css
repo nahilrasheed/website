@@ -51,3 +51,41 @@ a {
     color: hsl(var(--primary) / var(--un-text-opacity, 1));
   }
 }
+
+/* ── Wikilinks (a.internal from remark-wiki-link) ── */
+.prose a.internal {
+  color: hsl(var(--primary)) !important;
+  text-decoration-line: underline !important;
+  text-decoration-style: dotted !important;
+  text-decoration-color: hsl(var(--primary) / 0.4) !important;
+  text-underline-offset: 0.25em !important;
+  border-radius: 0.2em;
+  padding: 0.05em 0.15em;
+  margin: -0.05em -0.15em;
+  transition:
+    color 0.2s ease,
+    text-decoration-color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.prose a.internal:hover {
+  background-color: hsl(var(--primary) / 0.1) !important;
+  text-decoration-color: hsl(var(--primary) / 0.8) !important;
+  text-decoration-style: solid !important;
+}
+
+/* Dead / broken wikilinks — note doesn't exist in vault */
+.prose a.internal.new {
+  color: hsl(var(--muted-foreground)) !important;
+  text-decoration-color: hsl(var(--muted-foreground) / 0.3) !important;
+}
+
+.prose a.internal.new:hover {
+  background-color: hsl(var(--muted-foreground) / 0.08) !important;
+  text-decoration-color: hsl(var(--muted-foreground) / 0.6) !important;
+}
+
+/* Headings: inherit weight so wikilinks inside h1-h6 stay bold */
+.prose :is(h1, h2, h3, h4, h5, h6) a.internal {
+  font-weight: inherit !important;
+}

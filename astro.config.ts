@@ -119,7 +119,9 @@ export default defineConfig({
         {
           format: 'shortestPossible',
           files: vaultFiles,
-          permalinks
+          permalinks,
+          wikiLinkClassName: 'internal',
+          newClassName: 'new'
         }
       ],
       [remarkAddZoomable, config.integ.mediumZoom.options],
