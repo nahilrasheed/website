@@ -89,26 +89,27 @@ const typographyConfig = {
     }),
     // Blockquote
     blockquote: {
-      position: 'relative',
-      overflow: 'hidden',
-      'border-width': '1px',
-      'border-inline-start-color': 'inherit',
-      'border-radius': `calc(1.5 * ${radius})`,
-      'padding-inline': '1.6rem',
-      'box-shadow': `0 5px 0 ${bgMuted}`,
+      'border-inline-start': `0.25rem solid ${border}`,
+      'border-radius': `calc(0.5 * ${radius})`,
+      'padding-block': '0.5rem',
+      'padding-inline-start': '1rem',
+      'padding-inline-end': '1.25rem',
+      'background-color': bgMuted,
+      'box-shadow': 'none',
+      color: fgMuted,
       ...(typographyCustom.blockquoteStyle === 'normal' && { 'font-style': 'normal' })
     },
+    'blockquote::before': {
+      content: 'none'
+    },
     'blockquote::after': {
-      color: fgMuted,
-      position: 'absolute',
-      content: '"”"',
-      top: '2.6rem',
-      right: '-1.4rem',
-      'font-size': '10rem',
-      'font-family':
-        '"Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande", "Lucida Sans", Arial, sans-serif',
-      transform: 'rotate(-15deg)',
-      opacity: '0.1'
+      content: 'none'
+    },
+    'blockquote p:first-of-type::before': {
+      content: 'none'
+    },
+    'blockquote p:last-of-type::after': {
+      content: 'none'
     },
     // Table
     table: { display: 'block', 'font-size': '.875em' },

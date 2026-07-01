@@ -113,7 +113,7 @@ export const integ: IntegrationUserConfig = {
   typography: {
     class: 'prose text-base',
     // The style of blockquote font `normal` / `italic` (default to italic in typography)
-    blockquoteStyle: 'italic',
+    blockquoteStyle: 'normal',
     // The style of inline code block `code` / `modern` (default to code in typography)
     inlineCodeBlockStyle: 'modern'
   },
