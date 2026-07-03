@@ -46,9 +46,10 @@ bun run clean        # Remove .astro, .vercel, dist
 All content lives strictly in the unified `src/content/vault/` directory.
 
 #### Unified Content Workflow
-* **Creation**: Create a `.md` or `.mdx` file anywhere under `src/content/vault/` (subfolders like `posts/` or `writeups/` are recommended for organization).
-* **Routing**: All documents are compiled under the unified `/vault/[...slug]` path.
-* **Listing**:
+
+- **Creation**: Create a `.md` or `.mdx` file anywhere under `src/content/vault/` (subfolders like `posts/` or `writeups/` are recommended for organization).
+- **Routing**: All documents are compiled under the unified `/vault/[...slug]` path.
+- **Listing**:
   - **Blog posts** (entries with `type: 'post'`) are displayed on the `/blog` index page and link directly to `/vault/[...slug]`.
   - **Vault notes** (entries with `type: 'note'`) are visible in the left navigation sidebar tree and dashboard grid folders.
 
@@ -59,26 +60,27 @@ Here is the complete set of frontmatter properties validated by Zod ([src/conten
 ```yaml
 ---
 # Classification (Unified Router)
-type: 'note'                 # String or array of strings. Defaults to 'note'. Use 'post' for blog entries.
-                             # e.g., type: ['post'] or type: ['note', 'post']
+type:
+  'note' # String or array of strings. Defaults to 'note'. Use 'post' for blog entries.
+  # e.g., type: ['post'] or type: ['note', 'post']
 
 # Standard Metadata
-title: "Title Override"      # Optional string. If omitted, the title is auto-generated from the filename.
-description: "Description"   # Optional string. Brief synopsis shown under header and in meta tags.
-publishDate: 2026-06-16      # Optional date. Document creation date.
-updatedDate: 2026-06-16      # Optional date. Document modification date.
-publish: true                # Optional boolean. Default: true. Set to false to exclude from production builds.
-tags: ["cyber", "astro"]     # Optional string array. Category tags. Duplicates are auto-removed and normalized to lowercase.
-permalink: "custom-slug"     # Optional string. Custom URL override.
-order: 999                   # Optional number. Default: 999. Ascending sort order inside tree navigation/indexes.
-language: "en"               # Optional string. Language code for base page markup.
-comment: true                # Optional boolean. Default: true. Toggles comment system visibility.
+title: 'Title Override' # Optional string. If omitted, the title is auto-generated from the filename.
+description: 'Description' # Optional string. Brief synopsis shown under header and in meta tags.
+publishDate: 2026-06-16 # Optional date. Document creation date.
+updatedDate: 2026-06-16 # Optional date. Document modification date.
+publish: true # Optional boolean. Default: true. Set to false to exclude from production builds.
+tags: ['cyber', 'astro'] # Optional string array. Category tags. Duplicates are auto-removed and normalized to lowercase.
+permalink: 'custom-slug' # Optional string. Custom URL override.
+order: 999 # Optional number. Default: 999. Ascending sort order inside tree navigation/indexes.
+language: 'en' # Optional string. Language code for base page markup.
+comment: true # Optional boolean. Default: true. Toggles comment system visibility.
 
 # Media & Aesthetics
-heroImage:                   # Optional object. Renders a cover image layout with a blur overlay scroll effect:
-  src: "./thumbnail.jpg"     # Required image path. Optimized cover image asset.
-  alt: "Image description"   # Optional string. Image alternate text.
-  color: "#659EB9"           # Optional string. Hex/HSL accent color code. Overrides top page wash and TOC highlights.
+heroImage: # Optional object. Renders a cover image layout with a blur overlay scroll effect:
+  src: './thumbnail.jpg' # Required image path. Optimized cover image asset.
+  alt: 'Image description' # Optional string. Image alternate text.
+  color: '#659EB9' # Optional string. Hex/HSL accent color code. Overrides top page wash and TOC highlights.
 ---
 ```
 
@@ -105,6 +107,7 @@ heroImage:                   # Optional object. Renders a cover image layout wit
 ### Shiki Code Block Transformers ([src/plugins/shiki-custom-transformers.ts](src/plugins/shiki-custom-transformers.ts))
 
 Custom transformers (L21-153):
+
 - `updateStyle()` - Wraps code in nested `<div><pre>` structure
 - `addTitle()` - Extracts title from meta string (e.g., ```ts title="file.ts"`)
 - `addLanguage()` - Shows language label in corner
@@ -121,15 +124,14 @@ Official transformers: `transformerNotationDiff`, `transformerNotationHighlight`
 
 ```typescript
 // Path aliases for internal code
-import { getEnrichedVaultCollection, getVaultTree, sortMDByDate } from '@/utils/vault'
-import { cn } from '@/utils/class-merge'
 import PageLayout from '@/layouts/BaseLayout.astro'
-import config from '@/site-config'
-
+import { GithubCard, LinkPreview } from '@/components/advanced'
+import { Paginator, PostPreview } from '@/components/pages'
 // Component barrel exports
 import { Button, Card, Icon } from '@/components/user'
-import { GithubCard, LinkPreview } from '@/components/advanced'
-import { PostPreview, Paginator } from '@/components/pages'
+import { cn } from '@/utils/class-merge'
+import { getEnrichedVaultCollection, getVaultTree, sortMDByDate } from '@/utils/vault'
+import config from '@/site-config'
 ```
 
 ### Vault URL Sanitization
@@ -140,11 +142,11 @@ import { PostPreview, Paginator } from '@/components/pages'
 function sanitizeSlugPart(part: string): string {
   return part
     .toLowerCase()
-    .replace(/[&()[\]{}]/g, '')                 // Remove brackets/parens
-    .replace(/[,;:!?@#$%^*+=|\\/<>"'`~]/g, '')  // Remove punctuation
-    .replace(/\s+/g, '-')                       // Spaces → dashes
-    .replace(/--+/g, '-')                       // Dedup dashes
-    .replace(/^-+|-+$/g, '')                    // Trim edge dashes
+    .replace(/[&()[\]{}]/g, '') // Remove brackets/parens
+    .replace(/[,;:!?@#$%^*+=|\\/<>"'`~]/g, '') // Remove punctuation
+    .replace(/\s+/g, '-') // Spaces → dashes
+    .replace(/--+/g, '-') // Dedup dashes
+    .replace(/^-+|-+$/g, '') // Trim edge dashes
 }
 ```
 
@@ -154,13 +156,13 @@ This ensures URL consistency between wikilink resolution and actual page slugs. 
 
 ```typescript
 // Unified Vault helpers
-getEnrichedVaultCollection()  // Returns EnrichedVaultEntry[], automatically filtering publish: false
-sortMDByDate(posts)           // Sorts by updatedDate ?? publishDate
-groupCollectionsByYear()      // Groups posts for archives page
+getEnrichedVaultCollection() // Returns EnrichedVaultEntry[], automatically filtering publish: false
+sortMDByDate(posts) // Sorts by updatedDate ?? publishDate
+groupCollectionsByYear() // Groups posts for archives page
 getUniqueVaultTagsWithCount() // Unified tag cloud matching
-getVaultTree()                // Recursive tree for navigation (used by sidebar and dashboard)
-getVaultFlatList()            // Flattened list of notes for pagination
-sanitizeSlugPart()            // Match URL sanitization
+getVaultTree() // Recursive tree for navigation (used by sidebar and dashboard)
+getVaultFlatList() // Flattened list of notes for pagination
+sanitizeSlugPart() // Match URL sanitization
 ```
 
 ### Styling with UnoCSS
@@ -206,7 +208,7 @@ sanitizeSlugPart()            // Match URL sanitization
    - `sanitizeSlugPart()` in [src/utils/vault.ts](src/utils/vault.ts)
    - `remarkNormalizeLinks` plugin ([src/plugins/remark-normalize-links.ts](src/plugins/remark-normalize-links.ts))
 4. **Line breaks**: `remark-breaks` makes single newlines create `<br>` (different from standard markdown)
-5. **Image paths**: 
+5. **Image paths**:
    - `/src/assets/` - Optimized images processed by Astro
    - `/public/` - Static assets served as-is
    - Vault images in `/src/content/vault/` served via dynamic route

@@ -1,3 +1,5 @@
 node_modules/**
 src/icons/**
 public/scripts/*
+.obsidian
+src/content/vault/**

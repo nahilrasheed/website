@@ -42,16 +42,18 @@ if (isSynced) {
 }
 ---
 
-{ /* Inlined to avoid a flash of invalid active tab. */
-shouldRenderSyncedTabsRestoreScript && (
-  <script is:inline>
+{
+  /* Inlined to avoid a flash of invalid active tab. */
+  shouldRenderSyncedTabsRestoreScript && (
+    <Fragment
+      set:html={`<script is:inline>
     class StarlightTabsRestore extends HTMLElement {
       connectedCallback() {
         const starlightTabs = this.closest('starlight-tabs');
         if (!(starlightTabs instanceof HTMLElement) || typeof localStorage === 'undefined') return;
         const syncKey = starlightTabs.dataset.syncKey;
         if (!syncKey) return;
-        const label = localStorage.getItem(`starlight-synced-tabs__${syncKey}`);
+        const label = localStorage.getItem(\`starlight-synced-tabs__\${syncKey}\`);
         if (!label) return;
         const tabs = starlightTabs ? [...starlightTabs.querySelectorAll('[role="tab"]')] : [];
         const tabIndexToRestore = tabs.findIndex(
@@ -70,8 +72,10 @@ shouldRenderSyncedTabsRestoreScript && (
       }
     }
     customElements.define('starlight-tabs-restore', StarlightTabsRestore);
-  </script>
-)}
+  </script>`}
+    />
+  )
+}
 
 <starlight-tabs data-sync-key={syncKey}>
   {
@@ -82,7 +86,7 @@ shouldRenderSyncedTabsRestoreScript && (
             <li role='presentation' class='tab'>
               <a
                 role='tab'
-                draggable="false"
+                draggable='false'
                 href={'#' + panelId}
                 id={tabId}
                 aria-selected={idx === 0 ? 'true' : 'false'}

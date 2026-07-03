@@ -1,7 +1,7 @@
 ---
-import { getVaultTree } from '@/utils/vault'
-import { cn } from '@/utils'
 import { Icon } from '@/components/user'
+import { cn } from '@/utils'
+import { getVaultTree } from '@/utils/vault'
 import type { VaultNode } from '@/utils/vault'
 
 interface Props {
@@ -54,64 +54,6 @@ const canLink = !!node?.slug && node.showLink !== false
           <Astro.self node={rootNode} {currentSlug} {collapsed} level={level + 1} />
         ))}
       </ul>
-
-      <script>
-        class VaultTree extends HTMLElement {
-          constructor() {
-            super()
-          }
-
-          connectedCallback() {
-            const btn = this.querySelector('.toggle-all')
-            const expandIcon = this.querySelector('.icon-expand')
-            const collapseIcon = this.querySelector('.icon-collapse')
-
-            const updateState = () => {
-              const details = Array.from(this.querySelectorAll('details'))
-              const anyOpen = details.some((el) => el.open)
-
-              if (anyOpen) {
-                // State: Some are open -> Show Collapse Button
-                btn?.setAttribute('aria-label', 'Collapse all')
-                btn?.setAttribute('title', 'Collapse all')
-                expandIcon?.classList.add('hidden')
-                collapseIcon?.classList.remove('hidden')
-              } else {
-                // State: All closed -> Show Expand Button
-                btn?.setAttribute('aria-label', 'Expand all')
-                btn?.setAttribute('title', 'Expand all')
-                expandIcon?.classList.remove('hidden')
-                collapseIcon?.classList.add('hidden')
-              }
-            }
-
-            // Initial state check
-            updateState()
-
-            // Listen for user interactions with the button
-            btn?.addEventListener('click', () => {
-              const details = this.querySelectorAll('details')
-              const anyOpen = Array.from(details).some((el) => el.open)
-
-              if (anyOpen) {
-                // Collapse all
-                details.forEach((el) => (el.open = false))
-              } else {
-                // Expand all
-                details.forEach((el) => (el.open = true))
-              }
-              updateState()
-            })
-
-            // Listen for changes in any details element to update button state
-            this.addEventListener('toggle', updateState, { capture: true })
-          }
-        }
-
-        if (!customElements.get('vault-tree')) {
-          customElements.define('vault-tree', VaultTree)
-        }
-      </script>
     </vault-tree>
   ) : (
     <li class='my-0.5'>
@@ -119,7 +61,10 @@ const canLink = !!node?.slug && node.showLink !== false
         <details open={isOpen} class='group/details'>
           <summary class='flex items-center gap-1 cursor-pointer list-none py-1 text-sm text-muted-foreground hover:text-foreground transition-colors'>
             {/* Arrow Icon */}
-            <Icon name='chevron-right' class='w-3.5 h-3.5 shrink-0 transition-transform duration-200 group-open/details:rotate-90 text-muted-foreground/50' />
+            <Icon
+              name='chevron-right'
+              class='w-3.5 h-3.5 shrink-0 transition-transform duration-200 group-open/details:rotate-90 text-muted-foreground/50'
+            />
 
             {canLink ? (
               <span class='flex-1 truncate'>
@@ -131,7 +76,9 @@ const canLink = !!node?.slug && node.showLink !== false
                   )}
                 >
                   {node.title}
-                  {node.entry?.data.publish === false && <span class='text-red-500 text-xs ml-1'>(Unpublished)</span>}
+                  {node.entry?.data.publish === false && (
+                    <span class='text-red-500 text-xs ml-1'>(Unpublished)</span>
+                  )}
                 </a>
               </span>
             ) : (
@@ -155,12 +102,16 @@ const canLink = !!node?.slug && node.showLink !== false
               )}
             >
               {node.title}
-              {node.entry?.data.publish === false && <span class='text-red-500 text-xs ml-1'>(Unpublished)</span>}
+              {node.entry?.data.publish === false && (
+                <span class='text-red-500 text-xs ml-1'>(Unpublished)</span>
+              )}
             </a>
           ) : (
             <span class='flex-1 truncate ml-4 text-sm text-muted-foreground'>
               {node.title}
-              {node.entry?.data.publish === false && <span class='text-red-500 text-xs ml-1'>(Unpublished)</span>}
+              {node.entry?.data.publish === false && (
+                <span class='text-red-500 text-xs ml-1'>(Unpublished)</span>
+              )}
             </span>
           )}
         </div>
@@ -168,3 +119,61 @@ const canLink = !!node?.slug && node.showLink !== false
     </li>
   )
 }
+
+<script>
+  class VaultTree extends HTMLElement {
+    constructor() {
+      super()
+    }
+
+    connectedCallback() {
+      const btn = this.querySelector('.toggle-all')
+      const expandIcon = this.querySelector('.icon-expand')
+      const collapseIcon = this.querySelector('.icon-collapse')
+
+      const updateState = () => {
+        const details = Array.from(this.querySelectorAll('details'))
+        const anyOpen = details.some((el) => el.open)
+
+        if (anyOpen) {
+          // State: Some are open -> Show Collapse Button
+          btn?.setAttribute('aria-label', 'Collapse all')
+          btn?.setAttribute('title', 'Collapse all')
+          expandIcon?.classList.add('hidden')
+          collapseIcon?.classList.remove('hidden')
+        } else {
+          // State: All closed -> Show Expand Button
+          btn?.setAttribute('aria-label', 'Expand all')
+          btn?.setAttribute('title', 'Expand all')
+          expandIcon?.classList.remove('hidden')
+          collapseIcon?.classList.add('hidden')
+        }
+      }
+
+      // Initial state check
+      updateState()
+
+      // Listen for user interactions with the button
+      btn?.addEventListener('click', () => {
+        const details = this.querySelectorAll('details')
+        const anyOpen = Array.from(details).some((el) => el.open)
+
+        if (anyOpen) {
+          // Collapse all
+          details.forEach((el) => (el.open = false))
+        } else {
+          // Expand all
+          details.forEach((el) => (el.open = true))
+        }
+        updateState()
+      })
+
+      // Listen for changes in any details element to update button state
+      this.addEventListener('toggle', updateState, { capture: true })
+    }
+  }
+
+  if (!customElements.get('vault-tree')) {
+    customElements.define('vault-tree', VaultTree)
+  }
+</script>

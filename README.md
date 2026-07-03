@@ -15,12 +15,14 @@ A fast, elegant personal website combining **blog** and **knowledge vault** - bu
 ### ✨ Core Features
 
 #### 📚 Obsidian Vault Integration
+
 - **Wikilinks Support**: Full support via `@flowershow/remark-wiki-link` with proper permalink resolution
 - **Title Preservation**: File system mapping preserves original casing/symbols
 - **Folder Notes**: Support for index.md/README.md patterns
 - **Auto-Generated Titles**: Automatic title generation from filenames with symbol handling
 
 #### 🌿 Interactive Vault Dashboard
+
 - **Responsive Grid Layout**: Card-based interface with smooth animations
 - **Smart Navigation**: Auto-closes other folders when opening one for cleaner UX
 - **Unified Tree Component**: Recursive `VaultTree.astro` component for both sidebar and dashboard
@@ -28,20 +30,24 @@ A fast, elegant personal website combining **blog** and **knowledge vault** - bu
 - **Grid / List View Toggle**: Support for toggling between a folder card grid and a tree list view, saved persistently in `localStorage`
 
 #### 🕸️ Interactive Vault Network Graph & Backlinks
+
 - **Force-Directed Graph**: Visual interactive network graph mapping note connections and tags (built with `force-graph` and processed via `src/utils/graph.ts`). Renders a local neighborhood graph on individual notes and supports a full global graph overlay modal.
 - **Backlinks Discovery**: Dynamic tracking and display of other notes referencing the current note under a collapsible sidebar section.
 
 #### 🔍 Full-Site Search
+
 - **Pagefind Integration**: Fast, efficient search across all content
 - **Zero-JS Until Needed**: Search assets only loaded when activated
 
 #### 📝 Enhanced Markdown
+
 - **Obsidian Compatibility**: Single newlines create line breaks via `remark-breaks`
 - **Math Support**: KaTeX rendering for mathematical expressions
 - **Callouts**: Full support for Obsidian-style callouts via `rehype-callouts`
 - **Code Blocks**: Custom transformers with syntax highlighting, copy button, and collapse
 
 #### 🎨 UI Optimization
+
 - **Clean Design**: Minimal, distraction-free interface with custom typography (Satoshi font via native fonts system)
 - **Dark Mode**: Built-in theme switching
 - **Responsive Sidebar Drawer**: Organizes vault navigation, Table of Contents, graph, and backlinks into desktop sidebars that collapse to a drawer (below 1280px width) toggled by a floating list button.
@@ -100,9 +106,10 @@ bun run lint
 All content lives strictly in the unified `src/content/vault/` directory.
 
 #### Unified Content Workflow
-* **Creation**: Place any `.md` or `.mdx` file anywhere under `src/content/vault/` (subfolders like `posts/` or `writeups/` are recommended for organization).
-* **Routing**: All documents are compiled under the unified `/vault/[...slug]` path.
-* **Listing**:
+
+- **Creation**: Place any `.md` or `.mdx` file anywhere under `src/content/vault/` (subfolders like `posts/` or `writeups/` are recommended for organization).
+- **Routing**: All documents are compiled under the unified `/vault/[...slug]` path.
+- **Listing**:
   - **Blog posts** (entries containing `type: 'post'` in frontmatter) are displayed on the `/blog` index page and link directly to `/vault/[...slug]`.
   - **Vault notes** (entries containing `type: 'note'` or defaulting to it) show up in the left tree navigation sidebar and dashboard grid folders.
 
@@ -140,12 +147,15 @@ heroImage:                   # Optional. Renders a cover image layout with a blu
 
 ```markdown
 <!-- Basic wikilink -->
+
 [[Other Note]]
 
 <!-- Wikilink with custom text -->
+
 [[Other Note|Custom Display Text]]
 
 <!-- Nested paths work automatically -->
+
 [[Folder/Subfolder/Note]]
 ```
 
@@ -164,6 +174,7 @@ heroImage:                   # Optional. Renders a cover image layout with a blu
 ### Key Settings
 
 Edit `src/site.config.ts` to customize:
+
 - Site title, description, author info
 - Social links and profile URLs
 - Header navigation menu items
@@ -177,15 +188,16 @@ The project uses TypeScript path aliases for clean imports:
 
 ```typescript
 // Before (relative paths)
-import { cn } from '../../utils'
-import Card from '../components/Card.astro'
-
+import Card from '@/components/user/Card.astro'
 // After (path aliases)
 import { cn } from '@/utils'
-import Card from '@/components/user/Card.astro'
+
+import { cn } from '../../utils'
+import Card from '../components/Card.astro'
 ```
 
 Configured in `tsconfig.json`:
+
 - `@/*` → `src/*` - Main source directory
 - Enables tree-shaking and better IDE support
 
@@ -224,7 +236,7 @@ Inspired by [Astro Theme Pure](https://github.com/cworld1/astro-theme-pure), bui
 - **Runtime**: [Bun](https://bun.sh) (Node.js compatible)
 - **Styling**: [UnoCSS](https://unocss.dev) 0.66.6 with @unocss/preset-typography
 - **Graph Visualization**: [force-graph](https://github.com/vasturiano/force-graph)
-- **Markdown Processing**: 
+- **Markdown Processing**:
   - **Remark**: remark-math, remark-breaks, @flowershow/remark-wiki-link, reading-time
   - **Rehype**: rehype-katex, rehype-callouts, rehype-autolink-headings
   - **Custom plugins**: Shiki transformers, code collapse, external links, steps/tabs, image zoom
@@ -254,7 +266,8 @@ This project is open source under the [Apache 2.0](LICENSE).
 
 All components are organized in `src/components/` with barrel exports:
 
-**User Components** (`@/components/user`): 
+**User Components** (`@/components/user`):
+
 - Containers: `Card`, `Collapse`, `Aside`, `Tabs`, `TabItem`
 - Lists: `CardList`, `Timeline`, `Steps`
 - UI Elements: `Button`, `Label`, `Spoiler`, `Icon`, `FormattedDate`
@@ -270,9 +283,10 @@ All components are organized in `src/components/` with barrel exports:
 `VaultTree` (sidebar/dashboard tree), `VaultGraph` (force-directed graph visualizer), `Backlinks` (referenced notes list)
 
 **Import Examples**:
+
 ```typescript
-import { Button, Card, Timeline } from '@/components/user'
 import { GithubCard } from '@/components/advanced'
 import { PostPreview } from '@/components/pages'
-import { VaultGraph, Backlinks } from '@/components/vault'
+import { Button, Card, Timeline } from '@/components/user'
+import { Backlinks, VaultGraph } from '@/components/vault'
 ```
