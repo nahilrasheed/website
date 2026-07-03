@@ -1,5 +1,6 @@
 import {
   UserConfigSchema,
+  type CardListData,
   type ConfigOutput,
   type IntegrationUserConfig,
   type ThemeUserConfig
@@ -66,7 +67,7 @@ export const theme: ThemeUserConfig = {
     // Year format
     year: `© ${new Date().getFullYear()}`,
     // year: `© 2019 - ${new Date().getFullYear()}`,
-    links: [],
+    links: [{ title: 'Site Policy', link: '/terms', pos: 2 }],
     /** Enable displaying a "Astro & Pure theme powered" link in your site's footer. */
     credits: false,
     /** Optional details about the social media accounts for this site. */
@@ -134,3 +135,17 @@ export const integ: IntegrationUserConfig = {
 
 const config = UserConfigSchema.parse({ ...theme, integ }) as ConfigOutput
 export default config
+
+export const terms: CardListData = {
+  title: 'Terms content',
+  list: [
+    {
+      title: 'Privacy Policy',
+      link: '/terms/privacy-policy'
+    },
+    {
+      title: 'Terms and Conditions',
+      link: '/terms/terms-and-conditions'
+    }
+  ]
+}
