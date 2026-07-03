@@ -82,7 +82,7 @@ if (isSynced) {
     panels && (
       <div class='tablist-wrapper not-content'>
         <ul role='tablist' class='my-0 not-prose'>
-          {panels.map(({ label, panelId, tabId }, idx) => (
+          {panels.map(({ label, panelId, tabId }: { label: string; panelId: string; tabId: string }, idx: number) => (
             <li role='presentation' class='tab'>
               <a
                 role='tab'
