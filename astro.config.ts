@@ -1,4 +1,4 @@
-import { rehypeHeadingIds } from '@astrojs/markdown-remark'
+import { rehypeHeadingIds, unified } from '@astrojs/markdown-remark'
 import mdx from '@astrojs/mdx'
 import sitemap from '@astrojs/sitemap'
 import remarkWikiLink from '@flowershow/remark-wiki-link'
@@ -110,44 +110,46 @@ export default defineConfig({
 
   // [Markdown]
   markdown: {
-    remarkPlugins: [
-      remarkMath,
-      remarkBreaks,
-      remarkNormalizeLinks,
-      [
-        remarkWikiLink,
-        {
-          format: 'shortestPossible',
-          files: vaultFiles,
-          permalinks,
-          wikiLinkClassName: 'internal',
-          newClassName: 'new'
-        }
+    processor: unified({
+      remarkPlugins: [
+        remarkMath,
+        remarkBreaks,
+        remarkNormalizeLinks,
+        [
+          remarkWikiLink,
+          {
+            format: 'shortestPossible',
+            files: vaultFiles,
+            permalinks,
+            wikiLinkClassName: 'internal',
+            newClassName: 'new'
+          }
+        ],
+        [remarkAddZoomable, config.integ.mediumZoom.options],
+        remarkReadingTime
       ],
-      [remarkAddZoomable, config.integ.mediumZoom.options],
-      remarkReadingTime
-    ],
-    rehypePlugins: [
-      [rehypeKatex, {}],
-      rehypeHeadingIds,
-      [
-        rehypeAutolinkHeadings,
-        {
-          behavior: 'append',
-          properties: { className: ['anchor'] },
-          content: { type: 'text', value: '#' }
-        }
-      ],
-      rehypeCallouts,
-      [
-        rehypeExternalLinks,
-        {
-          content: { type: 'text', value: config.content.externalLinks.content },
-          contentProperties: config.content.externalLinks.properties
-        }
-      ],
-      rehypeTable
-    ],
+      rehypePlugins: [
+        [rehypeKatex, {}],
+        rehypeHeadingIds,
+        [
+          rehypeAutolinkHeadings,
+          {
+            behavior: 'append',
+            properties: { className: ['anchor'] },
+            content: { type: 'text', value: '#' }
+          }
+        ],
+        rehypeCallouts,
+        [
+          rehypeExternalLinks,
+          {
+            content: { type: 'text', value: config.content.externalLinks.content },
+            contentProperties: config.content.externalLinks.properties
+          }
+        ],
+        rehypeTable
+      ]
+    }),
     // https://docs.astro.build/en/guides/syntax-highlighting/
     shikiConfig: {
       themes: {
@@ -180,17 +182,5 @@ export default defineConfig({
   },
 
   // [Integrations]
-  integrations: [mdx({ optimize: true }), sitemap(), UnoCSS({ injectReset: true })],
-
-  // [Experimental]
-  experimental: {
-    // Allow compatible editors to support intellisense features for content collection entries
-    // https://docs.astro.build/en/reference/experimental-flags/content-intellisense/
-    contentIntellisense: true,
-    // Enable SVGO optimization for SVG assets
-    // https://docs.astro.build/en/reference/experimental-flags/svg-optimization/
-    svgo: true
-    // Enable font preloading and optimization
-    // https://docs.astro.build/en/reference/experimental-flags/fonts/
-  }
+  integrations: [mdx({ optimize: true }), sitemap(), UnoCSS({ injectReset: true })]
 })
