@@ -24,9 +24,9 @@
             }))
         }
         ;(((p = t.createElement('script')).type = 'text/javascript'),
-          (p.crossOrigin = 'anonymous'),
           (p.async = !0),
-          (p.src = s.api_host + '/static/array.js'),
+          (p.src =
+            s.api_host.replace('.i.posthog.com', '-assets.i.posthog.com') + '/static/array.js'),
           (r = t.getElementsByTagName('script')[0]).parentNode.insertBefore(p, r))
         var u = e
         for (
@@ -40,7 +40,7 @@
               return u.toString(1) + '.people (stub)'
             },
             o =
-              'capture identify alias people.set people.set_once set_config register register_once unregister opt_out_capturing has_opted_out_capturing opt_in_capturing reset isFeatureEnabled onFeatureFlags getFeatureFlag getFeatureFlagPayload reloadFeatureFlags group updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures getActiveMatchingSurveys getSurveys getNextSurveyStep onSessionId'.split(
+              'init capture register register_once register_for_session unregister opt_out_capturing has_opted_out_capturing opt_in_capturing reset isFeatureEnabled getFeatureFlag getFeatureFlagPayload reloadFeatureFlags group identify setPersonProperties setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags resetGroups onFeatureFlags addFeatureFlagsHandler onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey getNextSurveyStep'.split(
                 ' '
               ),
             n = 0;
@@ -54,6 +54,7 @@
   })(document, window.posthog || [])
   posthog.init(apiKey || '', {
     api_host: apiHost || 'https://us.i.posthog.com',
-    defaults: '2026-01-30'
+    cookieless_mode: 'always',
+    defaults: '2026-05-30'
   })
 </script>
