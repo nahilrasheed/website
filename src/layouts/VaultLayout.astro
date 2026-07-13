@@ -38,6 +38,7 @@ const highlightColor = entry?.data?.heroImage?.color
   <div class='flex flex-col lg:flex-row gap-6 lg:gap-12 items-start relative mt-4 px-4 lg:px-0'>
     <!-- Left Sidebar: Vault Navigation (Desktop) -->
     <aside
+      data-pagefind-ignore
       class='animate lg:w-64 shrink-0 lg:sticky lg:top-24 lg:h-[calc(100vh-8rem)] overflow-y-auto hidden lg:block border-r border-border/40 pr-4 custom-scrollbar'
     >
       <VaultTree {currentSlug} title='Vault' class='pb-10 w-full' />
@@ -53,7 +54,7 @@ const highlightColor = entry?.data?.heroImage?.color
 
     <!-- Middle: Content -->
     <main class='flex-1 min-w-0 w-full'>
-      <article>
+      <article data-pagefind-body>
         <div id='content-header' class='animate'>
           <slot name='header' />
           {
@@ -80,7 +81,7 @@ const highlightColor = entry?.data?.heroImage?.color
           {
             entry && (
               <>
-                <h1 class='text-2xl font-bold sm:mb-2 sm:text-3xl tracking-tight text-foreground'>
+                <h1 data-pagefind-meta="title" data-pagefind-weight="10" class='text-2xl font-bold sm:mb-2 sm:text-3xl tracking-tight text-foreground'>
                   {entry.data.title}
                   {entry.data.publish === false && <span class='text-red-500'> (Unpublished)</span>}
                 </h1>
@@ -143,7 +144,7 @@ const highlightColor = entry?.data?.heroImage?.color
 
                 <div class='mt-3 italic text-muted-foreground'>
                   {entry.data.description && (
-                    <blockquote class='text-sm text-muted-foreground'>
+                    <blockquote data-pagefind-meta="description" class='text-sm text-muted-foreground'>
                       <q>{entry.data.description}</q>
                     </blockquote>
                   )}
@@ -180,6 +181,7 @@ const highlightColor = entry?.data?.heroImage?.color
     </main>
     <!-- Right Sidebar: TOC -->
     <aside
+      data-pagefind-ignore
       class='animate lg:w-64 shrink-0 lg:sticky lg:top-24 hidden xl:block pl-4 z-40 fixed lg:order-2 lg:shrink-0 max-lg:border max-lg:px-4 max-lg:py-3 max-lg:bg-muted max-lg:rounded-xl right-0 top-20 h-[calc(100vh-7rem)] overflow-y-auto custom-scrollbar max-lg:hidden'
       id='sidebar'
     >
