@@ -2,6 +2,7 @@ import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { getCollection } from 'astro:content'
 import type { CollectionEntry } from 'astro:content'
+import { normalizeVaultSlug } from '@/utils/vault-link-index'
 
 export type VaultEntry = CollectionEntry<'vault'>
 const VAULT_CONTENT_PATH = './src/content/vault'
@@ -193,14 +194,7 @@ function isFolderNote(entryId: string): boolean {
   return sourcePath ? /\/(index|README)\.(md|mdx)$/i.test(sourcePath) : false
 }
 
-//  Convert entry ID to URL-safe slug
-export function normalizeVaultSlug(id: string): string {
-  return id
-    .replace(/\.(md|mdx)$/, '')
-    .split('/')
-    .map(sanitizeSlugPart)
-    .join('/')
-}
+export { normalizeVaultSlug }
 
 /**
  * Get a human-readable folder path from a vault entry id.

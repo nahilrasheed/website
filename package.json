@@ -26,6 +26,7 @@
     "@unocss/astro": "^66.7.4",
     "astro": "7.0.6",
     "force-graph": "^1.51.4",
+    "github-slugger": "^2.0.0",
     "hast-util-select": "^6.0.4",
     "katex": "^0.16.47",
     "mdast-util-to-string": "^4.0.0",

@@ -28,5 +28,5 @@
       "@/site-config": ["src/site.config.ts"]
     }
   },
-  "exclude": ["node_modules", "**/node_modules/*", ".vscode", "dist", "public/scripts/*", "test/*", "packages"]
+  "exclude": ["node_modules", "**/node_modules/*", ".vscode", "dist", "public/scripts/*", "test/*", "packages", "src/**/*.test.ts"]
 }

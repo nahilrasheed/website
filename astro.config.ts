@@ -3,7 +3,6 @@ import mdx from '@astrojs/mdx'
 import sitemap from '@astrojs/sitemap'
 import remarkWikiLink from '@flowershow/remark-wiki-link'
 import { defineConfig, fontProviders } from 'astro/config'
-import { globSync } from 'glob'
 import rehypeCallouts from 'rehype-callouts'
 import rehypeKatex from 'rehype-katex'
 import remarkBreaks from 'remark-breaks'
@@ -14,8 +13,9 @@ import UnoCSS from 'unocss/astro'
 import rehypeAutolinkHeadings from './src/plugins/rehype-auto-link-headings.ts'
 import rehypeExternalLinks from './src/plugins/rehype-external-links.ts'
 import rehypeTable from './src/plugins/rehype-table.ts'
-import { remarkNormalizeLinks } from './src/plugins/remark-normalize-links.ts'
+import { remarkResolveVaultLinks } from './src/plugins/remark-resolve-vault-links.ts'
 import { remarkAddZoomable, remarkReadingTime } from './src/plugins/remark-plugins.ts'
+import { createVaultLinkIndex } from './src/utils/vault-link-index.ts'
 // Shiki
 import {
   addCollapse,
@@ -31,41 +31,10 @@ import {
 } from './src/plugins/shiki-official/transformers.ts'
 import config from './src/site.config.ts'
 
-const vaultFiles = globSync('./src/content/vault/**/*.{md,mdx,jpg,jpeg,png,webp,gif,svg}')
-const contentFiles = vaultFiles.map((f) => f.replace(/\\/g, '/'))
+const vaultLinkIndex = createVaultLinkIndex()
+const vaultFiles = vaultLinkIndex.files
 
-/**
- * Sanitize a path segment for use in URLs - must match vault.ts sanitization
- */
-function sanitizeSlugPart(part: string): string {
-  return (
-    part
-      .toLowerCase()
-      // Remove special characters
-      .replace(/[&()[\]{}]/g, '') // Remove &, brackets, parens
-      .replace(/[,;:!?@#$%^*+=|\\/<>"'`~]/g, '') // Remove punctuation
-      .replace(/\s+/g, '-') // Spaces → dashes
-      .replace(/--+/g, '-') // Multiple dashes → single
-      .replace(/^-+|-+$/g, '')
-  ) // Trim dashes from ends
-}
-
-const permalinks = Object.fromEntries(
-  contentFiles.map((file) => {
-    // Use /vault/ prefix for markdown paths
-    const relativePath = file.replace(/^src\/content\/vault\//, '')
-    if (file.match(/\.(md|mdx)$/)) {
-      const slug = relativePath
-        .replace(/\.(md|mdx)$/, '')
-        .split('/')
-        .map(sanitizeSlugPart)
-        .join('/')
-      return [file, `/vault/${slug}`]
-    }
-    // For images/assets, use the dynamic vault attachment route
-    return [file, `/vault/${relativePath}`]
-  })
-)
+const permalinks = vaultLinkIndex.permalinks
 
 // https://astro.build/config
 export default defineConfig({
@@ -114,7 +83,6 @@ export default defineConfig({
       remarkPlugins: [
         remarkMath,
         remarkBreaks,
-        remarkNormalizeLinks,
         [
           remarkWikiLink,
           {
@@ -125,6 +93,7 @@ export default defineConfig({
             newClassName: 'new'
           }
         ],
+        remarkResolveVaultLinks(vaultLinkIndex),
         [remarkAddZoomable, config.integ.mediumZoom.options],
         remarkReadingTime
       ],

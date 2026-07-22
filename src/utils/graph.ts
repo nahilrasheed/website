@@ -1,4 +1,12 @@
-import { getEnrichedVaultCollection, normalizeVaultSlug } from '@/utils/vault'
+import remarkParse from 'remark-parse'
+import { unified } from 'unified'
+import { visit } from 'unist-util-visit'
+
+import { getEnrichedVaultCollection } from '@/utils/vault'
+import { createVaultLinkIndex } from '@/utils/vault-link-index'
+import type { VaultLinkIndex } from '@/utils/vault-link-index'
+
+const EXTERNAL = /^(?:[a-z][a-z\d+.-]*:|#)/i
 
 export interface GraphNode {
   id: string
@@ -21,30 +29,31 @@ export interface GraphData {
 
 // Cache in-memory for static builds
 let cachedGraphData: GraphData | null = null
+let vaultIndex: VaultLinkIndex | null = null
+
+function getVaultIndex(): VaultLinkIndex {
+  if (!vaultIndex) vaultIndex = createVaultLinkIndex()
+  return vaultIndex
+}
+
+function resolveLink(source: string, target: string, kind: 'note' | 'media'): string | undefined {
+  try {
+    const resolution = getVaultIndex().resolve({ source, target, kind })
+    return resolution.url.replace(/^\/vault\//, '')
+  } catch {
+    return undefined
+  }
+}
 
 export async function getVaultGraphData(): Promise<GraphData> {
   if (cachedGraphData && import.meta.env.PROD) return cachedGraphData
 
-  // Include all published entries (both notes and posts) as they are unified under /vault
   const entries = await getEnrichedVaultCollection()
   const nodes: GraphNode[] = []
   const links: GraphLink[] = []
 
   const backlinksMap: Record<string, Set<string>> = {}
   const linksMap: Record<string, Set<string>> = {}
-
-  // 1. Create a set of all valid slugs we can link to
-  const validSlugs = new Set(entries.map((e) => e.slug))
-
-  // Precompute basename -> matching slugs map for O(1) fallback lookups
-  const basenameMap = new Map<string, string[]>()
-  for (const slug of validSlugs) {
-    const basename = slug.split('/').pop()
-    if (!basename) continue
-    const existing = basenameMap.get(basename)
-    if (existing) existing.push(slug)
-    else basenameMap.set(basename, [slug])
-  }
 
   // Helper to init sets and add links
   const addLink = (source: string, target: string) => {
@@ -54,7 +63,8 @@ export async function getVaultGraphData(): Promise<GraphData> {
     backlinksMap[target].add(source)
   }
 
-  // 2. Extract links
+  const parser = unified().use(remarkParse)
+
   for (const entry of entries) {
     const sourceSlug = entry.slug
 
@@ -69,61 +79,36 @@ export async function getVaultGraphData(): Promise<GraphData> {
 
     if (!entry.body) continue
 
-    // Find wikilinks [[Link]] or [[Link|Alias]]
-    const wikiLinkRegex = /\[\[(.*?)\]\]/g
-    let match
-    while ((match = wikiLinkRegex.exec(entry.body)) !== null) {
-      const inner = match[1]
-      const target = inner.split('|')[0].trim() // use actual target, ignore alias
-      const targetSlug = normalizeVaultSlug(target)
+    const tree = parser.parse(entry.body)
 
-      // If it's a valid targeted file
-      if (validSlugs.has(targetSlug)) {
-        addLink(sourceSlug, targetSlug)
+    visit(tree, (node: any) => {
+      let target: string | undefined
+
+      if (node.type === 'link' || node.type === 'image') {
+        if (!node.url || EXTERNAL.test(node.url)) return
+        target = node.url.split('#')[0].split('?')[0]
+        if (!target) return
+      } else if (node.type === 'wikiLink' || node.type === 'embed') {
+        const inner = String(node.value ?? '')
+        target = inner.split('|')[0].split('#')[0].trim()
+        if (!target) return
       } else {
-        // Wikilinks sometimes omit the folder path; use precomputed map for O(1) basename lookup
-        const possibleTargets = basenameMap.get(targetSlug)
-        if (possibleTargets?.length === 1) {
-          addLink(sourceSlug, possibleTargets[0])
-        }
+        return
       }
-    }
 
-    // Find standard markdown links [text](./path/to/note)
-    const mdLinkRegex = /\[([^\]]+)\]\(([^)"]+)(?: "[^"]*")?\)/g
-    let mdMatch
-    while ((mdMatch = mdLinkRegex.exec(entry.body)) !== null) {
-      const href = mdMatch[2].trim()
-      // Skip external links and anchors
-      if (href.startsWith('http') || href.startsWith('#') || href.startsWith('mailto:')) continue
-
-      const cleanHref = href.split('#')[0].split('?')[0]
-      if (!cleanHref) continue
-
-      // Clean relative paths
-      const resolved = normalizeVaultSlug(cleanHref.replace(/^(?:\.\.\/)+|^(?:\.\/)+/, ''))
-      if (validSlugs.has(resolved)) {
-        addLink(sourceSlug, resolved)
-      } else {
-        // Try to match just the base name; use precomputed map for O(1) lookup
-        const baseName = cleanHref.split('/').pop() || ''
-        const baseSlug = normalizeVaultSlug(baseName)
-        const possibleTargets = basenameMap.get(baseSlug)
-        if (possibleTargets?.length === 1) {
-          addLink(sourceSlug, possibleTargets[0])
-        }
-      }
-    }
+      const kind = node.type === 'image' || node.type === 'embed' ? 'media' : 'note'
+      const resolved = resolveLink(sourceSlug, target, kind)
+      if (resolved) addLink(sourceSlug, resolved)
+    })
   }
 
-  // 3. Compile final arrays
+  // Compile final arrays
   for (const source in linksMap) {
     for (const target of linksMap[source]) {
       links.push({ source, target })
     }
   }
 
-  // Convert Sets to Arrays
   const finalLinksMap: Record<string, string[]> = {}
   const finalBacklinksMap: Record<string, string[]> = {}
 

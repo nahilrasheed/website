@@ -8,7 +8,10 @@ export const remarkAddZoomable: Plugin<[{ className?: string }], Root> =
   ({ className = 'zoomable' }) =>
   (tree) => {
     visit(tree, 'image', (node: Node) => {
-      node.data = { hProperties: { class: className } }
+      node.data = {
+        ...node.data,
+        hProperties: { ...(node.data?.hProperties ?? {}), class: className }
+      }
     })
   }
 
