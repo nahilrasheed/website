@@ -86,16 +86,16 @@ heroImage: # Optional object. Renders a cover image layout with a blur overlay s
 
 ## Markdown Processing Pipeline
 
-### Remark Plugins (AST transforms, [astro.config.ts](astro.config.ts) L105-121)
+### Remark Plugins (AST transforms, [astro.config.ts](astro.config.ts) L80-98)
 
 1. **remarkMath** - Parses LaTeX math expressions
 2. **remarkBreaks** - **Critical**: Single newlines → `<br>` (Obsidian compatibility)
-3. **remarkNormalizeLinks** ([src/plugins/remark-normalize-links.ts](src/plugins/remark-normalize-links.ts)) - Lowercases/sanitizes vault URLs
-4. **remarkWikiLink** (`@flowershow/remark-wiki-link`) - Converts `[[wikilinks]]` to proper URLs using permalink map
+3. **remarkWikiLink** (`@flowershow/remark-wiki-link`) - Converts `[[wikilinks]]` to proper URLs using permalink map
+4. **remarkResolveVaultLinks** ([src/plugins/remark-resolve-vault-links.ts](src/plugins/remark-resolve-vault-links.ts)) - Resolves standard links, images, wikilinks, and embeds through VaultLinkIndex. Handles heading fragments, relative/absolute paths, and Obsidian-style image metadata (`![[image.png|200x100|alt]]`)
 5. **remarkAddZoomable** - Adds `.zoomable` class to images for medium-zoom
 6. **remarkReadingTime** - Injects reading time into frontmatter
 
-### Rehype Plugins (HTML transforms, [astro.config.ts](astro.config.ts) L122-145)
+### Rehype Plugins (HTML transforms, [astro.config.ts](astro.config.ts) L100-120)
 
 1. **rehypeKatex** - Renders math with KaTeX
 2. **rehypeHeadingIds** - Adds IDs to headings for anchor links
@@ -136,21 +136,28 @@ import config from '@/site-config'
 
 ### Vault URL Sanitization
 
-**Critical pattern** in both [astro.config.ts](astro.config.ts) L43-52 and [src/utils/vault.ts](src/utils/vault.ts) L21-29:
+**Single source of truth** in [src/utils/vault-link-index.ts](src/utils/vault-link-index.ts) `normalizeVaultSlug()`:
 
 ```typescript
-function sanitizeSlugPart(part: string): string {
-  return part
-    .toLowerCase()
-    .replace(/[&()[\]{}]/g, '') // Remove brackets/parens
-    .replace(/[,;:!?@#$%^*+=|\\/<>"'`~]/g, '') // Remove punctuation
-    .replace(/\s+/g, '-') // Spaces → dashes
-    .replace(/--+/g, '-') // Dedup dashes
-    .replace(/^-+|-+$/g, '') // Trim edge dashes
+function normalizeVaultSlug(id: string): string {
+  return id
+    .replace(/\.(md|mdx)$/, '')
+    .split('/')
+    .filter(Boolean)
+    .map((part) =>
+      part
+        .toLowerCase()
+        .replace(/[&()[\]{}]/g, '') // Remove brackets/parens
+        .replace(/[,;:!?@#$%^*+=|\\/<>"'`~]/g, '') // Remove punctuation
+        .replace(/\s+/g, '-') // Spaces → dashes
+        .replace(/--+/g, '-') // Dedup dashes
+        .replace(/^-+|-+$/g, '') // Trim edge dashes
+    )
+    .join('/')
 }
 ```
 
-This ensures URL consistency between wikilink resolution and actual page slugs. File paths in `src/content/vault/subfolder/My Note.md` become `/vault/subfolder/my-note`.
+This is re-exported from `src/utils/vault.ts` for backward compatibility. The function also strips `/index` and `/README` suffixes for folder notes. File paths in `src/content/vault/subfolder/My Note.md` become `/vault/subfolder/my-note`.
 
 ### Content Helpers ([src/utils/vault.ts](src/utils/vault.ts))
 
@@ -162,7 +169,7 @@ groupCollectionsByYear() // Groups posts for archives page
 getUniqueVaultTagsWithCount() // Unified tag cloud matching
 getVaultTree() // Recursive tree for navigation (used by sidebar and dashboard)
 getVaultFlatList() // Flattened list of notes for pagination
-sanitizeSlugPart() // Match URL sanitization
+normalizeVaultSlug() // Re-exported from vault-link-index, converts entry IDs to URL slugs
 ```
 
 ### Styling with UnoCSS
@@ -204,9 +211,9 @@ sanitizeSlugPart() // Match URL sanitization
 1. **Shiki transformer types**: Always `@ts-ignore` custom transformers due to nested `@shikijs/types` versions
 2. **Visibility filtering**: Use `getEnrichedVaultCollection()` helper, NOT raw `getCollection('vault')` to ensure entries with `publish: false` are filtered out in production.
 3. **Vault URL matching**: Sanitization must match exactly between:
-   - Permalink map generation ([astro.config.ts](astro.config.ts) L43-52)
+   - Permalink map generation ([src/utils/vault-link-index.ts](src/utils/vault-link-index.ts) `normalizeVaultSlug()`)
    - `sanitizeSlugPart()` in [src/utils/vault.ts](src/utils/vault.ts)
-   - `remarkNormalizeLinks` plugin ([src/plugins/remark-normalize-links.ts](src/plugins/remark-normalize-links.ts))
+   - `remarkResolveVaultLinks` plugin ([src/plugins/remark-resolve-vault-links.ts](src/plugins/remark-resolve-vault-links.ts))
 4. **Line breaks**: `remark-breaks` makes single newlines create `<br>` (different from standard markdown)
 5. **Image paths**:
    - `/src/assets/` - Optimized images processed by Astro
@@ -219,7 +226,9 @@ sanitizeSlugPart() // Match URL sanitization
 - [src/site.config.ts](src/site.config.ts) - Site metadata and feature flags
 - [src/content.config.ts](src/content.config.ts) - Unified content collection schema with type extensibility
 - [src/utils/vault.ts](src/utils/vault.ts) - Vault tree building, sanitization, and queries
+- [src/utils/vault-link-index.ts](src/utils/vault-link-index.ts) - Centralized link resolution index with slug normalization
 - [src/utils/graph.ts](src/utils/graph.ts) - Precomputes node-link graph relationships and backlinks
+- [src/plugins/remark-resolve-vault-links.ts](src/plugins/remark-resolve-vault-links.ts) - Remark plugin resolving links through VaultLinkIndex
 - [src/components/vault/VaultGraph.astro](src/components/vault/VaultGraph.astro) - Force-directed interactive network graph
 - [src/components/vault/Backlinks.astro](src/components/vault/Backlinks.astro) - Backlinks list UI component
 - [src/pages/vault/graph.json.ts](src/pages/vault/graph.json.ts) - Lazy global graph data JSON endpoint

@@ -42,6 +42,8 @@ A fast, elegant personal website combining **blog** and **knowledge vault** - bu
 #### 📝 Enhanced Markdown
 
 - **Obsidian Compatibility**: Single newlines create line breaks via `remark-breaks`
+- **Wikilinks**: Full `[[wikilink]]` support with proper permalink resolution
+- **Vault Link Resolution**: Centralized index resolves standard links, images, embeds, heading fragments, and short-name references
 - **Math Support**: KaTeX rendering for mathematical expressions
 - **Callouts**: Full support for Obsidian-style callouts via `rehype-callouts`
 - **Code Blocks**: Custom transformers with syntax highlighting, copy button, and collapse
@@ -112,6 +114,7 @@ All content lives strictly in the unified `src/content/vault/` directory.
 - **Listing**:
   - **Blog posts** (entries containing `type: 'post'` in frontmatter) are displayed on the `/blog` index page and link directly to `/vault/[...slug]`.
   - **Vault notes** (entries containing `type: 'note'` or defaulting to it) show up in the left tree navigation sidebar and dashboard grid folders.
+- **Media**: Images and assets in `src/content/vault/` are served at `/vault/assets/...` URLs.
 
 #### Frontmatter Reference
 
@@ -147,16 +150,21 @@ heroImage:                   # Optional. Renders a cover image layout with a blu
 
 ```markdown
 <!-- Basic wikilink -->
-
 [[Other Note]]
 
 <!-- Wikilink with custom text -->
-
 [[Other Note|Custom Display Text]]
 
 <!-- Nested paths work automatically -->
-
 [[Folder/Subfolder/Note]]
+
+<!-- Heading fragments -->
+[[Note#Section Heading]]
+
+<!-- Image embeds (Obsidian-style) -->
+![[image.png]]
+![[image.png|200x100]]
+![[image.png|200x100|Alt text]]
 ```
 
 ---
@@ -187,19 +195,17 @@ Edit `src/site.config.ts` to customize:
 The project uses TypeScript path aliases for clean imports:
 
 ```typescript
-// Before (relative paths)
-import Card from '@/components/user/Card.astro'
-// After (path aliases)
-import { cn } from '@/utils'
-
-import { cn } from '../../utils'
-import Card from '../components/Card.astro'
+// Path aliases (configured in tsconfig.json)
+import PageLayout from '@/layouts/BaseLayout.astro'
+import { GithubCard, LinkPreview } from '@/components/advanced'
+import { Paginator, PostPreview } from '@/components/pages'
+import { Button, Card, Icon } from '@/components/user'
+import { cn } from '@/utils/class-merge'
+import { getEnrichedVaultCollection, getVaultTree, sortMDByDate } from '@/utils/vault'
+import config from '@/site-config'
 ```
 
-Configured in `tsconfig.json`:
-
-- `@/*` → `src/*` - Main source directory
-- Enables tree-shaking and better IDE support
+- `@/*` → `src/*` (primary import pattern)
 
 ---
 
@@ -208,20 +214,19 @@ Configured in `tsconfig.json`:
 ```
 ├── src/
 │   ├── content/          # Content collections
-│   │   └── vault/        # Unified Obsidian vault (includes posts, notes, workflows)
+│   │   └── vault/        # Unified Obsidian vault (includes posts, notes, writeups)
 │   ├── components/       # Reusable Astro components
 │   │   ├── advanced/     # Advanced components (GithubCard, LinkPreview, etc)
 │   │   ├── basic/        # Layout components (Header, Footer, ThemeProvider)
 │   │   ├── pages/        # Page-specific components (PostPreview, TOC, Paginator)
 │   │   ├── user/         # UI components (Button, Card, Tabs, Timeline)
 │   │   ├── projects/     # Project-specific components
-│   │   └── vault/        # Vault navigation components
-│   ├── layouts/          # Page layouts
+│   │   └── vault/        # Vault navigation components (VaultTree, VaultGraph, Backlinks)
+│   ├── layouts/          # Page layouts (BaseLayout, VaultLayout, ContentLayout)
 │   ├── pages/            # Route pages
-│   ├── plugins/          # Remark/Rehype plugins
+│   ├── plugins/          # Remark/Rehype plugins and Shiki transformers
 │   ├── types/            # TypeScript type definitions
-│   ├── utils/            # Utility functions
-│   ├── libs/             # Shared libraries
+│   ├── utils/            # Utility functions (vault, graph, vault-link-index)
 │   └── assets/           # Images, styles, fonts
 └── public/               # Static assets (favicon, robots.txt)
 ```
@@ -232,14 +237,15 @@ Configured in `tsconfig.json`:
 
 Inspired by [Astro Theme Pure](https://github.com/cworld1/astro-theme-pure), built as a standalone project:
 
-- **Framework**: [Astro](https://astro.build) 6.0.5 (Astro v6)
+- **Framework**: [Astro](https://astro.build) 7.0.6 (Astro v7)
 - **Runtime**: [Bun](https://bun.sh) (Node.js compatible)
-- **Styling**: [UnoCSS](https://unocss.dev) 0.66.6 with @unocss/preset-typography
+- **Styling**: [UnoCSS](https://unocss.dev) with @unocss/preset-typography
 - **Graph Visualization**: [force-graph](https://github.com/vasturiano/force-graph)
 - **Markdown Processing**:
-  - **Remark**: remark-math, remark-breaks, @flowershow/remark-wiki-link, reading-time
+  - **Remark**: remark-math, remark-breaks, @flowershow/remark-wiki-link, remarkResolveVaultLinks, reading-time
   - **Rehype**: rehype-katex, rehype-callouts, rehype-autolink-headings
-  - **Custom plugins**: Shiki transformers, code collapse, external links, steps/tabs, image zoom
+  - **Custom plugins**: Shiki transformers, code collapse, external links, image zoom
+  - **Link Resolution**: VaultLinkIndex with github-slugger for heading fragments
 - **Search**: [Pagefind](https://pagefind.app/) (automatically indexed post-build)
 - **Type System**: TypeScript with Zod for config validation
 - **Deployment**: [Cloudflare](https://cloudflare.com)
